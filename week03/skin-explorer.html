@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Explorer — BIOL 432 · Week 3 · Lecture 2</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D; --line:#D8D2C4;
+    --tealt:#E3ECEC; --coralt:#F8ECE6; --good:#2F7D5B; --bad:#B5462F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 60px}
+  h1,h2,h3,.serif{font-family:Cambria,Georgia,serif}
+  header{border-bottom:3px solid var(--accent);padding-bottom:18px}
+  .kick{font-size:12px;font-weight:700;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase}
+  h1{font-size:34px;color:var(--dark);margin:6px 0 4px}
+  .sub{color:var(--mute);font-size:16px}
+  .layla{display:flex;gap:14px;align-items:flex-start;background:var(--tealt);border-radius:12px;padding:14px 16px;margin:18px 0 6px;font-size:14.5px}
+  .layla .dot{flex:0 0 38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px}
+  .tabs{display:flex;gap:8px;margin:24px 0 18px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);color:var(--teal);font-weight:600;font-size:15px;padding:9px 18px;border-radius:30px;cursor:pointer;font-family:Calibri,sans-serif;transition:.15s}
+  .tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+  .tab:hover:not(.active){background:var(--tealt)}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 3px 10px rgba(40,40,40,.06)}
+  /* layers explorer */
+  .explore{display:grid;grid-template-columns:300px 1fr;gap:20px}
+  .stack{display:flex;flex-direction:column;gap:4px}
+  .seg{border:none;border-radius:8px;padding:10px 12px;color:#fff;font-family:Calibri,sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:.15s;position:relative;opacity:.9}
+  .seg:hover{opacity:1;transform:translateX(3px)}
+  .seg.active{outline:3px solid var(--accent);outline-offset:1px;opacity:1}
+  .seg small{display:block;font-weight:400;font-size:11.5px;opacity:.9}
+  .info{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;min-height:280px}
+  .info .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;padding:3px 11px;border-radius:20px;margin-bottom:8px}
+  .info h3{font-size:21px;color:var(--dark);margin-bottom:8px}
+  .info p{font-size:15px;margin:8px 0}
+  .info p b{color:var(--teal)}
+  .info ul{margin:6px 0 6px 18px;font-size:14.5px}
+  .info li{margin:4px 0}
+  /* rule of nines */
+  .nines{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+  .regions{display:grid;gap:8px}
+  .reg{display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:11px 15px;cursor:pointer;font-size:15px;font-family:Calibri,sans-serif;transition:.12s}
+  .reg:hover{border-color:var(--sea);background:var(--tealt)}
+  .reg.on{background:var(--coralt);border-color:var(--accent);font-weight:600}
+  .reg .pct{color:var(--mute);font-variant-numeric:tabular-nums}
+  .reg.on .pct{color:var(--accent)}
+  .gauge{background:var(--dark);color:#fff;border-radius:14px;padding:22px;text-align:center;position:sticky;top:14px}
+  .gauge .big{font-size:58px;font-family:Cambria,serif;font-weight:700;line-height:1}
+  .gauge .lbl{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#9FB9BA}
+  .gauge .note{font-size:13.5px;margin-top:14px;background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;line-height:1.45}
+  .gauge .note.crit{background:rgba(217,100,74,.25)}
+  .clr{margin-top:12px;background:transparent;border:1.5px solid #9FB9BA;color:#fff;font-size:13px;padding:7px 16px;border-radius:20px;cursor:pointer;font-family:Calibri,sans-serif}
+  /* quiz */
+  .bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:0 0 16px}
+  .bar>i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;font-size:13.5px;color:var(--mute);margin-bottom:10px}
+  .qtext{font-size:18.5px;font-family:Cambria,serif;color:var(--dark);font-weight:700;margin-bottom:14px}
+  .opts{display:grid;gap:10px}
+  .opt{text-align:left;border:1.5px solid var(--line);background:var(--card);padding:12px 15px;border-radius:10px;font-size:15.5px;color:var(--ink);cursor:pointer;font-family:Calibri,sans-serif;transition:.12s;display:flex;gap:10px;align-items:center}
+  .opt:hover:not(:disabled){border-color:var(--sea);background:var(--tealt)}
+  .opt .mk{flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .opt.correct{border-color:var(--good);background:#EAF4EE}.opt.correct .mk{border-color:var(--good);background:var(--good);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:#FBEDE9}.opt.wrong .mk{border-color:var(--bad);background:var(--bad);color:#fff}
+  .opt:disabled{cursor:default}
+  .fb{margin-top:14px;padding:13px 15px;border-radius:10px;font-size:14.5px;display:none}
+  .fb.show{display:block}.fb.ok{background:#EAF4EE;border:1px solid var(--good)}.fb.no{background:#FBEDE9;border:1px solid var(--bad)}
+  .fb b{font-family:Cambria,serif}
+  .btn{margin-top:14px;background:var(--accent);color:#fff;border:none;font-size:16px;font-weight:600;padding:11px 26px;border-radius:30px;cursor:pointer;font-family:Calibri,sans-serif}
+  .btn:hover{background:#c1543c}.btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}.btn.ghost:hover{background:var(--tealt)}
+  .result{text-align:center;padding:12px}.result .score{font-size:58px;font-family:Cambria,serif;color:var(--teal);font-weight:700}.result .ring{font-size:16px;color:var(--mute);margin-bottom:8px}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--mute);text-align:center}
+  @media(max-width:720px){.explore,.nines{grid-template-columns:1fr}.gauge{position:static}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Week 3 · Lecture 2 · Interactive</div>
+    <h1>Skin Explorer</h1>
+    <div class="sub">Explore the body's largest organ — layer by layer, and at its breaking points.</div>
+  </header>
+
+  <div class="layla">
+    <div class="dot">☀️</div>
+    <div><b>Layla's case.</b> She collapsed running in extreme heat. Her skin was cooling her by sweating and shielding her from UV. Explore how it's built — then use the Rule of Nines to see why skin failure becomes a fluid-balance emergency.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-p="layers">Layers</button>
+    <button class="tab" data-p="nines">Rule of Nines</button>
+    <button class="tab" data-p="quiz">Clinical Quiz</button>
+  </div>
+
+  <!-- LAYERS -->
+  <section class="panel show" id="layers">
+    <div class="card">
+      <p style="font-size:14.5px;color:var(--mute);margin-bottom:14px">Click any layer or appendage to read its structure and function. The stack runs from the surface (top) to the foundation (bottom).</p>
+      <div class="explore">
+        <div class="stack" id="stack"></div>
+        <div class="info" id="info"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RULE OF NINES -->
+  <section class="panel" id="nines">
+    <div class="card">
+      <p style="font-size:14.5px;color:var(--mute);margin-bottom:14px">Tap the burned regions to estimate total body surface area (TBSA). The Rule of Nines divides the adult body into sections of 9% to estimate fluid loss.</p>
+      <div class="nines">
+        <div class="regions" id="regions"></div>
+        <div class="gauge">
+          <div class="lbl">Burned TBSA</div>
+          <div class="big" id="tbsa">0%</div>
+          <div class="note" id="ninesNote">Select burned regions to estimate fluid-resuscitation needs.</div>
+          <button class="clr" id="clrNines">Clear all</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel" id="quiz">
+    <div class="card">
+      <div class="bar"><i id="prog"></i></div>
+      <div class="meta"><span id="qnum"></span><span id="scoreLbl">Score: 0</span></div>
+      <div id="qbody"></div>
+      <div class="fb" id="fb"></div>
+      <button class="btn" id="next" style="display:none">Next →</button>
+    </div>
+  </section>
+
+  <footer>BIOL 432 · Anatomy &amp; Physiology · Dr. Wael M. Osman · Pairs with <b>BIOL432_W3L2_Integumentary.pptx</b></footer>
+</div>
+
+<script>
+/* ===== LAYERS EXPLORER ===== */
+const LAYERS=[
+  {id:'corneum',name:'Stratum corneum',tag:'Epidermis · 5',c:'#0E3A40',html:`<p><b>Structure:</b> 20–30 rows of flat, dead, keratinized cells (corneocytes) — about 75% of epidermal thickness.</p><p><b>Function:</b> The ultimate barrier against water loss, abrasion, and external threats.</p>`},
+  {id:'lucidum',name:'Stratum lucidum',tag:'Epidermis · 4',c:'#14606E',html:`<p><b>Structure:</b> A thin, translucent band of clear, flat, dead keratinocytes.</p><p><b>Function:</b> Reinforcement layer — <b>found only in thick skin</b> (palms, soles).</p>`},
+  {id:'granulosum',name:'Stratum granulosum',tag:'Epidermis · 3',c:'#1C6F73',html:`<p><b>Structure:</b> 4–6 cell layers; keratinization begins. Keratohyaline granules build keratin; lamellar granules release a water-resistant glycolipid.</p><p><b>Function:</b> Waterproofing zone. Cells above this layer die.</p>`},
+  {id:'spinosum',name:'Stratum spinosum',tag:'Epidermis · 2',c:'#4F8A8B',html:`<p><b>Structure:</b> Several layers of "prickle cells" with pre-keratin filaments anchored to desmosomes.</p><p><b>Function:</b> Resists tension and pulling.</p>`},
+  {id:'basale',name:'Stratum basale',tag:'Epidermis · 1',c:'#6FA39E',html:`<p><b>Structure:</b> A single row of actively mitotic stem cells anchored to the dermis; contains melanocytes and tactile (Merkel) cells.</p><p><b>Function:</b> The foundation & factory — the only layer that divides. New cells take 25–45 days to reach the surface.</p>`},
+  {id:'papillary',name:'Papillary dermis',tag:'Dermis',c:'#C98B6B',html:`<p><b>Structure:</b> Areolar connective tissue (~20% of dermis) with dermal papillae carrying capillary loops and touch receptors (Meissner's corpuscles).</p><p><b>Function:</b> Sensation; its loose structure lets phagocytes patrol for invaders. Papillae create friction ridges (fingerprints).</p>`},
+  {id:'reticular',name:'Reticular dermis',tag:'Dermis',c:'#B06A4B',html:`<p><b>Structure:</b> Coarse, dense irregular connective tissue (~80% of dermis); rich in collagen and elastic fibers; holds the cutaneous plexus.</p><p><b>Function:</b> Strength and stretch-recoil. Collagen orientation forms cleavage (tension) lines — surgically important.</p>`},
+  {id:'append',name:'Appendages (hair · glands · nails)',tag:'Epidermal derivatives',c:'#8A6A4A',html:`<p>All appendages derive from the epidermis but project into the dermis.</p><ul><li><b>Hair & follicles:</b> hard-keratin strands; sensation, protection, reduce heat loss. Arrector pili raise "goose bumps."</li><li><b>Sweat glands:</b> eccrine (thermoregulation) and apocrine (scent).</li><li><b>Sebaceous glands:</b> secrete bactericidal sebum to lubricate skin and hair.</li></ul>`},
+  {id:'hypodermis',name:'Hypodermis (subcutaneous)',tag:'Foundation',c:'#D9B26A',html:`<p><b>Structure:</b> Mostly adipose tissue — not technically part of the skin.</p><p><b>Function:</b> Anchors skin to muscle, absorbs shock, and insulates against heat loss.</p>`},
+];
+const stack=document.getElementById('stack'),info=document.getElementById('info');
+LAYERS.forEach((L,k)=>{
+  const b=document.createElement('button');b.className='seg';b.style.background=L.c;
+  b.innerHTML=`${L.name}<small>${L.tag}</small>`;
+  b.onclick=()=>{document.querySelectorAll('.seg').forEach(s=>s.classList.remove('active'));b.classList.add('active');
+    info.innerHTML=`<span class="tag" style="background:${L.c}">${L.tag}</span><h3>${L.name}</h3>${L.html}`;};
+  stack.appendChild(b);
+  if(k===0)setTimeout(()=>b.click(),0);
+});
+
+/* ===== RULE OF NINES ===== */
+const REGIONS=[
+  {n:'Head & neck',p:9},{n:'Right arm',p:9},{n:'Left arm',p:9},
+  {n:'Anterior trunk',p:18},{n:'Posterior trunk',p:18},
+  {n:'Right leg',p:18},{n:'Left leg',p:18},{n:'Perineum',p:1},
+];
+const regBox=document.getElementById('regions');let total=0;
+REGIONS.forEach(R=>{
+  const el=document.createElement('div');el.className='reg';
+  el.innerHTML=`<span>${R.n}</span><span class="pct">${R.p}%</span>`;
+  el.onclick=()=>{el.classList.toggle('on');total+=el.classList.contains('on')?R.p:-R.p;updateNines();};
+  regBox.appendChild(el);
+});
+function updateNines(){
+  document.getElementById('tbsa').textContent=total+'%';
+  const note=document.getElementById('ninesNote');
+  if(total===0){note.className='note';note.textContent='Select burned regions to estimate fluid-resuscitation needs.';}
+  else if(total>=25){note.className='note crit';note.innerHTML=`<b>Critical burn.</b> At ${total}% TBSA, large fluid and electrolyte shifts are expected — the same imbalance treated in Layla's ER visit. Aggressive fluid resuscitation is required.`;}
+  else{note.className='note';note.innerHTML=`${total}% TBSA burned. Burns denature protein and breach the barrier; dehydration and electrolyte loss are the immediate threats to manage.`;}
+}
+document.getElementById('clrNines').onclick=()=>{document.querySelectorAll('.reg').forEach(r=>r.classList.remove('on'));total=0;updateNines();};
+
+/* ===== QUIZ ===== */
+const QUESTIONS=[
+  {q:'Name the only epidermal layer where mitosis occurs.',opts:['Stratum corneum','Stratum granulosum','Stratum basale','Stratum lucidum'],a:2,why:'The stratum basale (germinativum) holds the mitotic stem cells; new cells migrate upward over 25–45 days.'},
+  {q:'Two people have very different skin tones but the same number of melanocytes. The difference is mainly due to the:',opts:['Number of keratinocytes','Amount and form of melanin produced','Thickness of the hypodermis','Amount of carotene in the diet'],a:1,why:'Skin-color variation reflects the amount and form of melanin produced — not the number of melanocytes.'},
+  {q:'A patient is cyanotic (bluish skin). The most likely systemic cause is:',opts:['Liver disorder','Low oxygenation of hemoglobin','Insulin resistance','Anemia'],a:1,why:'Cyanosis signals poorly oxygenated hemoglobin. (Jaundice ↔ liver; "necklace" hyperpigmentation ↔ insulin resistance; pallor ↔ anemia.)'},
+  {q:'Surgeons prefer incisions parallel to cleavage lines because:',opts:['They are easier to see','The skin there has no nerves','Such incisions heal with less scarring','They avoid all blood vessels'],a:2,why:'Cleavage lines follow collagen-bundle orientation in the reticular dermis; cutting parallel to them reduces scarring.'},
+  {q:'Which gland is regulated by the sympathetic nervous system for cooling?',opts:['Apocrine sweat gland','Sebaceous gland','Eccrine (merocrine) sweat gland','Ceruminous gland'],a:2,why:'Eccrine glands are everywhere and provide thermoregulation; the sympathetic nervous system drives sweating to cool the body.'},
+  {q:'A burn shows blisters and involves the epidermis plus the upper dermis. It is classified as:',opts:['First-degree','Second-degree','Third-degree','Fourth-degree'],a:1,why:'Second-degree (partial-thickness) burns reach the upper dermis and blister. Third-degree are full-thickness and painless.'},
+  {q:'Which feature is NOT part of the melanoma ABCD warning rule?',opts:['Asymmetry','Border irregularity','Bleeding','Diameter > 6 mm'],a:2,why:'ABCD = Asymmetry, Border, Color, Diameter. Bleeding is not one of the four letters.'},
+  {q:'The hypodermis is best described as:',opts:['The deepest epidermal stratum','Mostly adipose tissue that anchors and insulates the skin','A serous membrane','The papillary layer of the dermis'],a:1,why:'The hypodermis (subcutaneous tissue) is mainly adipose — not technically skin — anchoring it to muscle and insulating.'},
+];
+let i=0,score=0,answered=false;
+const qbody=document.getElementById('qbody'),fb=document.getElementById('fb'),nextBtn=document.getElementById('next');
+function render(){
+  answered=false;fb.className='fb';nextBtn.style.display='none';
+  const Q=QUESTIONS[i];
+  document.getElementById('prog').style.width=(i/QUESTIONS.length*100)+'%';
+  document.getElementById('qnum').textContent=`Question ${i+1} of ${QUESTIONS.length}`;
+  document.getElementById('scoreLbl').textContent=`Score: ${score}`;
+  let h=`<div class="qtext">${Q.q}</div><div class="opts">`;
+  Q.opts.forEach((o,k)=>h+=`<button class="opt" data-k="${k}"><span class="mk">${String.fromCharCode(65+k)}</span><span>${o}</span></button>`);
+  h+='</div>';qbody.innerHTML=h;
+  qbody.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+}
+function choose(k){
+  if(answered)return;answered=true;
+  const Q=QUESTIONS[i],opts=qbody.querySelectorAll('.opt');
+  opts.forEach(o=>o.disabled=true);opts[Q.a].classList.add('correct');
+  if(k===Q.a){score++;fb.className='fb show ok';fb.innerHTML=`<b>Correct.</b> ${Q.why}`;}
+  else{opts[k].classList.add('wrong');fb.className='fb show no';fb.innerHTML=`<b>Not quite — the answer is ${Q.opts[Q.a]}.</b> ${Q.why}`;}
+  document.getElementById('scoreLbl').textContent=`Score: ${score}`;
+  document.getElementById('prog').style.width=((i+1)/QUESTIONS.length*100)+'%';
+  nextBtn.style.display='inline-block';nextBtn.textContent=i<QUESTIONS.length-1?'Next →':'See results';
+}
+nextBtn.onclick=()=>{if(i<QUESTIONS.length-1){i++;render();}else finish();};
+function finish(){
+  const pct=Math.round(score/QUESTIONS.length*100);
+  const msg=pct>=85?'Excellent — you know the integument inside out.':pct>=65?'Good work. Revisit the Layers tab for the misses.':'Keep practicing — explore the Layers tab, then retry.';
+  qbody.innerHTML=`<div class="result"><div class="score">${score}/${QUESTIONS.length}</div><div class="ring">${pct}% · ${msg}</div></div>`;
+  fb.className='fb';nextBtn.style.display='none';
+  const r=document.createElement('button');r.className='btn ghost';r.textContent='↻ Retry quiz';r.style.display='block';r.style.margin='4px auto 0';
+  r.onclick=()=>{i=0;score=0;render();};qbody.appendChild(r);
+  document.getElementById('prog').style.width='100%';
+}
+render();
+
+/* ===== TABS ===== */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('show'));
+  t.classList.add('active');document.getElementById(t.dataset.p).classList.add('show');
+});
+</script>
+</body>
+</html>

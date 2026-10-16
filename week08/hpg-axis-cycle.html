@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPG Axis & the 28-Day Cycle — BIOL 432 (Endocrine 4)</title>
+<style>
+  :root{
+    --primary:#0E5048; --teal:#0F766E; --tealMid:#14857B; --coral:#EE6C5B; --coralDk:#CF5340;
+    --seafoam:#8FD9C9; --seafoamLt:#DCF1EC; --ink:#133029; --inkSoft:#3F5A53;
+    --cloud:#F1F8F6; --line:#CFE6E0; --paper:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Calibri","Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--cloud);line-height:1.5;padding:24px 16px;}
+  .wrap{max-width:880px;margin:0 auto;}
+  header.top{background:var(--primary);color:#fff;border-radius:18px;padding:26px 30px;position:relative;overflow:hidden;}
+  header.top::after{content:"";position:absolute;right:-50px;top:-50px;width:200px;height:200px;background:var(--teal);border-radius:50%;opacity:.6;}
+  header.top .kick{color:var(--seafoam);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+  header.top h1{font-family:"Cambria",Georgia,serif;font-size:29px;margin:6px 0 6px;position:relative;z-index:1;}
+  header.top p{color:var(--seafoamLt);font-size:15px;position:relative;z-index:1;max-width:640px;}
+  nav.tabs{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap;}
+  nav.tabs button{font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--inkSoft);padding:10px 18px;border-radius:11px;transition:.15s;}
+  nav.tabs button.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(15,80,72,.05);}
+  /* cycle explorer */
+  .dayhead{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+  .dayhead .big{font-family:"Cambria",Georgia,serif;font-size:34px;font-weight:700;color:var(--teal);}
+  .phasechips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{font-size:12.5px;font-weight:700;padding:5px 13px;border-radius:20px;}
+  input[type=range]{width:100%;accent-color:var(--coral);height:6px;margin:14px 0 6px;}
+  .daymarks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--inkSoft);font-weight:700;}
+  .bars{margin:20px 0 6px;display:grid;gap:11px;}
+  .bar-row{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:12px;}
+  .bar-row .lab{font-size:13.5px;font-weight:700;}
+  .track{background:var(--cloud);border:1px solid var(--line);border-radius:8px;height:20px;overflow:hidden;}
+  .fill{height:100%;width:0;border-radius:7px;transition:width .35s ease;}
+  .desc{margin-top:18px;padding:16px 18px;border-radius:12px;border-left:4px solid var(--teal);background:var(--cloud);font-size:14.5px;}
+  .desc b{color:var(--teal);}
+  /* quiz (shared) */
+  .qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--inkSoft);font-weight:700;margin-bottom:6px;}
+  .progress{height:9px;background:var(--seafoamLt);border-radius:6px;overflow:hidden;margin:4px 0 18px;}
+  .progress>div{height:100%;background:var(--coral);width:0;transition:width .35s ease;}
+  .scenario{font-size:18px;font-family:"Cambria",Georgia,serif;color:var(--ink);margin:6px 0 18px;line-height:1.45;}
+  .opts{display:grid;gap:10px;}
+  .opt{font-family:inherit;text-align:left;font-size:15px;cursor:pointer;border:1.5px solid var(--line);background:var(--cloud);color:var(--ink);padding:13px 16px;border-radius:11px;transition:.12s;}
+  .opt:hover:not(:disabled){border-color:var(--tealMid);background:#fff;}
+  .opt:disabled{cursor:default;}
+  .opt.correct{background:#e6f6ef;border-color:var(--teal);color:#0c5a4f;font-weight:700;}
+  .opt.wrong{background:#fce9e5;border-color:var(--coralDk);color:#9c3a2b;}
+  .fb{margin-top:16px;padding:15px 17px;border-radius:12px;border-left:4px solid var(--teal);background:var(--cloud);font-size:14.5px;display:none;}
+  .fb.show{display:block;animation:fade .2s ease;}
+  .fb b{color:var(--teal);}
+  .row{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap;}
+  .btn{font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--coral);color:#fff;padding:11px 22px;border-radius:11px;transition:.15s;}
+  .btn:hover{background:var(--coralDk);}
+  .btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .result{text-align:center;padding:20px 10px;}
+  .result .score{font-family:"Cambria",Georgia,serif;font-size:46px;color:var(--teal);font-weight:700;}
+  .result .msg{font-size:16px;color:var(--inkSoft);margin-top:6px;}
+  /* axis reference */
+  .axis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .axis-col{background:var(--cloud);border:1px solid var(--line);border-radius:13px;padding:16px 18px;}
+  .axis-col h3{font-family:"Cambria",Georgia,serif;font-size:18px;margin-bottom:8px;}
+  .axis-col li{font-size:13.8px;margin:5px 0 5px 16px;color:var(--inkSoft);}
+  .note{font-size:13px;color:var(--inkSoft);font-style:italic;margin-top:18px;text-align:center;}
+  @media(max-width:640px){.axis-grid{grid-template-columns:1fr}.bar-row{grid-template-columns:78px 1fr}header.top h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kick">BIOL 432 · Endocrine System 4</div>
+    <h1>HPG Axis &amp; the 28-Day Cycle</h1>
+    <p>Move through a menstrual cycle one day at a time and watch FSH, LH, estrogen and progesterone drive the ovarian and uterine phases — then test your reasoning.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-p="cycle">Cycle explorer</button>
+    <button class="tab-btn" data-p="quiz">Reasoning quiz</button>
+    <button class="tab-btn" data-p="axis">HPG axis</button>
+  </nav>
+
+  <!-- CYCLE EXPLORER -->
+  <section id="cycle" class="panel active">
+    <div class="card">
+      <div class="dayhead">
+        <div class="big" id="dayLabel">Day 1</div>
+        <div class="phasechips">
+          <span class="chip" id="ovChip"></span>
+          <span class="chip" id="utChip"></span>
+        </div>
+      </div>
+      <input type="range" id="daySlider" min="1" max="28" value="1">
+      <div class="daymarks"><span>Day 1</span><span>7</span><span>14</span><span>21</span><span>28</span></div>
+      <div class="bars" id="bars"></div>
+      <div class="desc" id="dayDesc"></div>
+    </div>
+    <p class="note">Watch the order of events: estrogen climbs → triggers the LH surge (positive feedback) → ovulation (~day 14) → progesterone rises in the luteal phase.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="panel">
+    <div class="card">
+      <div class="qmeta"><span id="qcount"></span><span id="qscore">Score 0</span></div>
+      <div class="progress"><div id="qbar"></div></div>
+      <div id="quizBody">
+        <div class="scenario" id="qtext"></div>
+        <div class="opts" id="qopts"></div>
+        <div class="fb" id="qfb"></div>
+        <div class="row"><button class="btn" id="qnext" disabled>Next →</button></div>
+      </div>
+      <div id="quizResult" class="result" style="display:none;">
+        <div class="score" id="finalScore"></div>
+        <div class="msg" id="finalMsg"></div>
+        <div class="row" style="justify-content:center;"><button class="btn ghost" id="qrestart">Restart quiz</button></div>
+      </div>
+    </div>
+    <p class="note">Reason with the axis: brain → pituitary → gonad → feedback explains nearly every item.</p>
+  </section>
+
+  <!-- AXIS -->
+  <section id="axis" class="panel">
+    <div class="card">
+      <h2 style="font-family:Cambria,Georgia,serif;color:var(--teal);font-size:21px;margin-bottom:4px;">One axis, two patterns</h2>
+      <p style="font-size:14px;color:var(--inkSoft);margin-bottom:14px;">Hypothalamus → GnRH (pulsatile) → anterior pituitary → FSH &amp; LH → gonads → sex steroids + gametes, with feedback.</p>
+      <div class="axis-grid">
+        <div class="axis-col">
+          <h3 style="color:var(--teal)">Male — steady</h3>
+          <ul>
+            <li><b>LH → Leydig cells →</b> testosterone</li>
+            <li><b>FSH → Sertoli cells →</b> androgen-binding protein (keeps intratesticular testosterone high) + inhibin</li>
+            <li>Both are required for spermatogenesis</li>
+            <li>Testosterone &amp; inhibin give negative feedback; output is relatively constant</li>
+          </ul>
+        </div>
+        <div class="axis-col">
+          <h3 style="color:var(--coralDk)">Female — cyclic</h3>
+          <ul>
+            <li><b>Follicular:</b> FSH/LH → estrogen; negative feedback keeps FSH in check</li>
+            <li><b>Ovulation:</b> high estrogen flips to <b>positive feedback</b> → LH surge → ovulation</li>
+            <li><b>Luteal:</b> corpus luteum → progesterone + estrogen → negative feedback</li>
+            <li>No pregnancy → luteal regression → hormones fall → menstruation</li>
+          </ul>
+        </div>
+      </div>
+      <div class="desc" style="margin-top:16px;"><b>The big idea:</b> the same hierarchy produces a steady male pattern and a timed, cyclic female pattern — the difference is the brief positive-feedback LH surge.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ---------- tabs ----------
+var tabBtns=document.querySelectorAll('.tab-btn');
+for(var i=0;i<tabBtns.length;i++){
+  tabBtns[i].addEventListener('click', function(){
+    var p=this.getAttribute('data-p');
+    var b=document.querySelectorAll('.tab-btn');
+    for(var j=0;j<b.length;j++) b[j].classList.remove('active');
+    this.classList.add('active');
+    var pn=document.querySelectorAll('.panel');
+    for(var k=0;k<pn.length;k++) pn[k].classList.remove('active');
+    document.getElementById(p).classList.add('active');
+  });
+}
+
+// ---------- cycle explorer ----------
+function gauss(x,mu,sig){ return Math.exp(-((x-mu)*(x-mu))/(2*sig*sig)); }
+function levels(d){
+  // estrogen: follicular rise to peak ~day12, dip, luteal rise ~day21
+  var e = 12 + 78*gauss(d,12,3.0) + 48*gauss(d,21,4.0);
+  if(d<=5) e = 10 + d*2;
+  e=Math.min(100,e);
+  // LH: low baseline ~12, sharp surge centered day 13.5
+  var lh = 12 + 88*gauss(d,13.5,0.9);
+  // FSH: high early, decline, small ovulatory bump
+  var fsh = 20 + 40*gauss(d,2.5,2.2) + 30*gauss(d,13.5,1.1) + 8;
+  if(d>=16) fsh = 18 + 6*gauss(d,28,3);
+  fsh=Math.min(100,fsh);
+  // progesterone: low follicular, peak ~day22, fall
+  var p = 5 + 85*gauss(d,22,3.4);
+  if(d<=14) p = 5;
+  p=Math.min(100,p);
+  return {e:Math.round(e), lh:Math.round(lh), fsh:Math.round(fsh), p:Math.round(p)};
+}
+function ovPhase(d){ if(d<=13) return ["Follicular phase","#DCF1EC","#0F766E"]; if(d===14) return ["Ovulation","#CF5340","#fff"]; return ["Luteal phase","#8FD9C9","#0E5048"]; }
+function utPhase(d){ if(d<=5) return ["Menstrual","#EE6C5B","#fff"]; if(d<=14) return ["Proliferative","#B7E4D8","#133029"]; return ["Secretory","#F1F8F6","#133029"]; }
+function dayDesc(d){
+  if(d<=5) return "<b>Menstrual phase.</b> Hormones are low after last cycle's luteal regression. FSH begins recruiting a new cohort of follicles; the endometrium is shedding.";
+  if(d<=10) return "<b>Mid-follicular.</b> A dominant follicle grows. Granulosa cells convert thecal androgens to <b>estrogen</b>, which (with inhibin) suppresses FSH — negative feedback narrows the field to one follicle.";
+  if(d<=13) return "<b>Late follicular.</b> Estrogen climbs steeply. Once it is high and sustained, feedback flips from negative to <b>positive</b> — priming the pituitary for a surge.";
+  if(d===14) return "<b>Ovulation.</b> The estrogen-driven <b>LH surge</b> triggers release of the oocyte. This is the one moment of positive feedback in the cycle.";
+  if(d<=23) return "<b>Luteal phase.</b> The ruptured follicle becomes the <b>corpus luteum</b>, secreting <b>progesterone</b> (and estrogen). Progesterone builds the secretory endometrium and restores negative feedback.";
+  return "<b>Late luteal.</b> With no pregnancy, the corpus luteum regresses. Progesterone and estrogen fall, removing endometrial support — menstruation is about to begin, and FSH starts to rise again.";
+}
+var BARDEF=[["Estrogen","e","#0F766E"],["LH","lh","#CF5340"],["FSH","fsh","#14857B"],["Progesterone","p","#DB9430"]];
+(function(){
+  var b=document.getElementById('bars');
+  for(var i=0;i<BARDEF.length;i++){
+    var row=document.createElement('div'); row.className='bar-row';
+    row.innerHTML='<div class="lab" style="color:'+BARDEF[i][2]+'">'+BARDEF[i][0]+'</div>'+
+      '<div class="track"><div class="fill" id="fill_'+BARDEF[i][1]+'" style="background:'+BARDEF[i][2]+'"></div></div>';
+    b.appendChild(row);
+  }
+})();
+var daySlider=document.getElementById('daySlider');
+function updateCycle(){
+  var d=parseInt(daySlider.value,10);
+  document.getElementById('dayLabel').textContent="Day "+d;
+  var L=levels(d);
+  document.getElementById('fill_e').style.width=L.e+"%";
+  document.getElementById('fill_lh').style.width=L.lh+"%";
+  document.getElementById('fill_fsh').style.width=L.fsh+"%";
+  document.getElementById('fill_p').style.width=L.p+"%";
+  var ov=ovPhase(d), ut=utPhase(d);
+  var oc=document.getElementById('ovChip'); oc.textContent="Ovarian: "+ov[0]; oc.style.background=ov[1]; oc.style.color=ov[2];
+  var uc=document.getElementById('utChip'); uc.textContent="Uterine: "+ut[0]; uc.style.background=ut[1]; uc.style.color=ut[2]; uc.style.border="1px solid var(--line)";
+  document.getElementById('dayDesc').innerHTML=dayDesc(d);
+}
+daySlider.addEventListener('input', updateCycle);
+
+// ---------- quiz ----------
+var QUESTIONS=[
+  { q:"A 15-year-old has not begun puberty. Testing shows low FSH and LH. Where does the problem most likely lie?",
+    a:["The gonads can't make sex steroids","Central — low GnRH / gonadotropin output","Excess inhibin from the gonads","Too much positive feedback"], c:1,
+    why:"Low FSH and LH point upstream — the hypothalamus/pituitary aren't driving the gonads. Reason down the axis: brain → pituitary → gonad." },
+  { q:"In a male fertility work-up, sperm count is very low. Beyond testosterone, which signal is essential for spermatogenesis?",
+    a:["Aldosterone","FSH acting on Sertoli cells","Melatonin","ANP"], c:1,
+    why:"Spermatogenesis needs both: LH→testosterone AND FSH→Sertoli-cell support (ABP). Testosterone alone is not sufficient." },
+  { q:"A patient reports sharp one-sided pelvic pain around day 14 of her cycle. What event does this most likely reflect?",
+    a:["Menstruation","The LH surge triggering ovulation","Corpus luteum regression","Endometrial shedding"], c:1,
+    why:"Mid-cycle pain (~day 14) typically reflects ovulation, triggered by the estrogen-driven LH surge." },
+  { q:"What converts the cycle's usual negative feedback into the positive feedback that causes the LH surge?",
+    a:["A sharp fall in estrogen","High, sustained estrogen late in the follicular phase","Rising progesterone","Rising inhibin"], c:1,
+    why:"Sustained high estrogen flips feedback from negative to positive, driving the pituitary LH surge — the one positive-feedback moment in the cycle." },
+  { q:"Which hormone dominates the luteal phase and prepares the secretory endometrium?",
+    a:["FSH","Estrogen","Progesterone","LH"], c:2,
+    why:"After ovulation the corpus luteum secretes progesterone, which builds and stabilises the secretory endometrium." },
+  { q:"A competitive runner under-fuels heavily and her periods stop. What is the primary mechanism?",
+    a:["Ovarian failure from aging","Reduced GnRH pulsatility (functional hypothalamic suppression)","Excess progesterone","A pituitary tumour"], c:1,
+    why:"Energy deficit and stress reduce hypothalamic GnRH pulses → ↓ FSH/LH → ↓ estrogen → disrupted cycling. It is reversible and underlies RED-S." },
+  { q:"Low estrogen from prolonged hypothalamic suppression most directly raises the risk of which problem (linking back to Week 6)?",
+    a:["Hyperglycemia","Reduced bone density and stress fractures","Hypertension","Goiter"], c:1,
+    why:"Estrogen supports bone. Sustained low estrogen lowers bone density — raising stress-fracture risk, the Week 6 connection." },
+];
+var qi=0, score=0, answered=false;
+function renderQ(){
+  answered=false;
+  var Q=QUESTIONS[qi];
+  document.getElementById('qcount').textContent="Question "+(qi+1)+" of "+QUESTIONS.length;
+  document.getElementById('qscore').textContent="Score "+score;
+  document.getElementById('qbar').style.width=(qi/QUESTIONS.length*100)+"%";
+  document.getElementById('qtext').textContent=Q.q;
+  var fb=document.getElementById('qfb'); fb.className='fb'; fb.innerHTML='';
+  var nx=document.getElementById('qnext'); nx.disabled=true;
+  nx.textContent=(qi===QUESTIONS.length-1)?"See results →":"Next →";
+  var opts=document.getElementById('qopts'); opts.innerHTML='';
+  for(var n=0;n<Q.a.length;n++){(function(idx){
+    var bt=document.createElement('button'); bt.className='opt'; bt.textContent=Q.a[idx];
+    bt.addEventListener('click', function(){ pick(idx, bt); });
+    opts.appendChild(bt);
+  })(n);}
+}
+function pick(idx, el){
+  if(answered) return; answered=true;
+  var Q=QUESTIONS[qi];
+  var ob=document.getElementById('qopts').querySelectorAll('.opt');
+  for(var m=0;m<ob.length;m++){ ob[m].disabled=true; if(m===Q.c) ob[m].classList.add('correct'); }
+  if(idx===Q.c) score++; else el.classList.add('wrong');
+  document.getElementById('qscore').textContent="Score "+score;
+  var fb=document.getElementById('qfb'); fb.className='fb show';
+  fb.innerHTML=(idx===Q.c?"<b>Correct.</b> ":"<b>Not quite.</b> ")+Q.why;
+  document.getElementById('qnext').disabled=false;
+}
+document.getElementById('qnext').addEventListener('click', function(){
+  if(!answered) return;
+  if(qi<QUESTIONS.length-1){ qi++; renderQ(); } else { showRes(); }
+});
+function showRes(){
+  document.getElementById('quizBody').style.display='none';
+  document.getElementById('quizResult').style.display='block';
+  document.getElementById('qbar').style.width="100%";
+  document.getElementById('finalScore').textContent=score+" / "+QUESTIONS.length;
+  var pct=score/QUESTIONS.length, msg;
+  if(pct===1) msg="Excellent — you're thinking in axis logic, not isolated facts.";
+  else if(pct>=0.7) msg="Strong. Revisit the misses with the cycle explorer.";
+  else if(pct>=0.5) msg="Decent — replay the cycle explorer and HPG axis tabs, then retry.";
+  else msg="Worth another pass — use the HPG axis tab, then restart.";
+  document.getElementById('finalMsg').textContent=msg;
+}
+document.getElementById('qrestart').addEventListener('click', function(){
+  qi=0; score=0; answered=false;
+  document.getElementById('quizResult').style.display='none';
+  document.getElementById('quizBody').style.display='block';
+  renderQ();
+});
+
+// init
+updateCycle();
+renderQ();
+</script>
+</body>
+</html>

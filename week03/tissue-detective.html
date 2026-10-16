@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tissue Detective — BIOL 432 · Week 3 · Lecture 1</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D; --line:#D8D2C4;
+    --tealt:#E3ECEC; --coralt:#F8ECE6; --good:#2F7D5B; --bad:#B5462F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:28px 20px 60px}
+  h1,h2,h3,.serif{font-family:Cambria,Georgia,serif}
+  header{border-bottom:3px solid var(--accent);padding-bottom:18px;margin-bottom:8px}
+  .kick{font-size:12px;font-weight:700;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase}
+  h1{font-size:34px;color:var(--dark);margin:6px 0 4px}
+  .sub{color:var(--mute);font-size:16px}
+  .layla{display:flex;gap:14px;align-items:flex-start;background:var(--tealt);border-radius:12px;padding:14px 16px;margin:18px 0 6px;font-size:14.5px}
+  .layla .dot{flex:0 0 38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .tabs{display:flex;gap:8px;margin:24px 0 18px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);color:var(--teal);font-weight:600;font-size:15px;padding:9px 18px;border-radius:30px;cursor:pointer;font-family:Calibri,sans-serif;transition:.15s}
+  .tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+  .tab:hover:not(.active){background:var(--tealt)}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 3px 10px rgba(40,40,40,.06)}
+  .bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:0 0 18px}
+  .bar > i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;font-size:13.5px;color:var(--mute);margin-bottom:8px}
+  .qspec{background:var(--tealt);border-left:5px solid var(--sea);border-radius:0 10px 10px 0;padding:14px 16px;margin:6px 0 18px;font-size:16px}
+  .qspec b{color:var(--dark)}
+  .qtext{font-size:19px;font-family:Cambria,serif;color:var(--dark);font-weight:700;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{text-align:left;border:1.5px solid var(--line);background:var(--card);padding:13px 16px;border-radius:10px;font-size:16px;color:var(--ink);cursor:pointer;font-family:Calibri,sans-serif;transition:.12s;display:flex;align-items:center;gap:10px}
+  .opt:hover:not(:disabled){border-color:var(--sea);background:var(--tealt)}
+  .opt .mk{flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+  .opt.correct{border-color:var(--good);background:#EAF4EE}
+  .opt.correct .mk{border-color:var(--good);background:var(--good);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:#FBEDE9}
+  .opt.wrong .mk{border-color:var(--bad);background:var(--bad);color:#fff}
+  .opt:disabled{cursor:default;opacity:.95}
+  .fb{margin-top:16px;padding:14px 16px;border-radius:10px;font-size:15px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#EAF4EE;border:1px solid var(--good)}
+  .fb.no{background:#FBEDE9;border:1px solid var(--bad)}
+  .fb b{font-family:Cambria,serif}
+  .btn{margin-top:16px;background:var(--accent);color:#fff;border:none;font-size:16px;font-weight:600;padding:11px 26px;border-radius:30px;cursor:pointer;font-family:Calibri,sans-serif}
+  .btn:hover{background:#c1543c}
+  .btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+  .btn.ghost:hover{background:var(--tealt)}
+  .result{text-align:center;padding:14px}
+  .result .score{font-size:60px;font-family:Cambria,serif;color:var(--teal);font-weight:700}
+  .result .ring{font-size:17px;color:var(--mute);margin-bottom:10px}
+  /* reference */
+  .lib{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .tcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(40,40,40,.05)}
+  .tcard h3{font-size:17px;color:var(--dark);margin-bottom:2px}
+  .tcard .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;padding:2px 9px;border-radius:20px;margin-bottom:8px}
+  .tcard p{font-size:14px;margin:5px 0}
+  .tcard p b{color:var(--teal)}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--mute);text-align:center}
+  @media(max-width:680px){.lib{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Week 3 · Lecture 1 · Interactive</div>
+    <h1>Tissue Detective</h1>
+    <div class="sub">Identify the tissue from its structure, function, and location.</div>
+  </header>
+
+  <div class="layla">
+    <div class="dot">🏃</div>
+    <div><b>Layla's case.</b> A runner recovering from heat collapse has a torn knee and is being monitored in the ER. As you work each specimen, you're reading the same tissues a clinician must recognize — and predicting how each one heals.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-p="quiz">Quiz</button>
+    <button class="tab" data-p="lib">Reference Library</button>
+  </div>
+
+  <!-- QUIZ -->
+  <section class="panel show" id="quiz">
+    <div class="card">
+      <div class="bar"><i id="prog"></i></div>
+      <div class="meta"><span id="qnum"></span><span id="scoreLbl">Score: 0</span></div>
+      <div id="qbody"></div>
+      <div class="fb" id="fb"></div>
+      <button class="btn" id="next" style="display:none">Next →</button>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section class="panel" id="lib">
+    <div class="lib" id="libGrid"></div>
+  </section>
+
+  <footer>BIOL 432 · Anatomy &amp; Physiology · Dr. Wael M. Osman · Pairs with <b>BIOL432_W3L1_Tissues.pptx</b></footer>
+</div>
+
+<script>
+const C={hyaline:'#14606E',elastic:'#4F8A8B',fibro:'#0E3A40',bone:'#14606E',blood:'#D9644A',skel:'#14606E',card:'#4F8A8B',smooth:'#0E3A40',nerv:'#14606E',cut:'#D9644A',muc:'#14606E',ser:'#4F8A8B'};
+
+const LIB=[
+  {n:'Hyaline cartilage',tag:'Cartilage',c:C.hyaline,d:'Amorphous, firm matrix; collagen forms an imperceptible network.',f:'Supports, cushions, resists compression.',l:'Ends of long bones, ribs, nose, trachea, larynx.'},
+  {n:'Elastic cartilage',tag:'Cartilage',c:C.elastic,d:'Like hyaline but with many elastic fibers.',f:'Maintains shape while bending freely.',l:'External ear and epiglottis.'},
+  {n:'Fibrocartilage',tag:'Cartilage',c:C.fibro,d:'Thick collagen bundles predominate; between hyaline and dense regular CT.',f:'Absorbs compressive shock; high tensile strength.',l:'Intervertebral discs; knee menisci.'},
+  {n:'Bone (osseous)',tag:'Specialized CT',c:C.bone,d:'Hard, calcified matrix; osteons; richly vascularized.',f:'Supports & protects; levers; stores calcium; hematopoiesis.',l:'The skeleton.'},
+  {n:'Blood',tag:'Fluid CT',c:C.blood,d:'Cells in a liquid matrix (plasma); the atypical CT.',f:'Transports gases, nutrients, wastes, hormones.',l:'Within blood vessels.'},
+  {n:'Skeletal muscle',tag:'Muscle',c:C.skel,d:'Long, cylindrical, multinucleate cells with obvious striations.',f:'Voluntary movement; attached to bones.',l:'Skeletal muscles.'},
+  {n:'Cardiac muscle',tag:'Muscle',c:C.card,d:'Branching, striated cells joined by intercalated discs; uninucleate.',f:'Involuntary pumping of blood.',l:'Walls of the heart.'},
+  {n:'Smooth muscle',tag:'Muscle',c:C.smooth,d:'Spindle-shaped cells; no striations; uninucleate.',f:'Involuntary propulsion in sheets.',l:'Walls of hollow organs.'},
+  {n:'Nervous tissue',tag:'Nervous',c:C.nerv,d:'Neurons (conduct impulses) + glial cells (support & insulate).',f:'Regulates and controls body functions.',l:'Brain, spinal cord, nerves.'},
+  {n:'Cutaneous membrane',tag:'Membrane',c:C.cut,d:'Keratinized stratified squamous epithelium on dense irregular CT.',f:'A dry membrane covering the body.',l:'Body exterior (skin).'},
+  {n:'Mucous membrane',tag:'Membrane',c:C.muc,d:'Epithelium over loose CT (lamina propria); moist.',f:'Lines cavities open to the exterior.',l:'Digestive, respiratory, urogenital tracts.'},
+  {n:'Serous membrane',tag:'Membrane',c:C.ser,d:'Mesothelium on areolar CT; secretes serous fluid.',f:'Lines closed ventral cavities.',l:'Pleurae, pericardium, peritoneum.'},
+];
+
+const QUESTIONS=[
+  {spec:'A specimen is firm yet flexible, has <b>no blood vessels</b>, and receives nutrients from a surrounding membrane. Cells sit in lacunae.',q:'What is the broad tissue category?',opts:['Cartilage','Bone','Dense regular CT','Smooth muscle'],a:0,why:'Avascular + nourished by the perichondrium + cells in lacunae are the signature of cartilage — the reason it heals slowly.'},
+  {spec:'Glassy, bluish-white matrix; collagen network is imperceptible. Found at the ends of long bones and in the trachea.',q:'Which cartilage type is this?',opts:['Fibrocartilage','Elastic cartilage','Hyaline cartilage','Reticular tissue'],a:2,why:'Hyaline is the most abundant cartilage — glassy matrix, joint surfaces, trachea, ribs, nose.'},
+  {spec:'Thick collagen bundles predominate; sampled from an <b>intervertebral disc</b>.',q:'Identify the tissue.',opts:['Hyaline cartilage','Fibrocartilage','Bone','Elastic cartilage'],a:1,why:'Fibrocartilage is the most durable cartilage — its collagen lets it absorb compressive shock in discs and knee menisci.'},
+  {spec:'Hard, calcified matrix arranged in osteons. <b>Richly vascularized</b>; cells maintain it from within lacunae.',q:'What tissue is this?',opts:['Cartilage','Bone (osseous)','Dense irregular CT','Cardiac muscle'],a:1,why:'Bone is the calcified, highly vascular CT — the opposite of avascular cartilage, which is why it heals comparatively well.'},
+  {spec:'Cells are suspended in a <b>liquid matrix</b>; its "fibers" appear only during clotting.',q:'This atypical connective tissue is:',opts:['Areolar CT','Blood','Hyaline cartilage','Nervous tissue'],a:1,why:'Blood is the atypical CT — a fluid (plasma) matrix transporting gases, nutrients, wastes, and hormones.'},
+  {spec:'Long, cylindrical, <b>multinucleate</b> cells with obvious striations, attached to the skeleton.',q:'Which muscle type?',opts:['Smooth muscle','Cardiac muscle','Skeletal muscle','Nervous tissue'],a:2,why:'Multinucleate + striated + bone attachment = skeletal muscle (voluntary).'},
+  {spec:'Branching, striated cells linked by <b>intercalated discs</b>; generally one nucleus each.',q:'Identify the muscle.',opts:['Cardiac muscle','Skeletal muscle','Smooth muscle','Fibrocartilage'],a:0,why:'Intercalated discs are unique to cardiac muscle — and it has virtually no regenerative capacity, so scarring impairs the heart.'},
+  {spec:'Spindle-shaped cells, <b>no striations</b>, arranged in sheets within the wall of a hollow organ.',q:'This is:',opts:['Skeletal muscle','Smooth muscle','Cardiac muscle','Bone'],a:1,why:'No striations + spindle cells in sheets = smooth muscle (involuntary), as in the gut and vessel walls.'},
+  {spec:'Branching cells with long processes extend from a nucleus-containing cell body; accompanied by non-excitable supporting cells.',q:'What tissue is shown?',opts:['Nervous tissue','Cardiac muscle','Reticular CT','Elastic cartilage'],a:0,why:'Neurons (the conductors) plus glial/supporting cells (the protectors) define nervous tissue.'},
+  {spec:'A continuous sheet lines the <b>respiratory tract</b>: an epithelium resting on loose CT (lamina propria), kept moist by secretions.',q:'Which membrane is this?',opts:['Serous membrane','Cutaneous membrane','Mucous membrane','Synovial membrane'],a:2,why:'Mucous membranes line cavities open to the exterior and stay moist — the lamina propria is their loose-CT layer.'},
+  {spec:'A two-tissue sheet of mesothelium on areolar CT lines a <b>closed</b> ventral cavity and secretes a slippery fluid.',q:'Identify the membrane.',opts:['Mucous membrane','Serous membrane','Cutaneous membrane','Mucosa'],a:1,why:'Serous membranes (pleurae, pericardium, peritoneum) line closed cavities and reduce friction with serous fluid.'},
+  {spec:'Layla\u2019s knee laceration is healing. The wound shows new capillary-rich tissue with fibroblasts laying collagen across the gap.',q:'Which stage of tissue repair is this?',opts:['Inflammation','Organization','Fibrosis is complete','Regeneration is impossible here'],a:1,why:'Granulation tissue + fibroblasts bridging the gap = the organization stage, which restores blood supply before final repair.'},
+];
+
+// ---- build library ----
+const grid=document.getElementById('libGrid');
+LIB.forEach(t=>{
+  const el=document.createElement('div');el.className='tcard';
+  el.innerHTML=`<span class="tag" style="background:${t.c}">${t.tag}</span><h3>${t.n}</h3>
+    <p><b>Structure:</b> ${t.d}</p><p><b>Function:</b> ${t.f}</p><p><b>Location:</b> ${t.l}</p>`;
+  grid.appendChild(el);
+});
+
+// ---- tabs ----
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('show'));
+  t.classList.add('active');document.getElementById(t.dataset.p).classList.add('show');
+});
+
+// ---- quiz engine ----
+let i=0,score=0,answered=false;
+const qbody=document.getElementById('qbody'),fb=document.getElementById('fb'),nextBtn=document.getElementById('next');
+function render(){
+  answered=false;fb.className='fb';nextBtn.style.display='none';
+  const Q=QUESTIONS[i];
+  document.getElementById('prog').style.width=((i)/QUESTIONS.length*100)+'%';
+  document.getElementById('qnum').textContent=`Specimen ${i+1} of ${QUESTIONS.length}`;
+  document.getElementById('scoreLbl').textContent=`Score: ${score}`;
+  let h=`<div class="qspec">${Q.spec}</div><div class="qtext">${Q.q}</div><div class="opts">`;
+  Q.opts.forEach((o,k)=>{h+=`<button class="opt" data-k="${k}"><span class="mk">${String.fromCharCode(65+k)}</span><span>${o}</span></button>`;});
+  h+=`</div>`;qbody.innerHTML=h;
+  qbody.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(+b.dataset.k));
+}
+function choose(k){
+  if(answered)return;answered=true;
+  const Q=QUESTIONS[i];const opts=qbody.querySelectorAll('.opt');
+  opts.forEach(o=>o.disabled=true);
+  opts[Q.a].classList.add('correct');
+  if(k===Q.a){score++;fb.className='fb show ok';fb.innerHTML=`<b>Correct.</b> ${Q.why}`;}
+  else{opts[k].classList.add('wrong');fb.className='fb show no';fb.innerHTML=`<b>Not quite — the answer is ${Q.opts[Q.a]}.</b> ${Q.why}`;}
+  document.getElementById('scoreLbl').textContent=`Score: ${score}`;
+  document.getElementById('prog').style.width=((i+1)/QUESTIONS.length*100)+'%';
+  nextBtn.style.display='inline-block';
+  nextBtn.textContent = i<QUESTIONS.length-1 ? 'Next →' : 'See results';
+}
+nextBtn.onclick=()=>{ if(i<QUESTIONS.length-1){i++;render();} else finish(); };
+function finish(){
+  const pct=Math.round(score/QUESTIONS.length*100);
+  let msg = pct>=85?'Outstanding — you read tissues like a clinician.':pct>=65?'Solid work. Review the misses in the Reference Library.':'Keep going — revisit the Reference Library, then retry.';
+  qbody.innerHTML=`<div class="result"><div class="score">${score}/${QUESTIONS.length}</div><div class="ring">${pct}% · ${msg}</div></div>`;
+  fb.className='fb';nextBtn.style.display='none';
+  const r=document.createElement('button');r.className='btn ghost';r.textContent='↻ Retry quiz';r.style.display='block';r.style.margin='4px auto 0';
+  r.onclick=()=>{i=0;score=0;render();};qbody.appendChild(r);
+  document.getElementById('prog').style.width='100%';
+}
+render();
+</script>
+</body>
+</html>

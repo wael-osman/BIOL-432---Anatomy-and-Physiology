@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Tissue Self-Check</title>
+<style>
+  :root{--dark:#0E3A40;--teal:#14606E;--accent:#D9644A;--sea:#4F8A8B;--cream:#F4F8F7;--ink:#22373B;--mute:#6C7E81;--line:#DFE9E8;--good:#2E8B6F;--bad:#C24A37;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Calibri,'Segoe UI',Arial,sans-serif;color:var(--ink);background:var(--cream)}
+  header{background:var(--dark);color:#fff;padding:26px 28px}
+  header .kick{color:#9FC6C7;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+  header h1{margin:6px 0 2px;font-family:Cambria,Georgia,serif;font-size:28px}
+  header p{margin:0;color:#AFCFCF;font-size:14px}
+  .tabs{display:flex;gap:6px;padding:14px 28px 0;background:var(--dark);flex-wrap:wrap}
+  .tab{background:#14424A;color:#CFE3E2;border:none;padding:11px 20px;border-radius:10px 10px 0 0;font-size:15px;font-weight:600;cursor:pointer}
+  .tab.active{background:var(--cream);color:var(--teal)}
+  main{max-width:880px;margin:0 auto;padding:28px}
+  .panel{display:none}.panel.active{display:block}
+  .lead{color:var(--mute);font-size:15px;margin:0 0 18px}
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn:hover{filter:brightness(1.07)}.btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.counter{color:var(--mute);font-size:14px}
+  .fc{background:#fff;border:1px solid var(--line);border-radius:16px;min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;padding:34px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.06);user-select:none}
+  .fc .term{font-family:Cambria,Georgia,serif;font-size:26px;font-weight:700;color:var(--teal)}
+  .fc .ans{font-size:18px;color:var(--ink);line-height:1.4}
+  .fcwrap{position:relative}.hint{position:absolute;bottom:12px;right:16px;font-size:12px;color:var(--mute)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+  .card .ask{font-size:14px;color:var(--mute)}
+  .stmt{font-family:Cambria,Georgia,serif;font-size:21px;line-height:1.4;color:var(--ink);margin:8px 0 4px}
+  .choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .choice{flex:1 1 30%;min-width:150px;padding:12px;border:1.5px solid var(--line);border-radius:11px;background:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:center;color:var(--ink)}
+  .choice:hover{border-color:var(--sea)}.choice.correct{border-color:var(--good);background:#EAF6F1;color:var(--good)}.choice.wrong{border-color:var(--bad);background:#FBEDEA;color:var(--bad)}
+  .fb{margin-top:14px;font-size:15px;min-height:22px}.fb b.g{color:var(--good)}.fb b.r{color:var(--bad)}.why{color:var(--mute)}
+  .next-row{margin-top:18px;display:flex;gap:10px;align-items:center}
+  .q{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+  .q .qt{font-weight:700;margin:0 0 12px}
+  .opt{display:block;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}
+  .opt:hover{border-color:var(--sea)}.opt input{margin-right:9px}
+  .opt.correct{border-color:var(--good);background:#EAF6F1}.opt.wrong{border-color:var(--bad);background:#FBEDEA}
+  .exp{margin-top:10px;font-size:14px;color:var(--mute);display:none}.exp.show{display:block}
+  .scorebar{background:var(--dark);color:#fff;border-radius:12px;padding:16px 20px;font-size:18px;font-weight:700;margin-bottom:18px;display:none}.scorebar.show{display:block}
+  .done{font-size:18px;font-weight:700;color:var(--teal)}
+</style>
+</head>
+<body>
+<header>
+  <div class="kick">BIOL 432 · Anatomy &amp; Physiology · Week 2</div>
+  <h1>Tissue Self-Check — The Living Fabric</h1>
+  <p>Flashcards · name that epithelium · auto-graded quiz. Nothing is saved or sent.</p>
+</header>
+<div class="tabs">
+  <button class="tab active" data-tab="cards">Flashcards</button>
+  <button class="tab" data-tab="name">Name that epithelium</button>
+  <button class="tab" data-tab="quiz">Quiz</button>
+</div>
+<main>
+  <section class="panel active" id="cards">
+    <p class="lead">Click the card to flip it.</p>
+    <div class="fcwrap"><div class="fc" id="fc"><span class="content"></span><span class="hint">click to flip</span></div></div>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div class="row"><button class="btn ghost" id="prev">‹ Prev</button><button class="btn ghost" id="next">Next ›</button><button class="btn" id="shuffle">Shuffle</button></div>
+      <span class="counter" id="fcount"></span>
+    </div>
+  </section>
+  <section class="panel" id="name"><p class="lead">Read the description and pick the epithelium.</p><div id="nameBody"></div></section>
+  <section class="panel" id="quiz">
+    <p class="lead">Answer all ten, then check.</p>
+    <div class="scorebar" id="score"></div><div id="qlist"></div>
+    <div class="row"><button class="btn" id="check" style="background:var(--accent)">Check answers</button><button class="btn ghost" id="resetq">Reset</button></div>
+  </section>
+</main>
+
+<script>
+var FLASH=[
+ ["Tissue","A group of similar cells that perform a common function."],
+ ["Histology","The study of tissues."],
+ ["The four tissue types","Epithelial (covers), connective (supports), muscle (moves), nervous (controls)."],
+ ["Polarity","Epithelium has a different apical (free) and basal surface."],
+ ["Avascular","Epithelium has no blood vessels of its own; fed by diffusion."],
+ ["Simple vs stratified","One cell layer (absorb/secrete) vs many layers (protect)."],
+ ["Squamous / cuboidal / columnar","Flat / cube-shaped / tall column-like cells."],
+ ["Simple squamous","Diffusion & filtration; air sacs, vessels, serosae."],
+ ["Simple cuboidal","Secretion & absorption; kidney tubules, gland ducts."],
+ ["Simple columnar","Absorption & secretion; lining of the gut."],
+ ["Pseudostratified columnar","One layer that looks layered; moves mucus; trachea."],
+ ["Stratified squamous","Protection from abrasion; skin, mouth, esophagus."],
+ ["Transitional","Stretches as an organ fills; bladder, ureters."],
+ ["Extracellular matrix","Ground substance + fibres in which CT cells sit."],
+ ["Collagen / elastic / reticular","Strong & tensile / stretch & recoil / fine branched fibres."],
+ ["Four CT classes","Connective tissue proper, cartilage, bone, blood."]
+];
+var EPI=["Simple squamous","Simple cuboidal","Simple columnar","Pseudostratified","Stratified squamous","Transitional"];
+var NAMEQ=[
+ ["A single layer of extremely flat cells in the air sacs of the lungs.","Simple squamous","Thin cells allow rapid gas diffusion."],
+ ["Cube-shaped cells lining the kidney tubules.","Simple cuboidal","Cube cells suit secretion and absorption."],
+ ["A single layer of tall cells lining the digestive tract.","Simple columnar","Tall cells maximise absorptive surface."],
+ ["Looks layered but is one layer; ciliated, lines the trachea.","Pseudostratified","Cilia and goblet cells move a mucus escalator."],
+ ["Many cell layers protecting the skin and esophagus.","Stratified squamous","Layers resist abrasion."],
+ ["Cells that change shape as the bladder fills and empties.","Transitional","It stretches with the organ."],
+ ["A single layer of flat cells lining blood vessels and the heart.","Simple squamous","Smoothness reduces resistance to flow."],
+ ["Cube cells in the secretory ducts of small glands.","Simple cuboidal","Suited to secretion."]
+];
+var QUIZ=[
+ ["A tissue is best defined as:",["A single specialised cell","A group of similar cells with a common function","Any organ","The fluid around cells"],1,"Tissues are groups of similar cells."],
+ ["Which tissue covers and lines surfaces?",["Connective","Muscle","Epithelial","Nervous"],2,"Epithelium covers and lines."],
+ ["\u2018Simple\u2019 in an epithelial name refers to:",["Cell shape","A single cell layer","Lack of function","Location"],1,"Simple = one layer."],
+ ["Flat, scale-like epithelial cells are:",["Cuboidal","Columnar","Squamous","Transitional"],2,"Squamous = flat."],
+ ["Which epithelium lines the bladder and stretches?",["Simple squamous","Transitional","Stratified squamous","Simple columnar"],1,"Transitional stretches."],
+ ["Epithelium is avascular, meaning it:",["Has many vessels","Has no vessels of its own","Cannot regenerate","Has no nerves"],1,"Nourished by diffusion from below."],
+ ["Connective tissue cells are characteristically:",["Packed with no matrix","Suspended in an extracellular matrix","Always ciliated","Avascular sheets"],1,"Cells sit in an ECM."],
+ ["The strongest, most abundant CT fibre is:",["Elastic","Reticular","Collagen","Keratin"],2,"Collagen gives tensile strength."],
+ ["Which is NOT a connective-tissue class?",["Cartilage","Bone","Blood","Epithelium"],3,"Epithelium is its own tissue type."],
+ ["An \u2018osteoblast\u2019 is a cell that:",["Maintains bone passively","Builds bone matrix","Lines the gut","Carries oxygen"],1,"\u2018Blast\u2019 builds; \u2018cyte\u2019 maintains."]
+];
+
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active');};});
+
+/* flashcards */
+var deck=FLASH.slice(),fi=0,flip=false;var fc=document.getElementById('fc'),fcC=fc.querySelector('.content');
+function rc(){flip=false;fcC.className='content term';fcC.textContent=deck[fi][0];document.getElementById('fcount').textContent=(fi+1)+' / '+deck.length;}
+fc.onclick=function(){flip=!flip;if(flip){fcC.className='content ans';fcC.textContent=deck[fi][1];}else{fcC.className='content term';fcC.textContent=deck[fi][0];}};
+document.getElementById('next').onclick=function(){fi=(fi+1)%deck.length;rc();};
+document.getElementById('prev').onclick=function(){fi=(fi-1+deck.length)%deck.length;rc();};
+document.getElementById('shuffle').onclick=function(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=deck[i];deck[i]=deck[j];deck[j]=t;}fi=0;rc();};
+rc();
+
+/* name that epithelium */
+var ni=0,nScore=0,nLock=false;var nb=document.getElementById('nameBody');
+function showName(){
+  if(ni>=NAMEQ.length){nb.innerHTML='<div class="card"><div class="done">Done! You scored '+nScore+' / '+NAMEQ.length+'.</div></div><div class="next-row"><button class="btn ghost" id="nR">Restart</button></div>';document.getElementById('nR').onclick=function(){ni=0;nScore=0;showName();};return;}
+  nLock=false;var it=NAMEQ[ni];
+  var btns=EPI.map(function(e){return '<button class="choice" data-v="'+e+'">'+e+'</button>';}).join('');
+  nb.innerHTML='<div class="card"><div class="ask">Which epithelium?</div><div class="stmt">\u201C'+it[0]+'\u201D</div><div class="choices">'+btns+'</div><div class="fb" id="nfb"></div></div><div class="next-row"><button class="btn" id="nnext" style="display:none">Next \u203A</button><span class="counter">Item '+(ni+1)+' of '+NAMEQ.length+'  ·  score '+nScore+'</span></div>';
+  nb.querySelectorAll('.choice').forEach(function(b){b.onclick=function(){
+    if(nLock)return;nLock=true;var picked=b.dataset.v,correct=it[1];
+    nb.querySelectorAll('.choice').forEach(function(x){if(x.dataset.v===correct)x.classList.add('correct');});
+    var fb=document.getElementById('nfb');
+    if(picked===correct){nScore++;fb.innerHTML='<b class="g">Correct.</b> <span class="why">'+it[2]+'</span>';}
+    else{b.classList.add('wrong');fb.innerHTML='<b class="r">It\u2019s '+correct+'.</b> <span class="why">'+it[2]+'</span>';}
+    var nx=document.getElementById('nnext');nx.style.display='inline-block';nx.onclick=function(){ni++;showName();};
+  };});
+}
+showName();
+
+/* quiz */
+var qlist=document.getElementById('qlist');
+function buildQuiz(){qlist.innerHTML='';QUIZ.forEach(function(item,qi){var d=document.createElement('div');d.className='q';d.id='q'+qi;var h=document.createElement('p');h.className='qt';h.textContent=(qi+1)+'. '+item[0];d.appendChild(h);item[1].forEach(function(opt,oi){var l=document.createElement('label');l.className='opt';l.innerHTML='<input type="radio" name="q'+qi+'" value="'+oi+'">'+opt;d.appendChild(l);});var e=document.createElement('div');e.className='exp';e.textContent='Why: '+item[3];d.appendChild(e);qlist.appendChild(d);});}
+document.getElementById('check').onclick=function(){var correct=0;QUIZ.forEach(function(item,qi){var chosen=document.querySelector('input[name="q'+qi+'"]:checked');var labels=document.querySelectorAll('#q'+qi+' .opt');labels.forEach(function(l){l.classList.remove('correct','wrong');});labels[item[2]].classList.add('correct');if(chosen){var ci=parseInt(chosen.value,10);if(ci===item[2])correct++;else labels[ci].classList.add('wrong');}document.querySelector('#q'+qi+' .exp').classList.add('show');});var sb=document.getElementById('score');sb.classList.add('show');sb.textContent='You scored '+correct+' / '+QUIZ.length+'.  '+(correct===QUIZ.length?'Excellent.':correct>=7?'Strong — review the misses.':'Revisit the flashcards and try again.');sb.scrollIntoView({behavior:'smooth',block:'center'});};
+document.getElementById('resetq').onclick=function(){buildQuiz();document.getElementById('score').classList.remove('show');};
+buildQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuron Navigator · BIOL 432 · Week 4 · Lecture 1</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D;
+    --line:#D8D2C4; --tealt:#E3ECEC; --coralt:#F6E2DB; --good:#2F7D5B; --gold:#C98A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;padding:24px 16px 60px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1,h2,h3,.kicker{font-family:Cambria,Georgia,serif}
+  .kicker{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+  header h1{font-size:1.95rem;color:var(--dark);line-height:1.15;margin-bottom:10px}
+  .lede{color:var(--ink);font-size:1.02rem;max-width:760px}
+  .layla{background:var(--coralt);border-left:5px solid var(--accent);border-radius:8px;padding:14px 18px;margin:18px 0 22px;font-size:.96rem}
+  .layla b{color:var(--dark)}
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;border-bottom:2px solid var(--line);padding-bottom:2px}
+  .tab{font-family:Cambria,serif;font-size:.95rem;font-weight:700;color:var(--mute);background:none;border:none;padding:10px 16px;cursor:pointer;border-radius:8px 8px 0 0;transition:.15s}
+  .tab:hover{color:var(--teal);background:var(--tealt)}
+  .tab.active{color:#fff;background:var(--teal)}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(14,58,64,.05)}
+  h2{font-size:1.32rem;color:var(--dark);margin-bottom:4px}
+  h2 .sub{display:block;font-family:Calibri,sans-serif;font-weight:400;font-size:.9rem;color:var(--mute);margin-top:2px}
+  h3{font-size:1.05rem;color:var(--teal);margin:14px 0 8px}
+  /* cell grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:6px}
+  .cell{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:center;transition:.15s}
+  .cell:hover{border-color:var(--sea);transform:translateY(-2px)}
+  .cell.sel{border-color:var(--teal);background:var(--tealt)}
+  .cell .ico{font-size:1.7rem;line-height:1}
+  .cell .nm{font-family:Cambria,serif;font-weight:700;color:var(--dark);font-size:.95rem;margin-top:6px}
+  .cell .loc{font-size:.72rem;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+  .detail{margin-top:14px;background:var(--tealt);border-radius:10px;padding:14px 16px;min-height:54px;font-size:.96rem}
+  .detail.empty{color:var(--mute);font-style:italic;background:var(--paper)}
+  .detail b{color:var(--teal)}
+  /* reflex builder */
+  .pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .chip{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:8px 16px;font-weight:600;font-size:.9rem;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--accent)}
+  .chip:disabled{opacity:.35;cursor:default;border-style:dashed}
+  .slots{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
+  .slot{min-width:120px;min-height:48px;border:2px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--mute);padding:6px 10px;text-align:center}
+  .slot.filled{border-style:solid;border-color:var(--teal);background:var(--tealt);color:var(--dark);font-weight:700}
+  .slot.ok{border-color:var(--good);background:#E6F1EA}
+  .slot.bad{border-color:var(--accent);background:var(--coralt)}
+  .arrow{color:var(--sea);font-weight:700;font-size:1.2rem}
+  /* sorter */
+  .sortwrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .bin{border:2px solid var(--line);border-radius:10px;padding:12px;min-height:80px}
+  .bin h4{font-family:Cambria,serif;text-align:center;color:#fff;border-radius:7px;padding:6px;margin:-12px -12px 10px;font-size:.95rem}
+  .bin.cns h4{background:var(--teal)} .bin.pns h4{background:var(--sea)}
+  .feat{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:.86rem;cursor:pointer;transition:.15s}
+  .feat:hover{border-color:var(--accent)}
+  .feat.placed{cursor:default}
+  .feat.ok{border-color:var(--good);background:#E6F1EA}
+  .feat.bad{border-color:var(--accent);background:var(--coralt)}
+  .featpool{display:flex;flex-direction:column;gap:0}
+  /* NCS sliders */
+  .slider-row{margin:16px 0}
+  .slider-row label{display:flex;justify-content:space-between;font-weight:600;font-size:.92rem;margin-bottom:6px}
+  .slider-row .val{color:var(--teal);font-family:Cambria,serif}
+  input[type=range]{width:100%;accent-color:var(--teal)}
+  .verdict{margin-top:16px;border-radius:10px;padding:16px 18px;font-size:1rem;border-left:5px solid var(--teal);background:var(--tealt)}
+  .verdict.dem{border-color:var(--gold);background:#FBF3E2}
+  .verdict.ax{border-color:var(--accent);background:var(--coralt)}
+  .verdict.norm{border-color:var(--good);background:#E6F1EA}
+  .verdict b{font-family:Cambria,serif}
+  .btn{font-family:Cambria,serif;font-weight:700;font-size:.9rem;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;transition:.15s}
+  .btn:hover{background:var(--dark)}
+  .btn.ghost{background:none;color:var(--teal);border:1.5px solid var(--teal)}
+  .btn.ghost:hover{background:var(--tealt)}
+  .feedback{margin-top:12px;font-weight:700;font-size:.95rem;min-height:22px}
+  .feedback.win{color:var(--good)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  footer{text-align:center;color:var(--mute);font-size:.8rem;margin-top:26px}
+  .pill{display:inline-block;background:var(--dark);color:#fff;font-size:.7rem;letter-spacing:.05em;padding:3px 10px;border-radius:20px;font-family:Cambria,serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">BIOL 432 · Week 4 · Lecture 1</div>
+    <h1>Neuron Navigator</h1>
+    <p class="lede">An interactive tour of the cells, wiring, and clinical logic of the nervous system. Four hands-on stations — explore the cells, build a reflex arc, sort CNS vs PNS myelin, and read a nerve-conduction study.</p>
+    <div class="layla">
+      <b>Layla is in the ER.</b> The heat-collapse runner now has a <b>numb patch on her right foot</b> and brisk knee jerks. Every station below maps onto a question her neuro exam is asking — which cells carry her signals, how the reflex is wired, and where a lesion could hide.
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-p="cells">① The Cells</button>
+    <button class="tab" data-p="reflex">② Reflex Arc</button>
+    <button class="tab" data-p="myelin">③ Myelin Sorter</button>
+    <button class="tab" data-p="ncs">④ NCS Interpreter</button>
+  </div>
+
+  <!-- CELLS -->
+  <section class="panel active" id="cells">
+    <div class="card">
+      <h2>Meet the cells<span class="sub">Tap a cell to see its job. Neurons conduct; glia support — but "support" does a lot of work.</span></h2>
+      <div class="grid" id="cellGrid"></div>
+      <div class="detail empty" id="cellDetail">Select a cell above to read its role and clinical relevance.</div>
+    </div>
+  </section>
+
+  <!-- REFLEX -->
+  <section class="panel" id="reflex">
+    <div class="card">
+      <h2>Build Layla's knee-jerk reflex<span class="sub">Click the components in the correct order, receptor → effector. Five parts, one pathway.</span></h2>
+      <div class="pool" id="reflexPool"></div>
+      <div class="slots" id="reflexSlots"></div>
+      <div class="row">
+        <button class="btn" id="reflexCheck">Check order</button>
+        <button class="btn ghost" id="reflexReset">Reset</button>
+      </div>
+      <div class="feedback" id="reflexFb"></div>
+    </div>
+  </section>
+
+  <!-- MYELIN -->
+  <section class="panel" id="myelin">
+    <div class="card">
+      <h2>CNS vs PNS myelin<span class="sub">Tap a feature, then tap the bin it belongs to. Same insulation problem, two different solvers.</span></h2>
+      <div class="featpool" id="featPool"></div>
+      <div class="sortwrap">
+        <div class="bin cns" id="binCNS"><h4>CNS · Oligodendrocyte</h4></div>
+        <div class="bin pns" id="binPNS"><h4>PNS · Schwann cell</h4></div>
+      </div>
+      <div class="row"><button class="btn ghost" id="myelinReset">Reset</button></div>
+      <div class="feedback" id="myelinFb"></div>
+    </div>
+  </section>
+
+  <!-- NCS -->
+  <section class="panel" id="ncs">
+    <div class="card">
+      <h2>Read the nerve-conduction study<span class="sub">Two dials, two failure modes. Slide them and watch the diagnosis update in real time.</span></h2>
+      <div class="slider-row">
+        <label>Conduction velocity <span class="val" id="velVal">55 m/s</span></label>
+        <input type="range" id="vel" min="10" max="65" value="55">
+      </div>
+      <div class="slider-row">
+        <label>Response amplitude <span class="val" id="ampVal">100 %</span></label>
+        <input type="range" id="amp" min="15" max="100" value="100">
+      </div>
+      <div class="verdict norm" id="ncsVerdict"></div>
+    </div>
+  </section>
+
+  <footer><span class="pill">Neuron Navigator</span> &nbsp; BIOL 432 · Anatomy &amp; Physiology · Dr. Wael M. Osman · The Layla Case</footer>
+</div>
+
+<script>
+/* ---------- tabs ---------- */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const b=e.target.closest('.tab'); if(!b)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById(b.dataset.p).classList.add('active');
+});
+
+/* ---------- cells ---------- */
+const CELLS=[
+  {ic:'🧠',nm:'Neuron',loc:'CNS & PNS',d:'The <b>conducting cell</b> — receives, integrates, and transmits electrical signals. Long-lived, mostly amitotic, and metabolically hungry, so it tolerates Layla\'s heat-driven ischaemia poorly.'},
+  {ic:'⭐',nm:'Astrocyte',loc:'CNS',d:'Forms the <b>blood–brain barrier</b>, buffers extracellular K⁺, and recycles neurotransmitter. The most abundant CNS glia and the climate-control system for firing.'},
+  {ic:'🛡️',nm:'Microglia',loc:'CNS',d:'The brain\'s <b>resident immune cell</b> — phagocytoses debris and pathogens. Activates after injury or infection.'},
+  {ic:'💧',nm:'Ependymal',loc:'CNS',d:'Lines the ventricles and central canal; <b>produces and circulates cerebrospinal fluid</b> with its cilia.'},
+  {ic:'🧬',nm:'Oligodendrocyte',loc:'CNS',d:'Makes <b>CNS myelin</b> — one cell wraps <b>many</b> axons. Target of multiple sclerosis. Uses PLP and MBP.'},
+  {ic:'🔘',nm:'Satellite',loc:'PNS',d:'Surrounds and cushions <b>cell bodies in ganglia</b>, regulating their chemical environment — the PNS analogue of the astrocyte.'},
+  {ic:'🌀',nm:'Schwann',loc:'PNS',d:'Makes <b>PNS myelin</b> — one cell forms <b>one</b> internode. Crucially, it <b>scaffolds nerve repair</b>, which the CNS largely cannot manage. Uses P0 and PMP22.'},
+];
+const grid=document.getElementById('cellGrid'), cd=document.getElementById('cellDetail');
+CELLS.forEach((c,i)=>{
+  const el=document.createElement('div'); el.className='cell'; el.dataset.i=i;
+  el.innerHTML=`<div class="ico">${c.ic}</div><div class="nm">${c.nm}</div><div class="loc">${c.loc}</div>`;
+  el.onclick=()=>{document.querySelectorAll('.cell').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');cd.className='detail';cd.innerHTML=c.d;};
+  grid.appendChild(el);
+});
+
+/* ---------- reflex ---------- */
+const REFLEX=[
+  {k:'Receptor',t:'Receptor',h:'Muscle spindle senses the stretch from the tendon tap'},
+  {k:'Sensory',t:'Sensory neuron',h:'Afferent fibre carries the signal to the cord'},
+  {k:'Integration',t:'Integration centre',h:'Synapse in the spinal cord'},
+  {k:'Motor',t:'Motor neuron',h:'Efferent fibre carries the command out'},
+  {k:'Effector',t:'Effector',h:'Quadriceps contracts — the leg kicks'},
+];
+const order=['Receptor','Sensory','Integration','Motor','Effector'];
+let placed=[];
+const rPool=document.getElementById('reflexPool'), rSlots=document.getElementById('reflexSlots'), rFb=document.getElementById('reflexFb');
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function renderReflex(){
+  rPool.innerHTML=''; rSlots.innerHTML=''; rFb.textContent='';
+  shuffle(REFLEX).forEach(r=>{
+    const b=document.createElement('button'); b.className='chip'; b.textContent=r.t; b.dataset.k=r.k;
+    b.disabled=placed.includes(r.k);
+    b.onclick=()=>{if(placed.length<5){placed.push(r.k);drawSlots();b.disabled=true;}};
+    rPool.appendChild(b);
+  });
+  drawSlots();
+}
+function drawSlots(){
+  rSlots.innerHTML='';
+  for(let i=0;i<5;i++){
+    if(i>0){const a=document.createElement('span');a.className='arrow';a.textContent='→';rSlots.appendChild(a);}
+    const s=document.createElement('div'); s.className='slot';
+    if(placed[i]){const r=REFLEX.find(x=>x.k===placed[i]);s.className='slot filled';s.textContent=r.t;}
+    else s.textContent='—';
+    rSlots.appendChild(s);
+  }
+}
+document.getElementById('reflexCheck').onclick=()=>{
+  if(placed.length<5){rFb.textContent='Place all five components first.';rFb.className='feedback';return;}
+  const slots=rSlots.querySelectorAll('.slot'); let ok=true;
+  placed.forEach((k,i)=>{if(k===order[i])slots[i].classList.add('ok');else{slots[i].classList.add('bad');ok=false;}});
+  if(ok){rFb.textContent='✓ Correct — that is exactly the path of Layla\'s knee jerk.';rFb.className='feedback win';}
+  else{rFb.textContent='Not quite — the signal must run receptor → sensory → integration → motor → effector. Reset and try again.';rFb.className='feedback';}
+};
+document.getElementById('reflexReset').onclick=()=>{placed=[];renderReflex();};
+renderReflex();
+
+/* ---------- myelin sorter ---------- */
+const FEATS=[
+  {t:'One cell myelinates many axons',a:'CNS'},
+  {t:'One cell forms a single internode',a:'PNS'},
+  {t:'Uses PLP and MBP',a:'CNS'},
+  {t:'Uses P0 and PMP22',a:'PNS'},
+  {t:'Scaffolds regeneration after injury',a:'PNS'},
+  {t:'Poor repair; forms a glial scar',a:'CNS'},
+  {t:'Signature disease: multiple sclerosis',a:'CNS'},
+  {t:'Signature disease: Guillain-Barré',a:'PNS'},
+];
+let sel=null, sortDone=0;
+const fp=document.getElementById('featPool'), mFb=document.getElementById('myelinFb');
+function renderMyelin(){
+  fp.innerHTML=''; sortDone=0; sel=null; mFb.textContent='';
+  document.querySelectorAll('#binCNS .feat,#binPNS .feat').forEach(x=>x.remove());
+  shuffle(FEATS).forEach(f=>{
+    const el=document.createElement('div'); el.className='feat'; el.textContent=f.t; el.dataset.a=f.a;
+    el.onclick=()=>{if(el.classList.contains('placed'))return;document.querySelectorAll('.feat').forEach(x=>x.style.outline='');el.style.outline='2px solid var(--accent)';sel=el;};
+    fp.appendChild(el);
+  });
+}
+function placeInBin(bin){
+  if(!sel)return;
+  const correct=sel.dataset.a===bin;
+  sel.classList.add('placed', correct?'ok':'bad'); sel.style.outline='';
+  document.getElementById(bin==='CNS'?'binCNS':'binPNS').appendChild(sel);
+  sel.onclick=null; sel=null; sortDone++;
+  if(sortDone===FEATS.length){
+    const wrong=document.querySelectorAll('.feat.bad').length;
+    mFb.textContent= wrong===0 ? '✓ All sorted correctly — you have the CNS/PNS myelin map.' : `${FEATS.length-wrong} of ${FEATS.length} correct. Red tiles are misplaced — reset to retry.`;
+    mFb.className= wrong===0 ? 'feedback win':'feedback';
+  }
+}
+document.getElementById('binCNS').onclick=()=>placeInBin('CNS');
+document.getElementById('binPNS').onclick=()=>placeInBin('PNS');
+document.getElementById('myelinReset').onclick=renderMyelin;
+renderMyelin();
+
+/* ---------- NCS ---------- */
+const vel=document.getElementById('vel'), amp=document.getElementById('amp');
+const velVal=document.getElementById('velVal'), ampVal=document.getElementById('ampVal'), verdict=document.getElementById('ncsVerdict');
+function updateNCS(){
+  const v=+vel.value, a=+amp.value;
+  velVal.textContent=v+' m/s'; ampVal.textContent=a+' %';
+  const slow=v<40, low=a<60;
+  let cls,html;
+  if(!slow&&!low){cls='norm';html='<b>Normal study.</b> Velocity and amplitude both within range — conduction is intact. No demyelination or axonal loss detected.';}
+  else if(slow&&!low){cls='dem';html='<b>Demyelinating pattern.</b> Velocity is slowed but amplitude is preserved — the insulation is failing, not the axon. Saltatory conduction is impaired. Think MS (CNS) or Guillain-Barré / CMT (PNS).';}
+  else if(!slow&&low){cls='ax';html='<b>Axonal pattern.</b> Amplitude is reduced but velocity is near-normal — fewer working fibres (the wire itself is lost), each surviving one still conducting at speed.';}
+  else{cls='ax';html='<b>Mixed / severe.</b> Both slowed and low-amplitude — advanced disease with demyelination and secondary axonal loss. The signal to Layla\'s foot could fail here.';}
+  verdict.className='verdict '+cls; verdict.innerHTML=html;
+}
+vel.oninput=updateNCS; amp.oninput=updateNCS; updateNCS();
+</script>
+</body>
+</html>

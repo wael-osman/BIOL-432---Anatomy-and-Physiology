@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Bone Explorer</title>
+<style>
+  :root{
+    --deep:#0E4F52; --teal:#2E8B86; --sea:#6FB7B0; --seaTint:#E4F1EF;
+    --coral:#EE6A4C; --coralDk:#C44E36; --ink:#12343B; --muted:#5E7C7E;
+    --paper:#F4F8F7; --line:#CBE0DD; --gold:#E5A742;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:linear-gradient(160deg,#F4F8F7,#E4F1EF);color:var(--ink);line-height:1.5;padding:24px;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{background:var(--deep);color:#fff;border-radius:18px;padding:26px 30px;box-shadow:0 8px 24px rgba(14,79,82,.25);position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(111,183,176,.25)}
+  .kick{font-size:12px;letter-spacing:3px;font-weight:700;color:var(--sea);text-transform:uppercase}
+  h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:6px 0 4px}
+  header p{color:#BFE0DC;font-size:15px;font-style:italic}
+  .tabs{display:flex;gap:8px;margin-top:20px}
+  .tab{flex:1;text-align:center;background:#fff;border:1.5px solid var(--line);border-radius:12px 12px 0 0;padding:14px;font-weight:700;color:var(--muted);cursor:pointer;font-size:15px}
+  .tab.active{background:var(--deep);color:#fff;border-color:var(--deep)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:0 0 16px 16px;padding:24px;box-shadow:0 4px 14px rgba(14,79,82,.06)}
+  .panel{display:none} .panel.active{display:block}
+  h2{font-family:Cambria,Georgia,serif;color:var(--deep);font-size:21px;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .bone-name{font-family:Cambria,serif;font-size:28px;color:var(--deep);font-weight:700;text-align:center;margin:8px 0}
+  .bone-hint{text-align:center;color:var(--muted);font-style:italic;margin-bottom:18px}
+  .opts4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:680px){.opts4{grid-template-columns:repeat(2,1fr)}}
+  .shape{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:18px 10px;text-align:center;cursor:pointer;font-weight:600;color:var(--deep);transition:.15s}
+  .shape:hover{border-color:var(--sea);transform:translateY(-2px)}
+  .shape.correct{background:#e2f3ee;border-color:var(--teal)}
+  .shape.wrong{background:#fde7e1;border-color:var(--coral);color:var(--coralDk)}
+  .shape .ic{font-size:26px;display:block;margin-bottom:6px}
+  .fb{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--seaTint);font-size:14px;display:none}
+  .fb.show{display:block}
+  .row{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .progress{font-weight:700;color:var(--muted)}
+  button{font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:10px;padding:10px 18px;cursor:pointer}
+  .btn-primary{background:var(--coral);color:#fff;box-shadow:0 3px 8px rgba(238,106,76,.35)}
+  .btn-ghost{background:#fff;color:var(--deep);border:1.5px solid var(--line)}
+  .score{font-family:Cambria,serif;font-size:18px;color:var(--deep);font-weight:700}
+  /* simulator */
+  .sim{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+  @media(max-width:820px){.sim{grid-template-columns:1fr}}
+  .slider-block{margin-bottom:18px}
+  .slider-block label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:6px}
+  .slider-block .val{color:var(--coralDk);font-weight:700}
+  input[type=range]{width:100%;accent-color:var(--teal);height:6px}
+  .scale-vis{background:var(--seaTint);border-radius:14px;padding:20px;text-align:center}
+  .balance{position:relative;height:140px;margin:10px 0}
+  .density-meter{margin-top:10px}
+  .dm-bar{height:26px;border-radius:14px;background:#dfeceb;overflow:hidden;border:1px solid var(--line)}
+  .dm-bar > i{display:block;height:100%;transition:width .4s,background .4s;border-radius:14px}
+  .verdict{font-family:Cambria,serif;font-weight:700;font-size:18px;margin-top:12px;padding:12px;border-radius:10px;text-align:center}
+  .cells{display:flex;gap:12px;margin-top:6px}
+  .cell{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+  .cell .num{font-family:Cambria,serif;font-size:24px;font-weight:700}
+  .cell .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Musculoskeletal System</div>
+    <h1>Bone Explorer</h1>
+    <p>Classify bones by shape, then balance the remodelling crew to keep Layla's skeleton strong.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-p="classify">① Classification Challenge</div>
+    <div class="tab" data-p="remodel">② Remodelling Balance</div>
+  </div>
+
+  <div class="card">
+    <!-- PANEL 1 -->
+    <div class="panel active" id="classify">
+      <h2>Classification challenge</h2>
+      <div class="sub">Read each bone and choose its shape category. You get one guess per bone.</div>
+      <div class="bone-name" id="boneName"></div>
+      <div class="bone-hint" id="boneHint"></div>
+      <div class="opts4" id="shapeOpts"></div>
+      <div class="fb" id="classFb"></div>
+      <div class="row">
+        <div class="progress" id="classProg"></div>
+        <div>
+          <span class="score" id="classScore"></span>
+          <button class="btn-primary" id="nextBone" style="margin-left:12px;display:none">Next bone ›</button>
+          <button class="btn-ghost" id="restartClass" style="margin-left:6px;display:none">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2 -->
+    <div class="panel" id="remodel">
+      <h2>Remodelling balance simulator</h2>
+      <div class="sub">Bone is rebuilt continuously by builders (osteoblasts) and resorbers (osteoclasts). Adjust the inputs and watch the density change.</div>
+      <div class="sim">
+        <div>
+          <div class="slider-block">
+            <label>Mechanical load (Wolff's law) <span class="val" id="loadV">Moderate</span></label>
+            <input type="range" id="load" min="0" max="100" value="55">
+          </div>
+          <div class="slider-block">
+            <label>Estrogen level <span class="val" id="estV">Normal</span></label>
+            <input type="range" id="est" min="0" max="100" value="70">
+          </div>
+          <div class="slider-block">
+            <label>Calcium &amp; vitamin D intake <span class="val" id="calV">Adequate</span></label>
+            <input type="range" id="cal" min="0" max="100" value="65">
+          </div>
+          <div class="slider-block">
+            <label>Age-related turnover <span class="val" id="ageV">Young adult</span></label>
+            <input type="range" id="age" min="0" max="100" value="25">
+          </div>
+          <div class="cells">
+            <div class="cell"><div class="num" id="obNum" style="color:var(--teal)">—</div><div class="lab">Osteoblast (build)</div></div>
+            <div class="cell"><div class="num" id="ocNum" style="color:var(--coral)">—</div><div class="lab">Osteoclast (resorb)</div></div>
+          </div>
+        </div>
+        <div class="scale-vis">
+          <div style="font-weight:700;color:var(--deep);font-family:Cambria,serif">Bone density</div>
+          <div class="density-meter">
+            <div class="dm-bar"><i id="dmFill" style="width:60%"></i></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px" id="dmPct">60%</div>
+          </div>
+          <div class="verdict" id="verdict">—</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:10px" id="simNote"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>BIOL 432 · Anatomy &amp; Physiology — Dr. Wael M. Osman, Khalifa University · Interactive teaching activity</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ----- Tabs -----
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){
+    t.addEventListener("click", function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(x){ x.classList.remove("active"); });
+      Array.prototype.forEach.call(document.querySelectorAll(".panel"), function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      $(t.dataset.p).classList.add("active");
+    });
+  });
+
+  // ----- Classification challenge -----
+  var SHAPES = [
+    {k:"long", n:"Long", ic:"🦴"},
+    {k:"short", n:"Short", ic:"🧊"},
+    {k:"flat", n:"Flat", ic:"🛡️"},
+    {k:"irregular", n:"Irregular", ic:"🧩"}
+  ];
+  var BONES = [
+    {name:"Femur", hint:"the thigh bone", k:"long", why:"Long bones are longer than they are wide — classic limb bones like the femur and humerus."},
+    {name:"Vertebra", hint:"a single bone of the spine", k:"irregular", why:"Vertebrae have complex shapes that don't fit other categories — they are irregular bones."},
+    {name:"Sternum", hint:"the breastbone", k:"flat", why:"Flat bones are thin and often slightly curved, protecting organs — sternum, ribs, scapulae, most of the skull."},
+    {name:"Carpal (wrist bone)", hint:"a small bone of the wrist", k:"short", why:"Short bones are roughly cube-shaped — the carpals (wrist) and tarsals (ankle)."},
+    {name:"Humerus", hint:"the upper arm bone", k:"long", why:"Another textbook long bone of the appendicular skeleton."},
+    {name:"Patella", hint:"the kneecap", k:"short", why:"The patella is a sesamoid bone that forms within a tendon; sesamoids are classed with short bones."},
+    {name:"Hip bone (os coxae)", hint:"the large bone of the pelvis", k:"irregular", why:"The hip bone has a complex 3-D shape — an irregular bone."},
+    {name:"Scapula", hint:"the shoulder blade", k:"flat", why:"The scapula is a thin, flat plate that anchors muscles — a flat bone."}
+  ];
+  var ci = 0, cScore = 0, cAnswered = false;
+
+  function renderBone(){
+    cAnswered = false;
+    var bone = BONES[ci];
+    $("boneName").textContent = bone.name;
+    $("boneHint").textContent = "(" + bone.hint + ")";
+    var opts = $("shapeOpts"); opts.innerHTML="";
+    SHAPES.forEach(function(sh){
+      var d = document.createElement("div"); d.className="shape";
+      d.innerHTML = '<span class="ic">'+sh.ic+'</span>'+sh.n;
+      d.addEventListener("click", function(){
+        if(cAnswered) return; cAnswered=true;
+        var correct = (sh.k===bone.k);
+        if(correct){ d.classList.add("correct"); cScore++; }
+        else{ d.classList.add("wrong");
+          Array.prototype.forEach.call(opts.children, function(ch, idx){ if(SHAPES[idx].k===bone.k) ch.classList.add("correct"); });
+        }
+        $("classFb").textContent = (correct?"✓ Correct. ":"✗ Not quite. ") + bone.why;
+        $("classFb").classList.add("show");
+        $("classScore").textContent = "Score: " + cScore + " / " + BONES.length;
+        if(ci < BONES.length-1){ $("nextBone").style.display="inline-block"; }
+        else { $("restartClass").style.display="inline-block"; $("classScore").textContent = "Final: " + cScore + " / " + BONES.length + (cScore===BONES.length?" — perfect!":""); }
+      });
+      opts.appendChild(d);
+    });
+    $("classFb").classList.remove("show");
+    $("nextBone").style.display="none";
+    $("classProg").textContent = "Bone " + (ci+1) + " of " + BONES.length;
+  }
+  $("nextBone").addEventListener("click", function(){ if(ci<BONES.length-1){ ci++; renderBone(); } });
+  $("restartClass").addEventListener("click", function(){ ci=0; cScore=0; $("restartClass").style.display="none"; $("classScore").textContent=""; renderBone(); });
+
+  // ----- Remodelling simulator -----
+  function band(v, labels){ return labels[Math.min(labels.length-1, Math.floor(v/100*labels.length))]; }
+  function updateSim(){
+    var load = +$("load").value, est = +$("est").value, cal = +$("cal").value, age = +$("age").value;
+    $("loadV").textContent = band(load,["None (disuse)","Low","Moderate","High","Very high"]);
+    $("estV").textContent = band(est,["Very low","Low","Reduced","Normal","High"]);
+    $("calV").textContent = band(cal,["Deficient","Low","Marginal","Adequate","High"]);
+    $("ageV").textContent = band(age,["Child","Adolescent","Young adult","Middle age","Elderly"]);
+    // builder activity rises with load, calcium; resorber activity rises with low estrogen and age
+    var build = 0.45*load + 0.35*cal + 0.20*(100-age);
+    var resorb = 0.45*(100-est) + 0.30*age + 0.25*(100-load);
+    var net = build - resorb; // -100..100 roughly
+    var density = Math.max(8, Math.min(100, 60 + net*0.45));
+    $("obNum").textContent = Math.round(build);
+    $("ocNum").textContent = Math.round(resorb);
+    var fill = $("dmFill");
+    fill.style.width = density.toFixed(0)+"%";
+    var col = density>70?"#2E8B86":(density>45?"#E5A742":"#EE6A4C");
+    fill.style.background = col;
+    $("dmPct").textContent = density.toFixed(0)+"%";
+    var v = $("verdict"), note = $("simNote");
+    if(density>72){ v.textContent="Strong, healthy bone"; v.style.background="#e2f3ee"; v.style.color="#0E4F52";
+      note.textContent="Loading and good nutrition keep builders ahead of resorbers — the runner's dense-bone advantage."; }
+    else if(density>48){ v.textContent="Maintained — watch the balance"; v.style.background="#FBF1DC"; v.style.color="#9A7012";
+      note.textContent="Builders and resorbers are roughly matched. Small drops in load or estrogen could tip it toward loss."; }
+    else { v.textContent="Osteoporosis risk"; v.style.background="#fde7e1"; v.style.color="#C44E36";
+      note.textContent="Resorption is outpacing formation — the pattern seen with disuse, low estrogen, ageing, or poor calcium intake."; }
+  }
+  ["load","est","cal","age"].forEach(function(id){ $(id).addEventListener("input", updateSim); });
+
+  function init(){ renderBone(); updateSim(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Lecture 2 Self-Check</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --cream:#F4F8F7; --ink:#22373B; --mute:#6C7E81; --line:#DFE9E8;
+    --good:#2E8B6F; --bad:#C24A37;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Calibri,'Segoe UI',Arial,sans-serif;color:var(--ink);background:var(--cream)}
+  header{background:var(--dark);color:#fff;padding:26px 28px}
+  header .kick{color:#9FC6C7;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+  header h1{margin:6px 0 2px;font-family:Cambria,Georgia,serif;font-size:28px}
+  header p{margin:0;color:#AFCFCF;font-size:14px}
+  .tabs{display:flex;gap:6px;padding:14px 28px 0;background:var(--dark);flex-wrap:wrap}
+  .tab{background:#14424A;color:#CFE3E2;border:none;padding:11px 20px;border-radius:10px 10px 0 0;
+       font-size:15px;font-weight:600;cursor:pointer}
+  .tab.active{background:var(--cream);color:var(--teal)}
+  main{max-width:920px;margin:0 auto;padding:28px}
+  .panel{display:none} .panel.active{display:block}
+  .lead{color:var(--mute);font-size:15px;margin:0 0 18px}
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:15px;
+       font-weight:600;cursor:pointer} .btn:hover{filter:brightness(1.07)}
+  .btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+  .btn.accent{background:var(--accent)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  /* flashcards */
+  .fc{background:#fff;border:1px solid var(--line);border-radius:16px;min-height:230px;display:flex;
+      align-items:center;justify-content:center;text-align:center;padding:34px;cursor:pointer;
+      box-shadow:0 4px 14px rgba(0,0,0,.06);user-select:none}
+  .fc .term{font-family:Cambria,Georgia,serif;font-size:30px;font-weight:700;color:var(--teal)}
+  .fc .ans{font-size:19px;color:var(--ink);line-height:1.4}
+  .fc .hint{position:absolute;bottom:12px;right:16px;font-size:12px;color:var(--mute)}
+  .fcwrap{position:relative}
+  .counter{color:var(--mute);font-size:14px}
+
+  /* quiz */
+  .q{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+  .q .qt{font-weight:700;margin:0 0 12px}
+  .opt{display:block;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}
+  .opt:hover{border-color:var(--sea)}
+  .opt input{margin-right:9px}
+  .opt.correct{border-color:var(--good);background:#EAF6F1}
+  .opt.wrong{border-color:var(--bad);background:#FBEDEA}
+  .exp{margin-top:10px;font-size:14px;color:var(--mute);display:none}
+  .exp.show{display:block}
+  .scorebar{background:var(--dark);color:#fff;border-radius:12px;padding:16px 20px;font-size:18px;
+            font-weight:700;margin-bottom:18px;display:none}
+  .scorebar.show{display:block}
+
+  /* find the region */
+  .frwrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .prompt{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;flex:1;min-width:240px}
+  .prompt .ask{font-size:14px;color:var(--mute)}
+  .prompt .target{font-family:Cambria,Georgia,serif;font-size:34px;font-weight:700;color:var(--accent);margin:6px 0 2px}
+  .prompt .meaning{font-size:14px;color:var(--mute)}
+  .fb{margin-top:14px;font-weight:700;min-height:24px}
+  .fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+  svg{width:230px;height:auto;display:block}
+  .region{cursor:pointer;fill:var(--sea);transition:fill .12s}
+  .region:hover{fill:var(--teal)}
+  .region.hit{fill:var(--good)!important}
+  .region.miss{fill:var(--bad)!important}
+  .static{fill:#B9D2D2}
+  .done-msg{font-size:18px;font-weight:700;color:var(--teal)}
+</style>
+</head>
+<body>
+<header>
+  <div class="kick">BIOL 432 · Anatomy &amp; Physiology · Week 1</div>
+  <h1>Lecture 2 Self-Check — The Language of the Body</h1>
+  <p>Flashcards · auto-graded quiz · click-the-region. Nothing is saved or sent — this runs entirely in your browser.</p>
+</header>
+<div class="tabs">
+  <button class="tab active" data-tab="cards">Flashcards</button>
+  <button class="tab" data-tab="quiz">Quiz</button>
+  <button class="tab" data-tab="region">Find the Region</button>
+</div>
+<main>
+  <!-- FLASHCARDS -->
+  <section class="panel active" id="cards">
+    <p class="lead">Click the card to flip it. Use the buttons to move through the deck.</p>
+    <div class="fcwrap">
+      <div class="fc" id="fc"><span class="content"></span><span class="hint">click to flip</span></div>
+    </div>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div class="row">
+        <button class="btn ghost" id="prev">‹ Prev</button>
+        <button class="btn ghost" id="next">Next ›</button>
+        <button class="btn" id="shuffle">Shuffle</button>
+      </div>
+      <span class="counter" id="fcount"></span>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel" id="quiz">
+    <p class="lead">Answer all ten, then check. You'll see your score and an explanation for each.</p>
+    <div class="scorebar" id="score"></div>
+    <div id="qlist"></div>
+    <div class="row">
+      <button class="btn accent" id="check">Check answers</button>
+      <button class="btn ghost" id="resetq">Reset</button>
+    </div>
+  </section>
+
+  <!-- FIND THE REGION -->
+  <section class="panel" id="region">
+    <p class="lead">Read the region named on the right, then click that part of the body.</p>
+    <div class="frwrap">
+      <div id="bodywrap"></div>
+      <div class="prompt">
+        <div id="frbody">
+          <div class="ask">Click the region:</div>
+          <div class="target" id="frTarget">—</div>
+          <div class="meaning" id="frMeaning"></div>
+          <div class="fb" id="frFb"></div>
+          <div class="counter" id="frProgress" style="margin-top:14px"></div>
+        </div>
+        <div class="row" style="margin-top:16px">
+          <button class="btn ghost" id="frReset">Restart</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ---------- data ---------- */
+var FLASH = [
+  ["Superior (cranial)","Toward the head / upper body. The head is superior to the chest."],
+  ["Inferior (caudal)","Toward the lower body / feet. The navel is inferior to the chest."],
+  ["Anterior (ventral)","Toward the front. The sternum is anterior to the heart."],
+  ["Posterior (dorsal)","Toward the back. The spine is posterior to the heart."],
+  ["Medial","Toward the body's midline. The nose is medial to the eyes."],
+  ["Lateral","Away from the midline. The ears are lateral to the nose."],
+  ["Proximal","Nearer the trunk / attachment. The elbow is proximal to the wrist."],
+  ["Distal","Farther from the trunk / attachment. The fingers are distal to the wrist."],
+  ["Superficial","Toward the body surface. Skin is superficial to muscle."],
+  ["Deep","Away from the surface. Bones are deep to muscle."],
+  ["Sagittal plane","Vertical cut dividing left and right. Midsagittal = equal halves."],
+  ["Frontal (coronal) plane","Vertical cut dividing anterior (front) from posterior (back)."],
+  ["Transverse plane","Horizontal cut dividing superior from inferior — the CT 'axial' view."],
+  ["Parietal vs visceral","Parietal lines the cavity wall; visceral covers the organ; serous fluid lies between."]
+];
+
+var QUIZ = [
+  ["In standard anatomical position, the thumb lies on the ___ side of the hand.",
+   ["Medial","Lateral","Posterior","Deep"],1,"With palms forward (supinated), the thumb is lateral."],
+  ["A slice separating the head into superior and inferior portions is a:",
+   ["Sagittal plane","Frontal plane","Transverse plane","Median plane"],2,"Transverse = horizontal, top from bottom."],
+  ["\u201CThe heart is medial to the lungs.\u201D This statement is:",
+   ["True","False"],0,"The heart sits centrally, closer to the midline than the lungs."],
+  ["The antebrachial region is ___ to the brachial region.",
+   ["Proximal","Distal","Medial","Superficial"],1,"The forearm is distal to the arm."],
+  ["Which structure is found in the dorsal body cavity?",
+   ["Heart","Stomach","Spinal cord","Lungs"],2,"The dorsal cavity (cranial + vertebral) holds the brain and spinal cord."],
+  ["The diaphragm separates which two regions of the ventral cavity?",
+   ["Cranial and vertebral","Thoracic and abdominopelvic","Pleural and pericardial","Abdominal and pelvic"],1,"The diaphragm divides the thoracic (above) from the abdominopelvic (below)."],
+  ["The visceral layer of a serous membrane:",
+   ["Lines the cavity wall","Directly covers the organ","Secretes no fluid","Is found only in the skull"],1,"Visceral = on the organ; parietal = on the cavity wall."],
+  ["Inflammation of the serous membrane around the lungs involves the:",
+   ["Pericardium","Peritoneum","Pleura","Meninges"],2,"Pleura \u2192 lungs (pleurisy)."],
+  ["To image the body's left and right sides as mirror halves, cut along the:",
+   ["Transverse plane","Midsagittal plane","Frontal plane","Oblique plane"],1,"The midsagittal (median) plane gives equal left and right halves."],
+  ["A wound 'deep to the skin of the anterior thigh' is located:",
+   ["On the back of the thigh surface","Below the surface, on the front of the femoral region","On the lateral leg surface","Within the abdominal cavity"],1,"Deep = below the surface; anterior thigh = front of the femoral region."]
+];
+
+var REGIONS = [
+  ["cephalic","head"],["cervical","neck"],["thoracic","chest"],["abdominal","belly / lower trunk"],
+  ["brachial","arm (shoulder to elbow)"],["antebrachial","forearm (elbow to wrist)"],
+  ["femoral","thigh"],["crural","leg (knee to ankle)"]
+];
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  };
+});
+
+/* ---------- flashcards ---------- */
+var deck=FLASH.slice(), fi=0, flipped=false;
+var fc=document.getElementById('fc'), fcContent=fc.querySelector('.content');
+function renderCard(){
+  flipped=false;
+  fcContent.className='content term'; fcContent.textContent=deck[fi][0];
+  document.getElementById('fcount').textContent=(fi+1)+' / '+deck.length;
+}
+fc.onclick=function(){
+  flipped=!flipped;
+  if(flipped){fcContent.className='content ans';fcContent.textContent=deck[fi][1];}
+  else{fcContent.className='content term';fcContent.textContent=deck[fi][0];}
+};
+document.getElementById('next').onclick=function(){fi=(fi+1)%deck.length;renderCard();};
+document.getElementById('prev').onclick=function(){fi=(fi-1+deck.length)%deck.length;renderCard();};
+document.getElementById('shuffle').onclick=function(){
+  for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=deck[i];deck[i]=deck[j];deck[j]=tmp;}
+  fi=0;renderCard();
+};
+renderCard();
+
+/* ---------- quiz ---------- */
+var qlist=document.getElementById('qlist');
+function buildQuiz(){
+  qlist.innerHTML='';
+  QUIZ.forEach(function(item,qi){
+    var div=document.createElement('div'); div.className='q'; div.id='q'+qi;
+    var h=document.createElement('p'); h.className='qt'; h.textContent=(qi+1)+'. '+item[0]; div.appendChild(h);
+    item[1].forEach(function(opt,oi){
+      var lab=document.createElement('label'); lab.className='opt';
+      lab.innerHTML='<input type="radio" name="q'+qi+'" value="'+oi+'">'+opt;
+      div.appendChild(lab);
+    });
+    var exp=document.createElement('div'); exp.className='exp'; exp.textContent='Why: '+item[3]; div.appendChild(exp);
+    qlist.appendChild(div);
+  });
+}
+document.getElementById('check').onclick=function(){
+  var correct=0;
+  QUIZ.forEach(function(item,qi){
+    var chosen=document.querySelector('input[name="q'+qi+'"]:checked');
+    var labels=document.querySelectorAll('#q'+qi+' .opt');
+    labels.forEach(function(l){l.classList.remove('correct','wrong');});
+    labels[item[2]].classList.add('correct');
+    if(chosen){
+      var ci=parseInt(chosen.value,10);
+      if(ci===item[2]){correct++;}
+      else{labels[ci].classList.add('wrong');}
+    }
+    document.querySelector('#q'+qi+' .exp').classList.add('show');
+  });
+  var sb=document.getElementById('score');
+  sb.classList.add('show');
+  sb.textContent='You scored '+correct+' / '+QUIZ.length+'.  '+
+    (correct===QUIZ.length?'Perfect — you speak anatomy.':correct>=7?'Strong work — review the misses.':'Revisit the flashcards, then try again.');
+  sb.scrollIntoView({behavior:'smooth',block:'center'});
+};
+document.getElementById('resetq').onclick=function(){
+  buildQuiz(); document.getElementById('score').classList.remove('show');
+};
+buildQuiz();
+
+/* ---------- find the region ---------- */
+var BODY_SVG='<svg viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="body regions">'
++'<g class="region" data-region="cephalic"><circle cx="150" cy="48" r="36"/></g>'
++'<g class="region" data-region="cervical"><rect x="136" y="82" width="28" height="22" rx="6"/></g>'
++'<g class="region" data-region="thoracic"><rect x="104" y="102" width="92" height="92" rx="16"/></g>'
++'<g class="region" data-region="abdominal"><rect x="104" y="192" width="92" height="82" rx="16"/></g>'
++'<g class="region" data-region="brachial"><rect x="70" y="106" width="28" height="92" rx="12"/><rect x="202" y="106" width="28" height="92" rx="12"/></g>'
++'<g class="region" data-region="antebrachial"><rect x="70" y="200" width="28" height="86" rx="12"/><rect x="202" y="200" width="28" height="86" rx="12"/><circle cx="84" cy="296" r="14"/><circle cx="216" cy="296" r="14"/></g>'
++'<g class="region" data-region="femoral"><rect x="108" y="276" width="38" height="96" rx="14"/><rect x="154" y="276" width="38" height="96" rx="14"/></g>'
++'<g class="region" data-region="crural"><rect x="108" y="374" width="38" height="96" rx="14"/><rect x="154" y="374" width="38" height="96" rx="14"/><rect x="104" y="466" width="46" height="20" rx="8"/><rect x="150" y="466" width="46" height="20" rx="8"/></g>'
++'</svg>';
+document.getElementById('bodywrap').innerHTML=BODY_SVG;
+
+var order=[], rp=0, rScore=0, locked=false;
+function startRegion(){
+  order=REGIONS.slice();
+  for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;}
+  rp=0;rScore=0;locked=false; showRegion();
+}
+function showRegion(){
+  clearRegionStyles();
+  document.getElementById('frFb').textContent=''; document.getElementById('frFb').className='fb';
+  if(rp>=order.length){
+    document.getElementById('frTarget').textContent='Done!';
+    document.getElementById('frMeaning').textContent='';
+    var fbd=document.getElementById('frFb');
+    fbd.textContent='You scored '+rScore+' / '+REGIONS.length+'.';
+    fbd.className='fb good';
+    document.getElementById('frProgress').textContent='Press Restart to try again.';
+    return;
+  }
+  document.getElementById('frTarget').textContent=order[rp][0];
+  document.getElementById('frMeaning').textContent='('+order[rp][1]+')';
+  document.getElementById('frProgress').textContent='Region '+(rp+1)+' of '+order.length+'  ·  score '+rScore;
+  locked=false;
+}
+function clearRegionStyles(){
+  document.querySelectorAll('.region').forEach(function(r){r.classList.remove('hit','miss');});
+}
+document.querySelectorAll('.region').forEach(function(r){
+  r.onclick=function(){
+    if(locked||rp>=order.length) return;
+    var picked=r.dataset.region, target=order[rp][0];
+    var fb=document.getElementById('frFb');
+    if(picked===target){
+      r.classList.add('hit'); rScore++; locked=true;
+      fb.textContent='Correct!'; fb.className='fb good';
+      setTimeout(function(){rp++;showRegion();},750);
+    }else{
+      r.classList.add('miss');
+      fb.textContent='That is the '+picked+'. Try again.'; fb.className='fb bad';
+      setTimeout(function(){r.classList.remove('miss');},650);
+    }
+  };
+});
+document.getElementById('frReset').onclick=startRegion;
+startRegion();
+</script>
+</body>
+</html>

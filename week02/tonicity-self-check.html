@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Tonicity Self-Check</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --cream:#F4F8F7; --ink:#22373B; --mute:#6C7E81; --line:#DFE9E8;
+    --good:#2E8B6F; --bad:#C24A37;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Calibri,'Segoe UI',Arial,sans-serif;color:var(--ink);background:var(--cream)}
+  header{background:var(--dark);color:#fff;padding:26px 28px}
+  header .kick{color:#9FC6C7;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+  header h1{margin:6px 0 2px;font-family:Cambria,Georgia,serif;font-size:28px}
+  header p{margin:0;color:#AFCFCF;font-size:14px}
+  .tabs{display:flex;gap:6px;padding:14px 28px 0;background:var(--dark);flex-wrap:wrap}
+  .tab{background:#14424A;color:#CFE3E2;border:none;padding:11px 20px;border-radius:10px 10px 0 0;font-size:15px;font-weight:600;cursor:pointer}
+  .tab.active{background:var(--cream);color:var(--teal)}
+  main{max-width:880px;margin:0 auto;padding:28px}
+  .panel{display:none}.panel.active{display:block}
+  .lead{color:var(--mute);font-size:15px;margin:0 0 18px}
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn:hover{filter:brightness(1.07)}
+  .btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .counter{color:var(--mute);font-size:14px}
+
+  .fc{background:#fff;border:1px solid var(--line);border-radius:16px;min-height:210px;display:flex;align-items:center;justify-content:center;text-align:center;padding:34px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.06);user-select:none}
+  .fc .term{font-family:Cambria,Georgia,serif;font-size:28px;font-weight:700;color:var(--teal)}
+  .fc .ans{font-size:18px;color:var(--ink);line-height:1.4}
+  .fcwrap{position:relative}.hint{position:absolute;bottom:12px;right:16px;font-size:12px;color:var(--mute)}
+
+  .scenario{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+  .scenario .ask{font-size:14px;color:var(--mute)}
+  .scenario .sol{font-family:Cambria,Georgia,serif;font-size:24px;font-weight:700;color:var(--ink);margin:6px 0 14px}
+  .choices{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .choice{flex:1;min-width:150px;max-width:240px;padding:13px;border:1.5px solid var(--line);border-radius:11px;background:#fff;font-size:15px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .choice:hover{border-color:var(--sea)}
+  .choice.correct{border-color:var(--good);background:#EAF6F1;color:var(--good)}
+  .choice.wrong{border-color:var(--bad);background:#FBEDEA;color:var(--bad)}
+  .fb{margin-top:16px;font-size:15px;min-height:22px}.fb b.g{color:var(--good)}.fb b.r{color:var(--bad)}.why{color:var(--mute)}
+  svg{display:block;margin:8px auto 0}
+
+  .q{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+  .q .qt{font-weight:700;margin:0 0 12px}
+  .opt{display:block;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;margin:7px 0;cursor:pointer}
+  .opt:hover{border-color:var(--sea)}.opt input{margin-right:9px}
+  .opt.correct{border-color:var(--good);background:#EAF6F1}.opt.wrong{border-color:var(--bad);background:#FBEDEA}
+  .exp{margin-top:10px;font-size:14px;color:var(--mute);display:none}.exp.show{display:block}
+  .scorebar{background:var(--dark);color:#fff;border-radius:12px;padding:16px 20px;font-size:18px;font-weight:700;margin-bottom:18px;display:none}
+  .scorebar.show{display:block}
+  .done{font-size:18px;font-weight:700;color:var(--teal)}
+</style>
+</head>
+<body>
+<header>
+  <div class="kick">BIOL 432 · Anatomy &amp; Physiology · Week 2</div>
+  <h1>Tonicity Self-Check — Body Fluids &amp; Electrolytes</h1>
+  <p>Flashcards · predict the cell · auto-graded quiz. Nothing is saved or sent — it runs in your browser.</p>
+</header>
+<div class="tabs">
+  <button class="tab active" data-tab="cards">Flashcards</button>
+  <button class="tab" data-tab="predict">Predict the cell</button>
+  <button class="tab" data-tab="quiz">Quiz</button>
+</div>
+<main>
+  <section class="panel active" id="cards">
+    <p class="lead">Click the card to flip it.</p>
+    <div class="fcwrap"><div class="fc" id="fc"><span class="content"></span><span class="hint">click to flip</span></div></div>
+    <div class="row" style="margin-top:16px;justify-content:space-between">
+      <div class="row"><button class="btn ghost" id="prev">‹ Prev</button><button class="btn ghost" id="next">Next ›</button><button class="btn" id="shuffle">Shuffle</button></div>
+      <span class="counter" id="fcount"></span>
+    </div>
+  </section>
+
+  <section class="panel" id="predict">
+    <p class="lead">A red blood cell is placed in each solution. Predict what happens.</p>
+    <div id="predBody">
+      <div class="scenario">
+        <div class="ask">The cell is placed in:</div>
+        <div class="sol" id="solText">—</div>
+        <div class="choices">
+          <button class="choice" data-out="crenate">Shrinks (crenation)</button>
+          <button class="choice" data-out="lyse">Swells / bursts (lysis)</button>
+          <button class="choice" data-out="none">No change</button>
+        </div>
+        <div id="cellSvg"></div>
+        <div class="fb" id="fbP"></div>
+      </div>
+      <div class="row" style="margin-top:16px"><button class="btn" id="nextP" style="display:none">Next ›</button><span class="counter" id="progP"></span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="quiz">
+    <p class="lead">Answer all ten, then check.</p>
+    <div class="scorebar" id="score"></div>
+    <div id="qlist"></div>
+    <div class="row"><button class="btn" id="check" style="background:var(--accent)">Check answers</button><button class="btn ghost" id="resetq">Reset</button></div>
+  </section>
+</main>
+
+<script>
+var FLASH=[
+ ["Intracellular fluid (ICF)","Fluid inside cells; ~25 L (40% of body weight); K\u207A dominant."],
+ ["Extracellular fluid (ECF)","Fluid outside cells; ~15 L (20%); Na\u207A dominant; = interstitial + plasma."],
+ ["Electrolyte","A solute that dissociates into ions; high osmotic power."],
+ ["Non-electrolyte","A solute that does not dissociate (glucose, lipids, urea)."],
+ ["Osmosis","Water moves across a membrane toward the higher solute concentration."],
+ ["Osmolarity","Total dissolved particles per litre; each ion counts separately."],
+ ["Isotonic","Same osmolarity as the cell; no net water movement."],
+ ["Hypertonic","More solute outside; water leaves \u2192 crenation."],
+ ["Hypotonic","Less solute outside; water enters \u2192 lysis."],
+ ["Crenation","A cell shrivelling because water left it (hypertonic)."],
+ ["Lysis","A cell swelling and bursting because water entered (hypotonic)."],
+ ["Sodium (Na\u207A)","Main ECF cation; its content sets ECF volume and blood pressure."],
+ ["Potassium (K\u207A)","Main ICF cation; sets membrane potential; the heart is very sensitive to it."]
+];
+var SCEN=[
+ ["0.9% normal saline (isotonic)","none"],
+ ["Pure distilled water","lyse"],
+ ["A concentrated salt solution","crenate"],
+ ["Seawater (very salty)","crenate"],
+ ["A solution matching plasma osmolarity","none"],
+ ["A very dilute sugar solution","lyse"]
+];
+var OUTLABEL={crenate:"shrink (crenation)",lyse:"swell/burst (lysis)",none:"stay the same"};
+var WHYTXT={crenate:"More solute outside \u2192 water leaves the cell \u2192 it shrivels.",lyse:"Less solute outside \u2192 water enters \u2192 the cell swells and may burst.",none:"Osmolarity matches \u2192 no net water movement."};
+function cellSVG(out){
+  var r=out==="crenate"?26:out==="lyse"?50:40;
+  var col=out==="crenate"?"#D9644A":out==="lyse"?"#14606E":"#4F8A8B";
+  var extra=out==="lyse"?'<circle cx="70" cy="70" r="58" fill="none" stroke="#14606E" stroke-width="2" stroke-dasharray="4 5" opacity="0.5"/>':"";
+  return '<svg width="140" height="140" viewBox="0 0 140 140">'+extra+'<circle cx="70" cy="70" r="'+r+'" fill="'+col+'"/></svg>';
+}
+var QUIZ=[
+ ["The dominant cation inside cells (ICF) is:",["Na\u207A","K\u207A","Cl\u207B","Ca\u00B2\u207A"],1,"K\u207A dominates the ICF; Na\u207A the ECF."],
+ ["Which compartment holds the most body water?",["Plasma","Interstitial fluid","Intracellular fluid","CSF"],2,"About two-thirds of body water is intracellular."],
+ ["Compared with 1 mole of glucose, 1 mole of NaCl provides:",["Half the particles","The same","Twice the particles","No particles"],2,"NaCl \u2192 Na\u207A + Cl\u207B (2 particles)."],
+ ["In osmosis, water moves toward the side with:",["More solute","Less solute","Higher temperature","Lower pressure"],0,"Water follows solutes."],
+ ["A red blood cell in pure (hypotonic) water will:",["Shrink","Stay the same","Swell and may burst","Divide"],2,"Water enters \u2192 lysis."],
+ ["Isotonic saline is used for IV rehydration because it:",["Shrinks cells","Restores ECF volume without shifting water across membranes","Is hypotonic","Adds only glucose"],1,"Matching osmolarity avoids dangerous shifts."],
+ ["Total body Na\u207A content mainly determines:",["Blood pH","ECF volume and blood pressure","Body temperature","ICF potassium"],1,"Water follows sodium."],
+ ["Hyperkalemia is dangerous mainly because it:",["Thickens blood","Disturbs the heart's electrical activity","Raises temperature","Increases urine"],1,"K\u207A sets membrane potential."],
+ ["A shrivelled (crenated) cell was placed in a solution that is:",["Isotonic","Hypotonic","Hypertonic","Pure water"],2,"Hypertonic \u2192 water leaves \u2192 crenation."],
+ ["A runner who drinks litres of plain water (no salt) \u2014 water will move:",["Out of cells","Into cells, swelling them","Only into plasma","Nowhere"],1,"Diluted ECF is hypotonic \u2192 water enters cells."]
+];
+
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active');
+  };
+});
+
+/* flashcards */
+var deck=FLASH.slice(),fi=0,flip=false;
+var fc=document.getElementById('fc'),fcC=fc.querySelector('.content');
+function rc(){flip=false;fcC.className='content term';fcC.textContent=deck[fi][0];document.getElementById('fcount').textContent=(fi+1)+' / '+deck.length;}
+fc.onclick=function(){flip=!flip;if(flip){fcC.className='content ans';fcC.textContent=deck[fi][1];}else{fcC.className='content term';fcC.textContent=deck[fi][0];}};
+document.getElementById('next').onclick=function(){fi=(fi+1)%deck.length;rc();};
+document.getElementById('prev').onclick=function(){fi=(fi-1+deck.length)%deck.length;rc();};
+document.getElementById('shuffle').onclick=function(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=deck[i];deck[i]=deck[j];deck[j]=t;}fi=0;rc();};
+rc();
+
+/* predict */
+var pi=0,pScore=0,pLock=false;
+var pchoices=document.querySelectorAll('#predict .choice');
+function showScen(){
+  if(pi>=SCEN.length){
+    document.getElementById('predBody').innerHTML='<div class="done">Done! You scored '+pScore+' / '+SCEN.length+'.</div><div class="row" style="margin-top:14px"><button class="btn ghost" onclick="restartP()">Restart</button></div>';
+    return;
+  }
+  pLock=false;
+  document.getElementById('solText').textContent=SCEN[pi][0];
+  pchoices.forEach(function(c){c.classList.remove('correct','wrong');});
+  document.getElementById('cellSvg').innerHTML='';
+  document.getElementById('fbP').innerHTML='';
+  document.getElementById('nextP').style.display='none';
+  document.getElementById('progP').textContent='Solution '+(pi+1)+' of '+SCEN.length+'  ·  score '+pScore;
+}
+function bindPred(){
+  pchoices=document.querySelectorAll('#predict .choice');
+  pchoices.forEach(function(c){
+    c.onclick=function(){
+      if(pLock)return;pLock=true;
+      var picked=c.dataset.out,correct=SCEN[pi][1];
+      pchoices.forEach(function(x){if(x.dataset.out===correct)x.classList.add('correct');});
+      var fb=document.getElementById('fbP');
+      if(picked===correct){pScore++;fb.innerHTML='<b class="g">Correct.</b> <span class="why">'+WHYTXT[correct]+'</span>';}
+      else{c.classList.add('wrong');fb.innerHTML='<b class="r">Not quite — the cell will '+OUTLABEL[correct]+'.</b> <span class="why">'+WHYTXT[correct]+'</span>';}
+      document.getElementById('cellSvg').innerHTML=cellSVG(correct);
+      document.getElementById('nextP').style.display='inline-block';
+      document.getElementById('progP').textContent='Solution '+(pi+1)+' of '+SCEN.length+'  ·  score '+pScore;
+    };
+  });
+}
+document.getElementById('nextP').onclick=function(){pi++;showScen();};
+function restartP(){
+  document.getElementById('predBody').innerHTML=
+   '<div class="scenario"><div class="ask">The cell is placed in:</div><div class="sol" id="solText">—</div>'+
+   '<div class="choices"><button class="choice" data-out="crenate">Shrinks (crenation)</button>'+
+   '<button class="choice" data-out="lyse">Swells / bursts (lysis)</button>'+
+   '<button class="choice" data-out="none">No change</button></div>'+
+   '<div id="cellSvg"></div><div class="fb" id="fbP"></div></div>'+
+   '<div class="row" style="margin-top:16px"><button class="btn" id="nextP" style="display:none">Next \u203A</button><span class="counter" id="progP"></span></div>';
+  pi=0;pScore=0;bindPred();document.getElementById('nextP').onclick=function(){pi++;showScen();};showScen();
+}
+bindPred();showScen();
+
+/* quiz */
+var qlist=document.getElementById('qlist');
+function buildQuiz(){
+  qlist.innerHTML='';
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='q';d.id='q'+qi;
+    var h=document.createElement('p');h.className='qt';h.textContent=(qi+1)+'. '+item[0];d.appendChild(h);
+    item[1].forEach(function(opt,oi){var l=document.createElement('label');l.className='opt';l.innerHTML='<input type="radio" name="q'+qi+'" value="'+oi+'">'+opt;d.appendChild(l);});
+    var e=document.createElement('div');e.className='exp';e.textContent='Why: '+item[3];d.appendChild(e);
+    qlist.appendChild(d);
+  });
+}
+document.getElementById('check').onclick=function(){
+  var correct=0;
+  QUIZ.forEach(function(item,qi){
+    var chosen=document.querySelector('input[name="q'+qi+'"]:checked');
+    var labels=document.querySelectorAll('#q'+qi+' .opt');
+    labels.forEach(function(l){l.classList.remove('correct','wrong');});
+    labels[item[2]].classList.add('correct');
+    if(chosen){var ci=parseInt(chosen.value,10);if(ci===item[2])correct++;else labels[ci].classList.add('wrong');}
+    document.querySelector('#q'+qi+' .exp').classList.add('show');
+  });
+  var sb=document.getElementById('score');sb.classList.add('show');
+  sb.textContent='You scored '+correct+' / '+QUIZ.length+'.  '+(correct===QUIZ.length?'Excellent.':correct>=7?'Strong — review the misses.':'Revisit the flashcards and try again.');
+  sb.scrollIntoView({behavior:'smooth',block:'center'});
+};
+document.getElementById('resetq').onclick=function(){buildQuiz();document.getElementById('score').classList.remove('show');};
+buildQuiz();
+</script>
+</body>
+</html>

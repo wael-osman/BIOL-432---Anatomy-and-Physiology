@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Lab · BIOL 432 · Week 4 · Lecture 2</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D;
+    --line:#D8D2C4; --tealt:#E3ECEC; --coralt:#F6E2DB; --good:#2F7D5B; --gold:#C98A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;padding:24px 16px 60px}
+  .wrap{max-width:920px;margin:0 auto}
+  h1,h2,h3,h4,.kicker{font-family:Cambria,Georgia,serif}
+  .kicker{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+  header h1{font-size:1.95rem;color:var(--dark);line-height:1.15;margin-bottom:10px}
+  .lede{color:var(--ink);font-size:1.02rem;max-width:760px}
+  .layla{background:var(--coralt);border-left:5px solid var(--accent);border-radius:8px;padding:14px 18px;margin:18px 0 22px;font-size:.96rem}
+  .layla b{color:var(--dark)}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;border-bottom:2px solid var(--line);padding-bottom:2px}
+  .tab{font-family:Cambria,serif;font-size:.95rem;font-weight:700;color:var(--mute);background:none;border:none;padding:10px 16px;cursor:pointer;border-radius:8px 8px 0 0;transition:.15s}
+  .tab:hover{color:var(--teal);background:var(--tealt)}
+  .tab.active{color:#fff;background:var(--teal)}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(14,58,64,.05)}
+  h2{font-size:1.32rem;color:var(--dark);margin-bottom:4px}
+  h2 .sub{display:block;font-family:Calibri,sans-serif;font-weight:400;font-size:.9rem;color:var(--mute);margin-top:2px}
+  .slider-row{margin:14px 0}
+  .slider-row label{display:flex;justify-content:space-between;font-weight:600;font-size:.92rem;margin-bottom:6px}
+  .slider-row .val{color:var(--teal);font-family:Cambria,serif}
+  input[type=range]{width:100%;accent-color:var(--teal)}
+  .voltbox{display:flex;align-items:center;gap:18px;margin-top:14px;flex-wrap:wrap}
+  .voltdial{font-family:Cambria,serif;font-size:2.4rem;font-weight:700;color:var(--teal);min-width:130px}
+  .voltdial small{display:block;font-size:.8rem;color:var(--mute);font-weight:400;letter-spacing:.05em}
+  .togs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+  .tog{border:1.5px solid var(--line);border-radius:22px;padding:7px 14px;font-size:.86rem;font-weight:600;cursor:pointer;background:var(--card);transition:.15s}
+  .tog.on{background:var(--tealt);border-color:var(--teal);color:var(--dark)}
+  .note{background:var(--tealt);border-radius:10px;padding:12px 15px;font-size:.92rem;margin-top:12px}
+  .note b{color:var(--teal)}
+  /* AP explorer */
+  .apwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+  @media(max-width:680px){.apwrap{grid-template-columns:1fr}}
+  .phasebtns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .pbtn{font-family:Cambria,serif;font-weight:700;font-size:.82rem;border:1.5px solid var(--line);background:var(--card);color:var(--mute);border-radius:8px;padding:7px 11px;cursor:pointer;transition:.15s}
+  .pbtn:hover{border-color:var(--sea)}
+  .pbtn.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .phasecard{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-height:150px}
+  .phasecard h4{font-size:1.05rem;color:var(--dark);margin-bottom:6px}
+  .phasecard .ch{font-size:.9rem;margin:4px 0}
+  .phasecard .ch b{color:var(--teal)}
+  .badge{display:inline-block;font-size:.72rem;font-family:Cambria,serif;padding:2px 9px;border-radius:20px;color:#fff;margin-bottom:6px}
+  /* spike train */
+  .train{border:1px solid var(--line);border-radius:10px;background:var(--card);margin-top:12px}
+  .ratebox{font-family:Cambria,serif;color:var(--teal);font-size:1.1rem;margin-top:10px}
+  .ratebox b{font-size:1.5rem}
+  .verdict{margin-top:14px;border-radius:10px;padding:14px 16px;font-size:.97rem;border-left:5px solid var(--teal);background:var(--tealt)}
+  .verdict.no{border-color:var(--mute);background:#EEEDE6;color:var(--mute)}
+  .verdict.fire{border-color:var(--good);background:#E6F1EA}
+  .verdict b{font-family:Cambria,serif}
+  footer{text-align:center;color:var(--mute);font-size:.8rem;margin-top:26px}
+  .pill{display:inline-block;background:var(--dark);color:#fff;font-size:.7rem;letter-spacing:.05em;padding:3px 10px;border-radius:20px;font-family:Cambria,serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">BIOL 432 · Week 4 · Lecture 2</div>
+    <h1>Signal Lab</h1>
+    <p class="lede">The electrical signal, hands-on. Build the resting voltage from its ion currents, walk the action potential phase by phase, test the all-or-none law, and watch stimulus strength turn into firing rate.</p>
+    <div class="layla">
+      <b>Back to Layla.</b> The numb patch on her foot means action potentials from that skin are <b>not arriving</b> at her spinal cord. To explain it, you first need to know how the signal is born and how it travels — that is what this lab builds, from −70 mV upward.
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-p="rmp">① Resting Potential</button>
+    <button class="tab" data-p="apx">② Action Potential</button>
+    <button class="tab" data-p="thr">③ All-or-None</button>
+    <button class="tab" data-p="freq">④ Frequency Code</button>
+  </div>
+
+  <!-- RMP -->
+  <section class="panel active" id="rmp">
+    <div class="card">
+      <h2>Build the resting membrane potential<span class="sub">Toggle the three contributors and tune K⁺ permeability. Watch the inside-negative voltage settle.</span></h2>
+      <div class="togs" id="rmpTogs">
+        <div class="tog on" data-k="kleak">K⁺ leak (out)</div>
+        <div class="tog on" data-k="naleak">Na⁺ leak (in)</div>
+        <div class="tog on" data-k="pump">Na⁺/K⁺ pump (3:2)</div>
+      </div>
+      <div class="slider-row">
+        <label>Relative K⁺ permeability <span class="val" id="pkVal">high</span></label>
+        <input type="range" id="pk" min="0" max="100" value="85">
+      </div>
+      <div class="voltbox">
+        <div class="voltdial" id="voltDial">−70<small>mV · membrane potential</small></div>
+        <div class="note" id="rmpNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AP EXPLORER -->
+  <section class="panel" id="apx">
+    <div class="card">
+      <h2>Walk the action potential<span class="sub">Tap a phase on the trace. The card shows which channels are open and which way ions flow.</span></h2>
+      <div class="apwrap">
+        <div>
+          <div class="phasebtns" id="phaseBtns"></div>
+          <svg id="apSvg" viewBox="0 0 420 260" width="100%" style="border:1px solid var(--line);border-radius:10px;background:var(--card)"></svg>
+        </div>
+        <div class="phasecard" id="phaseCard">
+          <h4>Tap a phase</h4>
+          <div class="ch">Select any point on the curve to read the channel state and ion movement that produces it.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THRESHOLD -->
+  <section class="panel" id="thr">
+    <div class="card">
+      <h2>Threshold &amp; the all-or-none law<span class="sub">Slide the stimulus. Below −55 mV nothing fires; at or above it, the same full spike — every time.</span></h2>
+      <div class="slider-row">
+        <label>Stimulus strength <span class="val" id="stimVal">weak</span></label>
+        <input type="range" id="stim" min="0" max="100" value="20">
+      </div>
+      <svg id="thrSvg" viewBox="0 0 420 220" width="100%" style="border:1px solid var(--line);border-radius:10px;background:var(--card)"></svg>
+      <div class="verdict no" id="thrVerdict"></div>
+    </div>
+  </section>
+
+  <!-- FREQUENCY -->
+  <section class="panel" id="freq">
+    <div class="card">
+      <h2>Strength becomes frequency<span class="sub">If every spike is identical, how is intensity encoded? As firing rate. Turn it up.</span></h2>
+      <div class="slider-row">
+        <label>Stimulus intensity <span class="val" id="intVal">low</span></label>
+        <input type="range" id="intensity" min="10" max="100" value="35">
+      </div>
+      <svg id="trainSvg" class="train" viewBox="0 0 420 120" width="100%"></svg>
+      <div class="ratebox">Firing rate: <b id="rateNum">8</b> Hz</div>
+      <div class="note" id="freqNote">A light touch on Layla's foot fires slowly; a firm press fires fast — same spike, different rate. That rate <b>is</b> the message her brain reads as intensity.</div>
+    </div>
+  </section>
+
+  <footer><span class="pill">Signal Lab</span> &nbsp; BIOL 432 · Anatomy &amp; Physiology · Dr. Wael M. Osman · The Layla Case</footer>
+</div>
+
+<script>
+/* ---- tabs ---- */
+document.getElementById('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('.tab'); if(!b)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  b.classList.add('active'); document.getElementById(b.dataset.p).classList.add('active');
+  if(b.dataset.p==='apx') drawAP();
+});
+
+/* ---- RMP ---- */
+const state={kleak:true,naleak:true,pump:true};
+const dial=document.getElementById('voltDial'), rmpNote=document.getElementById('rmpNote'), pk=document.getElementById('pk'), pkVal=document.getElementById('pkVal');
+document.getElementById('rmpTogs').addEventListener('click',e=>{
+  const t=e.target.closest('.tog'); if(!t)return;
+  state[t.dataset.k]=!state[t.dataset.k]; t.classList.toggle('on'); updateRMP();
+});
+function updateRMP(){
+  const p=+pk.value;
+  pkVal.textContent= p>70?'high':p>35?'moderate':'low';
+  let v;
+  let note='';
+  if(!state.kleak){
+    v=-15;
+    note='<b>Without K⁺ leak</b> the dominant outward current is gone — the membrane drifts toward 0 mV. K⁺ permeability is what makes the inside negative.';
+  } else {
+    // base near -70, modulated by K perm and Na leak
+    v = -90 + (100-p)*0.45;           // more K perm → closer to -90
+    if(state.naleak) v += 12;          // Na leak pulls it up toward 0
+    if(!state.pump)  v += 8;           // losing pump degrades gradient over time
+    v = Math.round(v);
+    if(v>-40)v=-40; if(v<-90)v=-90;
+    note = '<b>Resting steady state.</b> K⁺ leaks out (dominant), Na⁺ leaks in (minor), and the pump (3 Na⁺ out : 2 K⁺ in) holds the gradients. ';
+    if(!state.naleak) note+='No Na⁺ leak → voltage sits even closer to the K⁺ equilibrium. ';
+    if(!state.pump) note+='Pump off → gradients would run down over time, eroding the potential.';
+  }
+  dial.innerHTML = (v>0?'+':'−')+Math.abs(v)+'<small>mV · membrane potential</small>';
+  rmpNote.innerHTML=note;
+}
+pk.oninput=updateRMP; updateRMP();
+
+/* ---- AP EXPLORER ---- */
+const PHASES=[
+  {id:'rest',nm:'Resting',col:'#5C6B6D',x:40, state:'Leak channels open; voltage-gated channels shut.',ion:'K⁺ leak dominates',volt:'Steady ≈ −70 mV'},
+  {id:'depol',nm:'Depolarization',col:'#D9644A',x:150,state:'Voltage-gated <b>Na⁺</b> channels open.',ion:'Na⁺ rushes <b>in</b>',volt:'Rapid rise toward +30 mV'},
+  {id:'repol',nm:'Repolarization',col:'#14606E',x:225,state:'Na⁺ channels inactivate; voltage-gated <b>K⁺</b> open.',ion:'K⁺ flows <b>out</b>',volt:'Falls back toward rest'},
+  {id:'hyper',nm:'Hyperpolarization',col:'#4F8A8B',x:285,state:'K⁺ channels close slowly (overshoot).',ion:'Excess K⁺ <b>out</b>',volt:'Dips below −70 mV'},
+  {id:'return',nm:'Return to rest',col:'#2F7D5B',x:360,state:'Pump + leak restore balance.',ion:'Na⁺/K⁺ pump 3:2',volt:'Back to −70 mV'},
+];
+// AP polyline points (x,y) in viewBox 420x260; y: top=+40mV ... bottom=-90mV
+function vy(mv){ // map mV to y: +40->20, -90->230
+  const top=20,bot=230,vmax=40,vmin=-90;
+  return top + (vmax-mv)/(vmax-vmin)*(bot-top);
+}
+const apPath=[ [40,vy(-70)],[120,vy(-70)],[140,vy(-55)],[160,vy(30)],[200,vy(20)],[235,vy(-70)],[285,vy(-80)],[330,vy(-72)],[400,vy(-70)] ];
+function drawAP(){
+  const svg=document.getElementById('apSvg'); if(svg.dataset.done)return;
+  let h='';
+  // axes
+  h+=`<line x1="40" y1="20" x2="40" y2="240" stroke="#D8D2C4"/>`;
+  h+=`<line x1="40" y1="${vy(-70)}" x2="410" y2="${vy(-70)}" stroke="#E3ECEC"/>`;
+  h+=`<line x1="40" y1="${vy(-55)}" x2="410" y2="${vy(-55)}" stroke="#D9644A" stroke-dasharray="4 3" opacity=".7"/>`;
+  h+=`<text x="44" y="${vy(-55)-3}" font-size="9" fill="#D9644A" font-family="Calibri">threshold −55</text>`;
+  h+=`<text x="44" y="${vy(-70)-3}" font-size="9" fill="#5C6B6D" font-family="Calibri">rest −70</text>`;
+  h+=`<text x="6" y="24" font-size="9" fill="#5C6B6D" font-family="Calibri">+40</text>`;
+  h+=`<text x="8" y="232" font-size="9" fill="#5C6B6D" font-family="Calibri">−90</text>`;
+  // curve
+  h+=`<polyline fill="none" stroke="#14606E" stroke-width="2.5" points="${apPath.map(p=>p.join(',')).join(' ')}"/>`;
+  // clickable phase markers
+  PHASES.forEach(ph=>{
+    const yy = ph.id==='rest'?vy(-70): ph.id==='depol'?vy(0): ph.id==='repol'?vy(-40): ph.id==='hyper'?vy(-80):vy(-70);
+    h+=`<circle class="pmark" data-id="${ph.id}" cx="${ph.x}" cy="${yy}" r="7" fill="${ph.col}" stroke="#fff" stroke-width="2" style="cursor:pointer"/>`;
+  });
+  svg.innerHTML=h; svg.dataset.done='1';
+  svg.querySelectorAll('.pmark').forEach(c=>c.addEventListener('click',()=>selPhase(c.dataset.id)));
+  // phase buttons
+  const pb=document.getElementById('phaseBtns'); pb.innerHTML='';
+  PHASES.forEach(ph=>{const b=document.createElement('button');b.className='pbtn';b.textContent=ph.nm;b.dataset.id=ph.id;b.onclick=()=>selPhase(ph.id);pb.appendChild(b);});
+}
+function selPhase(id){
+  const ph=PHASES.find(p=>p.id===id);
+  document.querySelectorAll('.pbtn').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  document.querySelectorAll('.pmark').forEach(c=>c.setAttribute('r', c.dataset.id===id?'10':'7'));
+  document.getElementById('phaseCard').innerHTML=
+    `<span class="badge" style="background:${ph.col}">${ph.nm}</span>
+     <h4>${ph.nm}</h4>
+     <div class="ch"><b>Channels:</b> ${ph.state}</div>
+     <div class="ch"><b>Ion:</b> ${ph.ion}</div>
+     <div class="ch"><b>Voltage:</b> ${ph.volt}</div>`;
+}
+
+/* ---- THRESHOLD ---- */
+const stim=document.getElementById('stim'), stimVal=document.getElementById('stimVal'), thrV=document.getElementById('thrVerdict');
+function drawThr(){
+  const s=+stim.value, fires=s>=45;
+  stimVal.textContent= s<25?'weak':s<45?'sub-threshold':'supra-threshold';
+  const svg=document.getElementById('thrSvg');
+  const y0=170;
+  let h=`<line x1="30" y1="${y0}" x2="410" y2="${y0}" stroke="#E3ECEC"/>`;
+  h+=`<line x1="30" y1="60" x2="410" y2="60" stroke="#D9644A" stroke-dasharray="4 3" opacity=".6"/><text x="34" y="56" font-size="9" fill="#D9644A" font-family="Calibri">threshold</text>`;
+  // stimulus bump height scales with s but AP is fixed
+  const bump = y0 - (s/100)*95;
+  if(!fires){
+    h+=`<polyline fill="none" stroke="#5C6B6D" stroke-width="2.5" points="30,${y0} 150,${y0} 175,${bump} 205,${y0} 410,${y0}"/>`;
+    thrV.className='verdict no'; thrV.innerHTML='<b>No action potential.</b> The depolarization fails to reach −55 mV, so voltage-gated Na⁺ channels stay shut. A local, graded blip that fades — nothing propagates.';
+  } else {
+    // fixed full spike regardless of s
+    h+=`<polyline fill="none" stroke="#14606E" stroke-width="2.5" points="30,${y0} 140,${y0} 158,60 172,25 188,40 215,${y0} 245,185 280,${y0} 410,${y0}"/>`;
+    thrV.className='verdict fire'; thrV.innerHTML='<b>Full action potential fired.</b> Threshold reached → the spike is triggered at its <b>fixed</b> size. Pushing the stimulus higher does <b>not</b> make a taller spike — that is the all-or-none law.';
+  }
+  svg.innerHTML=h;
+}
+stim.oninput=drawThr; drawThr();
+
+/* ---- FREQUENCY ---- */
+const intensity=document.getElementById('intensity'), intVal=document.getElementById('intVal'), rateNum=document.getElementById('rateNum');
+function drawTrain(){
+  const v=+intensity.value;
+  const rate=Math.round(4+v*0.4); // 8..44 Hz
+  rateNum.textContent=rate;
+  intVal.textContent= v<35?'low':v<70?'moderate':'high';
+  const n=Math.max(2,Math.round(v/9)); // number of spikes shown
+  const svg=document.getElementById('trainSvg'); const y0=95, W=410;
+  let h=`<line x1="10" y1="${y0}" x2="${W}" y2="${y0}" stroke="#E3ECEC"/>`;
+  const gap=(W-30)/n;
+  for(let i=0;i<n;i++){
+    const x=20+i*gap+gap*0.3;
+    h+=`<polyline fill="none" stroke="#14606E" stroke-width="2.4" points="${x-6},${y0} ${x},${y0} ${x+3},20 ${x+6},${y0} ${x+18},${y0}"/>`;
+  }
+  svg.innerHTML=h;
+}
+intensity.oninput=drawTrain; drawTrain();
+</script>
+</body>
+</html>

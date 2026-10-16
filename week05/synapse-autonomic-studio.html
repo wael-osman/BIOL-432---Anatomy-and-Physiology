@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BIOL 432 · W5 L1 · Synapse & Autonomic Studio</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --coral:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D;
+    --line:#D8D2C4; --tealt:#E3ECEC; --coralt:#F6E2DB; --seat:#E7EFEC;
+    --gold:#C98A2B; --goldt:#F3E7CE; --good:#2F7D5B; --goodt:#E0EFE7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif; line-height:1.5;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:24px 20px 64px;}
+  h1,h2,h3,.serif{font-family:Cambria,Georgia,"Times New Roman",serif;}
+  .kicker{font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    font-weight:700; color:var(--coral); margin:0 0 6px;}
+  header h1{margin:0 0 8px; font-size:30px; color:var(--dark); line-height:1.15;}
+  header p.sub{margin:0; color:var(--mute); font-size:15px;}
+  .rule{height:4px; width:74px; background:var(--coral); border-radius:3px; margin:14px 0 22px;}
+
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+  .tab{appearance:none; border:1px solid var(--line); background:var(--card);
+    color:var(--teal); font-family:Cambria,Georgia,serif; font-weight:700; font-size:14.5px;
+    padding:9px 15px; border-radius:9px; cursor:pointer; transition:.15s;}
+  .tab:hover{border-color:var(--sea);}
+  .tab.active{background:var(--teal); color:#fff; border-color:var(--teal);}
+  .panel{display:none; animation:fade .25s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px 22px; margin-bottom:18px; box-shadow:0 1px 0 rgba(14,58,64,.04);}
+  .card h2{margin:0 0 4px; font-size:21px; color:var(--dark);}
+  .card .lead{margin:0 0 16px; color:var(--mute); font-size:14.5px;}
+  .barL{border-left:5px solid var(--teal);}
+  .barC{border-left:5px solid var(--coral);}
+  .barG{border-left:5px solid var(--gold);}
+
+  /* sequencer */
+  .seqtray{display:flex; flex-direction:column; gap:9px; margin-bottom:14px;}
+  .stepbtn{display:flex; align-items:center; gap:12px; text-align:left;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    padding:12px 14px; border-radius:10px; cursor:pointer; font-size:14.5px; transition:.15s;}
+  .stepbtn:hover:not([disabled]){border-color:var(--sea); background:var(--seat);}
+  .stepbtn[disabled]{opacity:.45; cursor:default;}
+  .stepbtn .ord{min-width:26px; height:26px; border-radius:50%; background:var(--tealt);
+    color:var(--teal); font-weight:700; display:grid; place-items:center; font-size:13px;
+    font-family:Cambria,Georgia,serif;}
+  .stepbtn.placed{background:var(--goodt); border-color:var(--good);}
+  .stepbtn.placed .ord{background:var(--good); color:#fff;}
+  .stepbtn.wrong{background:var(--coralt); border-color:var(--coral); animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:none;}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+  .slots{display:flex; flex-direction:column; gap:7px; margin-bottom:12px;}
+  .slot{display:flex; align-items:center; gap:10px; border:1px dashed var(--line);
+    border-radius:9px; padding:9px 12px; min-height:44px; color:var(--mute); font-size:13.5px; background:#fcfbf7;}
+  .slot .num{min-width:24px; height:24px; border-radius:50%; background:var(--dark); color:#fff;
+    font-weight:700; display:grid; place-items:center; font-size:12px; font-family:Cambria,serif;}
+  .slot.filled{border-style:solid; border-color:var(--good); color:var(--ink); background:var(--goodt);}
+
+  /* quiz */
+  .q{margin-bottom:6px; font-size:15.5px; font-weight:600;}
+  .qmeta{font-size:12px; color:var(--coral); font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:8px;}
+  .opts{display:flex; flex-direction:column; gap:9px; margin:12px 0 6px;}
+  .opt{display:flex; gap:11px; align-items:flex-start; border:1px solid var(--line);
+    background:var(--card); border-radius:10px; padding:11px 14px; cursor:pointer;
+    font-size:14.5px; transition:.12s;}
+  .opt:hover:not(.locked){border-color:var(--sea); background:var(--seat);}
+  .opt .key{min-width:24px; height:24px; border-radius:6px; background:var(--tealt); color:var(--teal);
+    font-weight:700; display:grid; place-items:center; font-size:13px; font-family:Cambria,serif;}
+  .opt.correct{background:var(--goodt); border-color:var(--good);}
+  .opt.correct .key{background:var(--good); color:#fff;}
+  .opt.bad{background:var(--coralt); border-color:var(--coral);}
+  .opt.bad .key{background:var(--coral); color:#fff;}
+  .opt.locked{cursor:default;}
+  .fb{margin-top:10px; padding:11px 14px; border-radius:9px; font-size:14px; display:none;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--goodt); border:1px solid var(--good); color:#1c5238;}
+  .fb.no{background:var(--coralt); border:1px solid var(--coral); color:#7a2d1c;}
+
+  .progress{font-size:13px; color:var(--mute); margin-top:4px;}
+  .btn{appearance:none; border:none; border-radius:9px; padding:10px 18px; font-size:14px;
+    font-weight:700; cursor:pointer; font-family:Cambria,Georgia,serif; transition:.15s;}
+  .btn.primary{background:var(--coral); color:#fff;}
+  .btn.primary:hover{background:#c4543c;}
+  .btn.ghost{background:transparent; color:var(--teal); border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--sea);}
+  .btnrow{display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap;}
+
+  .layla{background:var(--coralt); border-left:5px solid var(--coral); border-radius:12px;
+    padding:18px 20px; margin-bottom:18px;}
+  .layla h3{margin:0 0 8px; color:var(--coral); font-size:17px;}
+  .layla p{margin:0 0 10px; font-size:14.5px;}
+  .reveal{display:none; margin-top:12px; padding:14px 16px; border-radius:10px;
+    background:var(--card); border:1px solid var(--good);}
+  .reveal.show{display:block;}
+  .reveal strong{color:var(--good);}
+  .scorebar{font-family:Cambria,Georgia,serif; font-weight:700; color:var(--dark); font-size:15px;}
+  .pill{display:inline-block; background:var(--tealt); color:var(--teal); border-radius:999px;
+    padding:2px 10px; font-size:12px; font-weight:700; margin-left:6px;}
+  footer{margin-top:30px; color:var(--mute); font-size:12.5px; text-align:center;}
+  b,strong{color:inherit;}
+  .hint{font-size:13px; color:var(--mute); margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">BIOL 432 · Anatomy &amp; Physiology · Week 5 · Lecture 1</p>
+    <h1>Synapse &amp; Autonomic Studio</h1>
+    <p class="sub">An active-recall companion to <em>Nervous System 3 — The Synapse, the Chemistry &amp; the Autopilot.</em></p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="tabs" id="tabbar">
+    <button class="tab active" data-p="panel-seq">1 · Synapse sequencer</button>
+    <button class="tab" data-p="panel-quiz">2 · Autonomic challenge</button>
+    <button class="tab" data-p="panel-layla">3 · Layla's case</button>
+  </div>
+
+  <!-- ===== PANEL 1: SEQUENCER ===== -->
+  <div class="panel active" id="panel-seq">
+    <div class="card barL">
+      <h2>Build the chemical synapse — in order</h2>
+      <p class="lead">Click the five events in the sequence they actually occur. Get one wrong and it bounces back. Remember the trigger.</p>
+      <div class="slots" id="slots"></div>
+      <div class="seqtray" id="tray"></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="seqReset">Reset</button>
+        <span class="scorebar" id="seqStatus">0 / 5 placed</span>
+      </div>
+      <div class="fb" id="seqDone">
+        <strong>That's the chain.</strong> Notice step 2 — <b>calcium entry is the trigger</b>. No Ca²⁺ influx, no neurotransmitter release. That single dependency is why the synapse is the most drug-sensitive point in the whole pathway.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PANEL 2: QUIZ ===== -->
+  <div class="panel" id="panel-quiz">
+    <div class="card barC">
+      <h2>Autonomic challenge</h2>
+      <p class="lead">Five scenarios on transmitters, receptors, and the exceptions that matter at the bedside. Pick one answer each.</p>
+      <div id="quizHost"></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="quizReset">Restart quiz</button>
+        <span class="scorebar" id="quizScore">Score: 0 / 5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PANEL 3: LAYLA ===== -->
+  <div class="panel" id="panel-layla">
+    <div class="layla">
+      <h3>Layla — the sweat-gland puzzle</h3>
+      <p>During her heat collapse, Layla's body ran a full <b>sympathetic</b> surge: racing heart, blood shunted to muscle — and <b>sweating</b>. Yet the rule you just learned says sympathetic postganglionic fibres release <b>norepinephrine</b>, while sweating is driven by acetylcholine.</p>
+      <p><b>The closing MPT prompt:</b> which receptor type let Layla keep sweating, even though sweating is a sympathetic response?</p>
+    </div>
+    <div class="card barG">
+      <p class="q">Type or think your answer, then reveal the model response.</p>
+      <div class="btnrow">
+        <button class="btn primary" id="laylaBtn">Reveal model answer</button>
+      </div>
+      <div class="reveal" id="laylaReveal">
+        <p><strong>Muscarinic cholinergic receptors.</strong> Sweat glands are the famous exception: although they are <b>sympathetic</b>, their postganglionic fibres are <b>cholinergic</b> — they release <b>acetylcholine</b>, which acts on <b>muscarinic</b> receptors on the gland. So Layla sweated through a sympathetic pathway that happens to use the parasympathetic transmitter.</p>
+        <p class="hint">Follow-up to pose the room: if you blocked muscarinic receptors with atropine, what would happen to her sweating? (It would stop — atropine dries secretions.)</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    BIOL 432 · Week 5 · Lecture 1 · Dr. Wael M. Osman · College of Medicine and Health Sciences, Khalifa University<br>
+    Self-check activity — please click through once before class to confirm it behaves as expected in your browser.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- TABS ----------
+  var tabs = document.getElementById("tabbar").querySelectorAll(".tab");
+  for (var i=0;i<tabs.length;i++){
+    tabs[i].addEventListener("click", function(){
+      var id = this.getAttribute("data-p");
+      var all = document.getElementById("tabbar").querySelectorAll(".tab");
+      for (var j=0;j<all.length;j++){ all[j].classList.remove("active"); }
+      this.classList.add("active");
+      var panels = document.querySelectorAll(".panel");
+      for (var k=0;k<panels.length;k++){ panels[k].classList.remove("active"); }
+      document.getElementById(id).classList.add("active");
+    });
+  }
+
+  // ---------- SEQUENCER ----------
+  var STEPS = [
+    {n:1, t:"Action potential arrives at the axon terminal."},
+    {n:2, t:"Voltage-gated Ca²⁺ channels open; calcium floods in."},
+    {n:3, t:"Synaptic vesicles fuse and release neurotransmitter by exocytosis."},
+    {n:4, t:"Neurotransmitter diffuses across the cleft and binds receptors."},
+    {n:5, t:"Ion channels open → a graded potential in the postsynaptic cell."}
+  ];
+  var nextExpected = 1;
+
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function buildSeq(){
+    nextExpected = 1;
+    var slots = document.getElementById("slots");
+    var tray = document.getElementById("tray");
+    slots.innerHTML = ""; tray.innerHTML = "";
+    document.getElementById("seqDone").classList.remove("show");
+    for (var s=1;s<=STEPS.length;s++){
+      var d = document.createElement("div");
+      d.className = "slot"; d.id = "slot-"+s;
+      d.innerHTML = '<span class="num">'+s+'</span><span>waiting…</span>';
+      slots.appendChild(d);
+    }
+    var order = shuffle(STEPS);
+    for (var m=0;m<order.length;m++){
+      (function(step){
+        var b = document.createElement("button");
+        b.className = "stepbtn"; b.id = "step-"+step.n;
+        b.innerHTML = '<span class="ord">?</span><span>'+step.t+'</span>';
+        b.addEventListener("click", function(){ placeStep(step, b); });
+        tray.appendChild(b);
+      })(order[m]);
+    }
+    updateSeqStatus();
+  }
+
+  function placeStep(step, btn){
+    if (btn.getAttribute("disabled")) return;
+    if (step.n === nextExpected){
+      var slot = document.getElementById("slot-"+nextExpected);
+      slot.classList.add("filled");
+      slot.innerHTML = '<span class="num">'+nextExpected+'</span><span>'+step.t+'</span>';
+      btn.classList.remove("wrong");
+      btn.classList.add("placed");
+      btn.querySelector(".ord").textContent = nextExpected;
+      btn.setAttribute("disabled","true");
+      nextExpected++;
+      updateSeqStatus();
+      if (nextExpected > STEPS.length){
+        document.getElementById("seqDone").classList.add("show","good");
+        document.getElementById("seqDone").classList.add("good");
+      }
+    } else {
+      btn.classList.add("wrong");
+      setTimeout(function(){ btn.classList.remove("wrong"); }, 320);
+    }
+  }
+
+  function updateSeqStatus(){
+    var placed = nextExpected - 1;
+    document.getElementById("seqStatus").textContent = placed + " / " + STEPS.length + " placed";
+  }
+
+  document.getElementById("seqReset").addEventListener("click", buildSeq);
+
+  // ---------- QUIZ ----------
+  var QUIZ = [
+    {
+      meta:"Transmitters",
+      q:"Which two neurotransmitters run essentially the entire autonomic nervous system?",
+      opts:["Dopamine and serotonin","Acetylcholine and norepinephrine","Glutamate and GABA","Epinephrine and histamine"],
+      correct:1,
+      why:"ACh and NE do almost all autonomic signalling. Cholinergic fibres release ACh; adrenergic fibres release NE."
+    },
+    {
+      meta:"The exception",
+      q:"Sweat glands are sympathetic, yet their postganglionic fibres release which transmitter?",
+      opts:["Norepinephrine, like other sympathetic fibres","Epinephrine from the adrenal medulla","Acetylcholine — the cholinergic exception","Dopamine"],
+      correct:2,
+      why:"Sweat-gland sympathetic fibres are cholinergic — they release ACh. This is exactly why Layla sweated during a sympathetic surge."
+    },
+    {
+      meta:"Receptors",
+      q:"ACh excites skeletal muscle but slows the heart. What explains one molecule doing both?",
+      opts:["The dose differs at each site","Different receptors: nicotinic at the NMJ, muscarinic on the heart","The heart converts ACh to NE","Skeletal muscle has no receptors for ACh"],
+      correct:1,
+      why:"The receptor decides the effect. Nicotinic (NMJ) is always excitatory; cardiac muscarinic receptors here are inhibitory."
+    },
+    {
+      meta:"Adrenergic subtypes",
+      q:"Why can a β₁-selective blocker be safer than a non-selective one in a patient with asthma?",
+      opts:["It blocks β₂ and opens the airways","It slows the heart (β₁) without blocking airway-opening β₂ receptors","It only works on blood vessels","It converts to a β₂ agonist"],
+      correct:1,
+      why:"β₁ selectivity slows the heart while sparing the β₂ receptors that keep airways open — avoiding bronchoconstriction."
+    },
+    {
+      meta:"Postsynaptic response",
+      q:"A transmitter hyperpolarises the postsynaptic membrane, moving it further from threshold. This is…",
+      opts:["An EPSP — excitatory","An IPSP — inhibitory","An action potential","Temporal summation"],
+      correct:1,
+      why:"Hyperpolarisation away from threshold is an IPSP. Inhibition is active control, not just the absence of a signal."
+    }
+  ];
+  var quizState = [];
+
+  function buildQuiz(){
+    quizState = QUIZ.map(function(){ return null; });
+    var host = document.getElementById("quizHost");
+    host.innerHTML = "";
+    QUIZ.forEach(function(item, qi){
+      var block = document.createElement("div");
+      block.style.marginBottom = "22px";
+      var keys = ["A","B","C","D"];
+      var optsHtml = "";
+      item.opts.forEach(function(o, oi){
+        optsHtml += '<div class="opt" id="q'+qi+'o'+oi+'" data-q="'+qi+'" data-o="'+oi+'">'
+          + '<span class="key">'+keys[oi]+'</span><span>'+o+'</span></div>';
+      });
+      block.innerHTML =
+        '<div class="qmeta">'+item.meta+'</div>'
+        + '<div class="q">'+(qi+1)+'. '+item.q+'</div>'
+        + '<div class="opts">'+optsHtml+'</div>'
+        + '<div class="fb" id="q'+qi+'fb"></div>';
+      host.appendChild(block);
+    });
+    // wire options
+    var opts = host.querySelectorAll(".opt");
+    for (var i=0;i<opts.length;i++){
+      opts[i].addEventListener("click", function(){
+        var qi = parseInt(this.getAttribute("data-q"),10);
+        var oi = parseInt(this.getAttribute("data-o"),10);
+        answer(qi, oi);
+      });
+    }
+    updateScore();
+  }
+
+  function answer(qi, oi){
+    if (quizState[qi] !== null) return; // locked
+    quizState[qi] = oi;
+    var item = QUIZ[qi];
+    for (var k=0;k<item.opts.length;k++){
+      var el = document.getElementById("q"+qi+"o"+k);
+      el.classList.add("locked");
+      if (k === item.correct) el.classList.add("correct");
+    }
+    var picked = document.getElementById("q"+qi+"o"+oi);
+    var fb = document.getElementById("q"+qi+"fb");
+    if (oi === item.correct){
+      fb.className = "fb show good";
+      fb.innerHTML = "<strong>Correct.</strong> " + item.why;
+    } else {
+      picked.classList.add("bad");
+      fb.className = "fb show no";
+      fb.innerHTML = "<strong>Not quite.</strong> " + item.why;
+    }
+    updateScore();
+  }
+
+  function updateScore(){
+    var correct = 0, answered = 0;
+    for (var i=0;i<quizState.length;i++){
+      if (quizState[i] !== null){ answered++; if (quizState[i] === QUIZ[i].correct) correct++; }
+    }
+    document.getElementById("quizScore").textContent = "Score: " + correct + " / " + QUIZ.length;
+  }
+
+  document.getElementById("quizReset").addEventListener("click", buildQuiz);
+
+  // ---------- LAYLA ----------
+  document.getElementById("laylaBtn").addEventListener("click", function(){
+    document.getElementById("laylaReveal").classList.add("show");
+    this.textContent = "Model answer shown";
+    this.setAttribute("disabled","true");
+    this.classList.remove("primary"); this.classList.add("ghost");
+  });
+
+  // ---------- INIT ----------
+  buildSeq();
+  buildQuiz();
+})();
+</script>
+</body>
+</html>

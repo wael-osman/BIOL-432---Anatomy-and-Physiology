@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Muscle Contraction Explorer</title>
+<style>
+  :root{
+    --deep:#0E4F52; --teal:#2E8B86; --sea:#6FB7B0; --seaTint:#E4F1EF;
+    --coral:#EE6A4C; --coralDk:#C44E36; --ink:#12343B; --muted:#5E7C7E;
+    --paper:#F4F8F7; --line:#CBE0DD; --gold:#E5A742;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:linear-gradient(160deg,#F4F8F7,#E4F1EF);color:var(--ink);line-height:1.5;padding:24px;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{background:var(--deep);color:#fff;border-radius:18px;padding:26px 30px;box-shadow:0 8px 24px rgba(14,79,82,.25);position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(111,183,176,.25)}
+  .kick{font-size:12px;letter-spacing:3px;font-weight:700;color:var(--sea);text-transform:uppercase}
+  h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:6px 0 4px}
+  header p{color:#BFE0DC;font-size:15px;font-style:italic}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;box-shadow:0 4px 14px rgba(14,79,82,.06)}
+  h2{font-family:Cambria,Georgia,serif;color:var(--deep);font-size:21px;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .stage{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+  @media(max-width:820px){.stage{grid-template-columns:1fr}}
+  svg{width:100%;height:auto;background:var(--seaTint);border-radius:12px;display:block}
+  .step-title{font-family:Cambria,serif;font-size:20px;color:var(--deep);font-weight:700;margin-bottom:6px}
+  .step-body{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .badge{display:inline-block;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:var(--teal);padding:4px 10px;border-radius:20px;margin-bottom:10px}
+  .meters{display:flex;gap:12px;margin:12px 0}
+  .meter{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .meter .lab{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .bar{height:9px;border-radius:6px;background:#dfeceb;margin-top:5px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:6px;transition:width .5s ease}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  button{font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;transition:transform .08s,box-shadow .2s}
+  button:active{transform:translateY(1px)}
+  .btn-primary{background:var(--coral);color:#fff;box-shadow:0 3px 8px rgba(238,106,76,.35)}
+  .btn-ghost{background:#fff;color:var(--deep);border:1.5px solid var(--line)}
+  .btn-deep{background:var(--deep);color:#fff}
+  .pips{display:flex;gap:6px;margin:14px 0 4px;flex-wrap:wrap}
+  .pip{width:26px;height:26px;border-radius:50%;background:#dfeceb;color:var(--muted);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent}
+  .pip.active{background:var(--coral);color:#fff}
+  .pip.done{background:var(--teal);color:#fff}
+  .toggle{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px;border-radius:10px;background:var(--seaTint)}
+  .switch{position:relative;width:46px;height:26px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:#b9d6d2;border-radius:26px;transition:.3s;cursor:pointer}
+  .slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+  .switch input:checked + .slider{background:var(--coral)}
+  .switch input:checked + .slider::before{transform:translateX(20px)}
+  .quiz .q{font-weight:600;margin:14px 0 8px;color:var(--ink)}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;margin:6px 0;cursor:pointer;font-size:14px;color:var(--ink)}
+  .opt:hover{border-color:var(--sea)}
+  .opt.correct{background:#e2f3ee;border-color:var(--teal);color:var(--deep);font-weight:600}
+  .opt.wrong{background:#fde7e1;border-color:var(--coral);color:var(--coralDk)}
+  .fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:8px;background:var(--seaTint);display:none}
+  .fb.show{display:block}
+  .score{font-family:Cambria,serif;font-size:18px;color:var(--deep);font-weight:700;margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Musculoskeletal System</div>
+    <h1>Muscle Contraction Explorer</h1>
+    <p>Step through excitation–contraction coupling and watch the sarcomere shorten — then see why Layla's muscle cramped.</p>
+  </header>
+
+  <div class="card">
+    <h2>The contraction cascade</h2>
+    <div class="sub">Use Next / Previous (or click a number) to move through the cascade. Watch the calcium and ATP meters, and the sarcomere on the left.</div>
+    <div class="pips" id="pips"></div>
+    <div class="stage">
+      <div>
+        <svg viewBox="0 0 520 260" id="sarc" aria-label="sarcomere schematic">
+          <!-- Z discs -->
+          <rect id="zL" x="70" y="60" width="6" height="140" fill="#0E4F52"/>
+          <rect id="zR" x="444" y="60" width="6" height="140" fill="#0E4F52"/>
+          <text id="zLt" x="73" y="220" font-size="13" fill="#0E4F52" text-anchor="middle" font-weight="bold">Z</text>
+          <text id="zRt" x="447" y="220" font-size="13" fill="#0E4F52" text-anchor="middle" font-weight="bold">Z</text>
+          <!-- thick filament (myosin) -->
+          <rect id="thick" x="190" y="123" width="140" height="14" rx="6" fill="#EE6A4C"/>
+          <rect id="mline" x="257" y="95" width="6" height="70" fill="#C44E36"/>
+          <!-- thin filaments -->
+          <rect id="thinL" x="76" y="127" width="170" height="6" rx="3" fill="#2E8B86"/>
+          <rect id="thinR" x="274" y="127" width="170" height="6" rx="3" fill="#2E8B86"/>
+          <!-- calcium ions -->
+          <g id="caions"></g>
+          <text x="260" y="245" font-size="12" fill="#5E7C7E" text-anchor="middle" font-style="italic">thin (teal) slides over thick (coral) toward the M line</text>
+        </svg>
+        <div class="meters">
+          <div class="meter"><div class="lab">Cytosolic Ca²⁺</div><div class="bar"><i id="caBar" style="width:5%;background:#2E8B86"></i></div></div>
+          <div class="meter"><div class="lab">ATP available</div><div class="bar"><i id="atpBar" style="width:90%;background:#EE6A4C"></i></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="badge" id="stepBadge">Step 1 / 7</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-body" id="stepBody"></div>
+        <div class="controls">
+          <button class="btn-ghost" id="prevBtn">‹ Previous</button>
+          <button class="btn-primary" id="nextBtn">Next ›</button>
+          <button class="btn-deep" id="playBtn">▶ Auto-play</button>
+        </div>
+        <div class="toggle">
+          <label class="switch"><input type="checkbox" id="crampToggle"><span class="slider"></span></label>
+          <div><strong>Layla's cramp scenario</strong><br><span style="font-size:13px;color:var(--muted)">Low ATP — watch relaxation fail</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card quiz">
+    <h2>Check your understanding</h2>
+    <div class="sub">Three quick questions on the mechanism you just stepped through.</div>
+    <div id="quizArea"></div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <footer>BIOL 432 · Anatomy &amp; Physiology — Dr. Wael M. Osman, Khalifa University · Interactive teaching activity</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var steps = [
+    {t:"Neuromuscular junction", badge:"Excitation", b:"A motor-neuron action potential releases acetylcholine, which binds nicotinic receptors and triggers a muscle action potential.", ca:8, overlap:0},
+    {t:"Down the T-tubules", badge:"Excitation", b:"The action potential races along the sarcolemma and into the T-tubules, reaching deep into the fibre at the triads.", ca:10, overlap:0},
+    {t:"DHPR opens RyR1", badge:"Coupling", b:"At the triad the voltage sensor DHPR mechanically opens the SR's RyR1 channel — the molecular handshake of E–C coupling.", ca:25, overlap:0.05},
+    {t:"Calcium floods the cytosol", badge:"Coupling", b:"The SR releases a burst of Ca²⁺. Calcium binds troponin-C, tropomyosin shifts, and actin's binding sites are exposed.", ca:95, overlap:0.1},
+    {t:"Cross-bridge power stroke", badge:"Contraction", b:"Myosin heads attach to actin and pivot, pulling the thin filaments toward the M line. The sarcomere shortens.", ca:95, overlap:0.6},
+    {t:"Cycling continues", badge:"Contraction", b:"While Ca²⁺ is high and ATP is available, heads detach (using ATP), re-cock, and reattach — repeating the power stroke.", ca:90, overlap:0.95},
+    {t:"Relaxation (SERCA)", badge:"Relaxation", b:"SERCA pumps Ca²⁺ back into the SR (spending ATP). Tropomyosin re-covers actin, cycling stops, and the sarcomere lengthens.", ca:8, overlap:0.05}
+  ];
+  var i = 0, playing = false, playTimer = null, cramp = false;
+  var $ = function(id){ return document.getElementById(id); };
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  function renderCa(level){
+    var g = $("caions");
+    while(g.firstChild) g.removeChild(g.firstChild);
+    var n = Math.round(level/100*14);
+    for(var k=0;k<n;k++){
+      var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+      var cx = 90 + Math.random()*340, cy = 70 + Math.random()*120;
+      c.setAttribute("cx", cx.toFixed(0)); c.setAttribute("cy", cy.toFixed(0));
+      c.setAttribute("r","4"); c.setAttribute("fill","#E5A742"); c.setAttribute("opacity","0.85");
+      g.appendChild(c);
+    }
+  }
+
+  function draw(){
+    var s = steps[i];
+    var ov = s.overlap;
+    // sarcomere geometry: Z discs move inward as overlap grows
+    var leftZ = lerp(70, 150, ov), rightZ = lerp(444, 364, ov);
+    $("zL").setAttribute("x", leftZ);
+    $("zR").setAttribute("x", rightZ);
+    $("zLt").setAttribute("x", leftZ+3);
+    $("zRt").setAttribute("x", rightZ+3);
+    // thin filaments anchored to Z discs
+    $("thinL").setAttribute("x", leftZ+6);
+    $("thinL").setAttribute("width", Math.max(20, 246-(70-leftZ)-(150-leftZ)+ (leftZ-70) ));
+    // simpler: thin filaments fixed length from each Z toward centre
+    $("thinL").setAttribute("x", leftZ+6); $("thinL").setAttribute("width", 175);
+    $("thinR").setAttribute("x", rightZ-175); $("thinR").setAttribute("width", 175);
+    // meters
+    var atp = cramp ? (i>=4 ? Math.max(8, 30 - (i-4)*10) : 60) : (i===6?70:90);
+    var caShown = (cramp && i===6) ? 70 : s.ca; // cramp: Ca stays high at relaxation step
+    $("caBar").style.width = caShown + "%";
+    $("atpBar").style.width = atp + "%";
+    $("atpBar").style.background = atp < 25 ? "#C44E36" : "#EE6A4C";
+    renderCa(caShown);
+    // text
+    $("stepBadge").textContent = "Step " + (i+1) + " / " + steps.length;
+    $("stepTitle").textContent = s.t;
+    var body = s.b;
+    if(cramp && i===6){
+      body = "ATP is too low for SERCA to clear the calcium. Ca²⁺ stays bound to troponin, cross-bridges keep cycling, and the muscle CANNOT relax — this is Layla's cramp.";
+    }
+    $("stepBody").textContent = body;
+    // pips
+    Array.prototype.forEach.call(document.querySelectorAll(".pip"), function(p, idx){
+      p.className = "pip" + (idx===i?" active":(idx<i?" done":""));
+    });
+    $("prevBtn").disabled = (i===0);
+  }
+
+  function buildPips(){
+    var c = $("pips");
+    steps.forEach(function(_, idx){
+      var d = document.createElement("div");
+      d.className="pip"; d.textContent=(idx+1);
+      d.addEventListener("click", function(){ i=idx; draw(); });
+      c.appendChild(d);
+    });
+  }
+
+  function next(){ if(i<steps.length-1){ i++; draw(); } else { stopPlay(); } }
+  function prev(){ if(i>0){ i--; draw(); } }
+  function stopPlay(){ playing=false; if(playTimer) clearInterval(playTimer); playTimer=null; $("playBtn").textContent="▶ Auto-play"; }
+  function togglePlay(){
+    if(playing){ stopPlay(); return; }
+    playing=true; $("playBtn").textContent="❚❚ Pause";
+    if(i===steps.length-1) i=0;
+    playTimer = setInterval(function(){ if(i<steps.length-1){ i++; draw(); } else { stopPlay(); } }, 1700);
+    draw();
+  }
+
+  // Quiz
+  var quiz = [
+    {q:"Which step is the FIRST to fail when a muscle runs low on ATP?",
+     opts:["Acetylcholine release","SERCA pumping calcium back into the SR","Action potential conduction","Troponin binding calcium"],
+     correct:1, fb:"Relaxation is active: SERCA needs ATP to clear calcium. Low ATP means calcium lingers and the muscle can't relax — exactly Layla's cramp."},
+    {q:"In skeletal muscle, what directly opens the SR calcium-release channel?",
+     opts:["Calcium entering from outside the cell","A mechanical change in DHPR coupled to RyR1","Acetylcholine binding RyR1","ATP binding the myosin head"],
+     correct:1, fb:"Skeletal E–C coupling is voltage-driven: the T-tubule DHPR mechanically opens RyR1 — no external calcium needed."},
+    {q:"During contraction, why does the A band stay the same length?",
+     opts:["Thin filaments lengthen","The thick filament length is fixed; filaments slide rather than shrink","Calcium shortens the myosin","The Z-discs dissolve"],
+     correct:1, fb:"The A band equals the thick-filament length, which doesn't change. Sliding shortens the I band and H zone instead."}
+  ];
+  var answered = 0, correctCount = 0;
+  function buildQuiz(){
+    var area = $("quizArea");
+    quiz.forEach(function(item, qi){
+      var qd = document.createElement("div"); qd.className="q"; qd.textContent=(qi+1)+". "+item.q; area.appendChild(qd);
+      item.opts.forEach(function(opt, oi){
+        var btn = document.createElement("button"); btn.className="opt"; btn.textContent=opt;
+        btn.addEventListener("click", function(){
+          if(btn.dataset.locked) return;
+          var sib = btn.parentNode.querySelectorAll(".opt-"+qi);
+          var fb = document.getElementById("fb-"+qi);
+          Array.prototype.forEach.call(document.querySelectorAll(".opt-"+qi), function(b){ b.dataset.locked="1"; });
+          if(oi===item.correct){ btn.classList.add("correct"); correctCount++; }
+          else { btn.classList.add("wrong");
+            var c = document.querySelectorAll(".opt-"+qi)[item.correct]; if(c) c.classList.add("correct"); }
+          fb.textContent = item.fb; fb.classList.add("show");
+          answered++; updateScore();
+        });
+        btn.classList.add("opt-"+qi);
+        area.appendChild(btn);
+      });
+      var fb = document.createElement("div"); fb.className="fb"; fb.id="fb-"+qi; area.appendChild(fb);
+    });
+  }
+  function updateScore(){
+    if(answered===quiz.length){ $("score").textContent = "Score: "+correctCount+" / "+quiz.length + (correctCount===quiz.length?"  — perfect!":""); }
+  }
+
+  function init(){
+    buildPips(); buildQuiz(); draw();
+    $("nextBtn").addEventListener("click", next);
+    $("prevBtn").addEventListener("click", prev);
+    $("playBtn").addEventListener("click", togglePlay);
+    $("crampToggle").addEventListener("change", function(e){ cramp = e.target.checked; if(cramp){ i=6; } draw(); });
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+</body>
+</html>
