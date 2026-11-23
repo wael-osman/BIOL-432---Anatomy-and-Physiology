@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hemostasis Studio · Blood Part 2 · BIOL 432</title>
+<style>
+  :root{
+    --deep:#0E3A40; --teal:#14606E; --coral:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D;
+    --line:#D8D2C4; --tealT:#E3ECEC; --coralT:#F6E2DB; --crimson:#9E2B25;
+    --good:#2F7D5B; --gold:#C98A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+  header{background:var(--deep);color:#fff;border-radius:16px;padding:26px 28px;position:relative;overflow:hidden}
+  header .eye{color:var(--coral);font-weight:700;letter-spacing:2px;font-size:13px}
+  header h1{font-family:Cambria,Georgia,serif;font-size:34px;margin:4px 0 6px}
+  header p{color:#CFE0E0;font-size:15px;max-width:660px}
+  header .blob{position:absolute;width:220px;height:220px;border-radius:50%;background:#14606E;top:-70px;right:-40px;opacity:.55}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 14px}
+  .tab{border:1px solid var(--line);background:var(--card);color:var(--teal);font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;cursor:pointer}
+  .tab:hover{background:var(--tealT)}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+  .panel.show{display:block;animation:f .25s ease}
+  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-family:Cambria,Georgia,serif;color:var(--deep);font-size:22px;margin-bottom:4px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:16px}
+  .btn{background:var(--coral);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn.sec{background:var(--teal)}
+  .controls{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .fb{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:14px;display:none}
+  .fb.show{display:block}
+  /* seal */
+  .stepwrap{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .badge{background:var(--tealT);color:var(--teal);border:none;border-radius:6px;padding:3px 9px;font-size:13px;cursor:pointer;margin-left:6px}
+  /* abo grid */
+  table{border-collapse:collapse;width:100%;margin-top:6px;font-size:14px}
+  th,td{border:1px solid var(--line);padding:10px;text-align:center}
+  th{background:var(--deep);color:#fff}
+  .pick{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .pickcol{flex:1;min-width:200px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;color:var(--teal)}
+  .chip:hover{background:var(--tealT)}
+  .chip.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .result{margin-top:8px;padding:14px 16px;border-radius:12px;font-weight:700;display:none}
+  .result.show{display:block}
+  .safe{background:#E2EFE7;color:var(--good)} .danger{background:var(--coralT);color:var(--crimson)}
+  /* diagnoser */
+  .casebox{background:var(--deep);color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px}
+  .casebox .q{font-size:16px;font-weight:700}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opt{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-weight:600;color:var(--ink);text-align:left}
+  .opt:hover{border-color:var(--teal);background:var(--tealT)}
+  .opt.correct{background:#E2EFE7;border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:var(--coralT);border-color:var(--crimson);color:var(--crimson)}
+  .score{font-weight:700;color:var(--teal);margin-top:10px}
+  .reflib{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .refcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .refcard h3{font-family:Cambria,serif;color:var(--teal);font-size:16px;margin-bottom:4px}
+  .refcard p{font-size:13.5px}
+  .note{font-size:12.5px;color:var(--mute);font-style:italic;margin-top:14px}
+  @media(max-width:640px){.opts{grid-template-columns:1fr}.reflib{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="blob"></div>
+    <div class="eye">BIOL 432 · BLOOD · PART 2</div>
+    <h1>Hemostasis Studio</h1>
+    <p>Clot here — but nowhere else. Build the three-step seal, test transfusion compatibility on the ABO grid, and diagnose the disorders where hemostasis goes wrong.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="seal" onclick="showTab('seal')">Seal the Breach</button>
+    <button class="tab" data-tab="abo" onclick="showTab('abo')">Transfusion Matcher</button>
+    <button class="tab" data-tab="diagnose" onclick="showTab('diagnose')">Disorder Diagnoser</button>
+    <button class="tab" data-tab="reference" onclick="showTab('reference')">Reference</button>
+  </div>
+
+  <!-- SEAL -->
+  <div class="panel show" id="panel-seal">
+    <h2>Seal the Breach — the three steps of hemostasis</h2>
+    <div class="sub">Order the steps the body uses to stop bleeding. Each later step reinforces the one before. Use ▲ ▼ then check.</div>
+    <div class="stepwrap" id="sealList"></div>
+    <div class="controls">
+      <button class="btn" onclick="checkSeal()">Check order</button>
+      <button class="btn sec" onclick="shuffleSeal()">Shuffle</button>
+    </div>
+    <div class="fb" id="sealFb"></div>
+  </div>
+
+  <!-- ABO -->
+  <div class="panel" id="panel-abo">
+    <h2>Transfusion Matcher</h2>
+    <div class="sub">RBC antigen = what you ARE; plasma antibody = what you ATTACK. Pick a donor and a recipient (RBC transfusion) and see if it's safe.</div>
+    <div class="pick">
+      <div class="pickcol">
+        <b style="color:var(--teal)">Donor red cells</b>
+        <div class="chips" id="donorChips"></div>
+      </div>
+      <div class="pickcol">
+        <b style="color:var(--coral)">Recipient</b>
+        <div class="chips" id="recipChips"></div>
+      </div>
+    </div>
+    <div class="result" id="aboResult"></div>
+    <h2 style="margin-top:20px;font-size:18px">Full compatibility grid</h2>
+    <div class="sub">✓ safe · ✗ agglutination/hemolysis</div>
+    <table id="aboTable"></table>
+    <div class="note">Type O = universal RBC donor (no A/B antigens to attack). Type AB = universal recipient (no anti-A/anti-B antibodies).</div>
+  </div>
+
+  <!-- DIAGNOSE -->
+  <div class="panel" id="panel-diagnose">
+    <h2>Disorder Diagnoser</h2>
+    <div class="sub">Match the clinical pattern to the disorder. Reading the pattern localises the defect before any lab returns.</div>
+    <div class="casebox"><div class="q" id="dgText">Loading…</div></div>
+    <div class="opts" id="dgOpts"></div>
+    <div class="fb" id="dgFb"></div>
+    <div class="controls">
+      <button class="btn" onclick="nextDg()">Next case →</button>
+      <button class="btn sec" onclick="resetDg()">Restart</button>
+    </div>
+    <div class="score" id="dgScore">Score: 0 / 0</div>
+  </div>
+
+  <!-- REFERENCE -->
+  <div class="panel" id="panel-reference">
+    <h2>Quick Reference</h2>
+    <div class="sub">The high-yield facts from Blood, Part 2.</div>
+    <div class="reflib">
+      <div class="refcard"><h3>Three-step hemostasis</h3><p>1) Vascular spasm 2) Platelet plug (primary) 3) Coagulation/fibrin (secondary).</p></div>
+      <div class="refcard"><h3>Coagulation</h3><p>Extrinsic + intrinsic → common pathway → prothrombin activator → thrombin → fibrin. Thrombin is the big switch.</p></div>
+      <div class="refcard"><h3>Anemia vs polycythemia</h3><p>Anemia = low O₂-carrying capacity. Polycythemia = excess RBCs → viscosity → clot risk.</p></div>
+      <div class="refcard"><h3>ABO rule</h3><p>Antigen = what you ARE; antibody = what you ATTACK. O = universal donor, AB = universal recipient.</p></div>
+      <div class="refcard"><h3>Thrombosis</h3><p>Thrombus (in place) → embolus (travelling) → embolism (lodged). Risk: injury, stasis, hypercoagulability.</p></div>
+      <div class="refcard"><h3>Bleeding pattern</h3><p>Platelet problem → petechiae/skin bleeding. Factor problem → deep joint/muscle bleeding.</p></div>
+    </div>
+    <div class="note">Layla at altitude: chronic low O₂ → EPO → secondary polycythemia. Helpful in moderation; hyperviscosity and clot risk in excess.</div>
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  var tabs=document.getElementById('tabs').getElementsByClassName('tab');
+  for(var i=0;i<tabs.length;i++){ tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tab')===name); }
+  ['seal','abo','diagnose','reference'].forEach(function(p){ document.getElementById('panel-'+p).classList.toggle('show', p===name); });
+}
+
+/* ---- Seal the Breach ---- */
+var sealCorrect=[
+  {k:"Vascular spasm", d:"Vessel constricts — immediate, buys time"},
+  {k:"Platelet plug", d:"Primary hemostasis — fast but fragile"},
+  {k:"Coagulation (fibrin)", d:"Secondary hemostasis — durable mesh"}
+];
+var sealOrder=[];
+function renderSeal(){
+  var list=document.getElementById('sealList'); list.innerHTML='';
+  sealOrder.forEach(function(st,idx){
+    var d=document.createElement('div'); d.className='step';
+    d.innerHTML='<span><b>'+st.k+'</b> — '+st.d+'</span>';
+    var ctr=document.createElement('span');
+    var up=document.createElement('button'); up.className='badge'; up.textContent='▲'; up.onclick=function(){ moveSeal(idx,-1); };
+    var dn=document.createElement('button'); dn.className='badge'; dn.textContent='▼'; dn.onclick=function(){ moveSeal(idx,1); };
+    ctr.appendChild(up); ctr.appendChild(dn); d.appendChild(ctr); list.appendChild(d);
+  });
+}
+function moveSeal(i,dir){ var j=i+dir; if(j<0||j>=sealOrder.length)return; var t=sealOrder[i]; sealOrder[i]=sealOrder[j]; sealOrder[j]=t; renderSeal(); document.getElementById('sealFb').className='fb'; }
+function shuffleSeal(){ sealOrder=sealCorrect.slice(); for(var i=sealOrder.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=sealOrder[i];sealOrder[i]=sealOrder[j];sealOrder[j]=t;} renderSeal(); document.getElementById('sealFb').className='fb'; }
+function checkSeal(){
+  var ok=sealOrder.every(function(st,i){return st.k===sealCorrect[i].k;});
+  var fb=document.getElementById('sealFb'); fb.className='fb show';
+  if(ok){ fb.style.background='#E2EFE7'; fb.style.color='#2F7D5B'; fb.textContent='Correct! Spasm slows the leak, the platelet plug patches it fast, and fibrin makes the seal permanent.'; }
+  else { fb.style.background='#F6E2DB'; fb.style.color='#9E2B25'; fb.textContent='Not yet. Think speed → permanence: an immediate spasm, then the fast platelet plug, then the durable fibrin mesh.'; }
+}
+
+/* ---- Transfusion Matcher ---- */
+var types=['O','A','B','AB'];
+var antigens={O:[],A:['A'],B:['B'],AB:['A','B']};
+var antibodies={O:['anti-A','anti-B'],A:['anti-B'],B:['anti-A'],AB:[]};
+var donorSel=null, recipSel=null;
+function compatible(donor,recip){
+  // recipient antibodies must not target donor antigens
+  var ag=antigens[donor];
+  var ab=antibodies[recip];
+  for(var i=0;i<ag.length;i++){ if(ab.indexOf('anti-'+ag[i])>=0) return false; }
+  return true;
+}
+function buildChips(){
+  var dc=document.getElementById('donorChips'); var rc=document.getElementById('recipChips');
+  dc.innerHTML=''; rc.innerHTML='';
+  types.forEach(function(t){
+    var d=document.createElement('button'); d.className='chip'; d.textContent='Type '+t; d.onclick=function(){ donorSel=t; markChips(); evalABO(); };
+    d.setAttribute('data-d',t); dc.appendChild(d);
+    var r=document.createElement('button'); r.className='chip'; r.textContent='Type '+t; r.onclick=function(){ recipSel=t; markChips(); evalABO(); };
+    r.setAttribute('data-r',t); rc.appendChild(r);
+  });
+}
+function markChips(){
+  var dc=document.getElementById('donorChips').getElementsByClassName('chip');
+  for(var i=0;i<dc.length;i++){ dc[i].classList.toggle('sel', dc[i].getAttribute('data-d')===donorSel); }
+  var rc=document.getElementById('recipChips').getElementsByClassName('chip');
+  for(var j=0;j<rc.length;j++){ rc[j].classList.toggle('sel', rc[j].getAttribute('data-r')===recipSel); }
+}
+function evalABO(){
+  var res=document.getElementById('aboResult');
+  if(!donorSel||!recipSel){ res.className='result'; return; }
+  var ok=compatible(donorSel,recipSel);
+  res.className='result show '+(ok?'safe':'danger');
+  if(ok){ res.textContent='✓ SAFE: Type '+recipSel+' recipient has no antibody against type '+donorSel+' red cells ('+(antigens[donorSel].length?antigens[donorSel].join('+')+' antigen':'no antigens')+').'; }
+  else { res.textContent='✗ DANGER: Type '+recipSel+' plasma carries '+antibodies[recipSel].join(' + ')+', which attacks the donor\u2019s '+antigens[donorSel].join('+')+' antigen → agglutination & hemolysis.'; }
+}
+function buildABOTable(){
+  var t=document.getElementById('aboTable');
+  var head='<tr><th>Donor \\ Recipient</th>';
+  types.forEach(function(r){ head+='<th>'+r+'</th>'; }); head+='</tr>';
+  var body='';
+  types.forEach(function(d){
+    body+='<tr><th>'+d+'</th>';
+    types.forEach(function(r){
+      var ok=compatible(d,r);
+      body+='<td style="color:'+(ok?'#2F7D5B':'#9E2B25')+';font-weight:700">'+(ok?'\u2713':'\u2717')+'</td>';
+    });
+    body+='</tr>';
+  });
+  t.innerHTML=head+body;
+}
+
+/* ---- Disorder Diagnoser ---- */
+var dgCases=[
+  {t:"Pinpoint red-purple dots on the shins after a viral illness; superficial mucosal bleeding.",a:"Thrombocytopenia",opts:["Thrombocytopenia","Polycythemia vera","Hemophilia (factor defect)","Leukemia"],fb:"Low platelets → petechiae. Superficial skin/mucosal bleeding = a PLATELET problem (primary hemostasis)."},
+  {t:"Immobile after a long flight → swollen calf → sudden breathlessness and falling O₂ saturation.",a:"Deep-vein thrombosis → pulmonary embolism",opts:["Deep-vein thrombosis → pulmonary embolism","Thrombocytopenia","Iron-deficiency anemia","Polycythemia vera"],fb:"Stasis → thrombus in deep veins → embolus → pulmonary embolism. Danger peaks on standing/walking."},
+  {t:"Older adult: headache, dizziness, ruddy face, very high hematocrit; no dehydration or altitude.",a:"Polycythemia vera",opts:["Polycythemia vera","Anemia","Thrombocytopenia","Leukopenia"],fb:"Excess RBCs → hyperviscosity → sluggish flow, headache, clot risk. Treated with therapeutic phlebotomy."},
+  {t:"Endurance athlete, recovered, now fatigued and breathless; Hb 10.4, low ferritin, small pale cells.",a:"Iron-deficiency anemia",opts:["Iron-deficiency anemia","Secondary polycythemia","Hemophilia","Embolism"],fb:"Low Hb + low ferritin + microcytic cells = iron-deficiency anemia — Layla's case. Marrow has EPO but lacks iron."},
+  {t:"Cancer patient on chemotherapy with recurrent infections; low white-cell count.",a:"Leukopenia",opts:["Leukopenia","Polycythemia","Thrombosis","Petechiae from low platelets"],fb:"Chemo suppresses fast-dividing marrow precursors → leukopenia → too few immune cells → infections."},
+  {t:"Man on daily aspirin bruises easily and bleeds longer from nicks; platelet COUNT is normal.",a:"Impaired platelet function (aspirin)",opts:["Impaired platelet function (aspirin)","Thrombocytopenia","Factor deficiency","Polycythemia"],fb:"Normal count but easy bleeding = a FUNCTION problem. Aspirin blunts platelet activation/aggregation."}
+];
+var di=0, dScore=0, dAns=0;
+function loadDg(){
+  var c=dgCases[di];
+  document.getElementById('dgText').textContent=c.t;
+  var box=document.getElementById('dgOpts'); box.innerHTML='';
+  c.opts.forEach(function(o){ var b=document.createElement('button'); b.className='opt'; b.textContent=o; b.onclick=function(){ chooseDg(b,o); }; box.appendChild(b); });
+  document.getElementById('dgFb').className='fb';
+}
+function chooseDg(btn,choice){
+  var c=dgCases[di];
+  var opts=document.getElementById('dgOpts').getElementsByClassName('opt');
+  for(var i=0;i<opts.length;i++){ opts[i].onclick=null; if(opts[i].textContent===c.a) opts[i].classList.add('correct'); }
+  dAns++; if(choice===c.a){ dScore++; } else { btn.classList.add('wrong'); }
+  var fb=document.getElementById('dgFb'); fb.className='fb show';
+  fb.style.background=choice===c.a?'#E2EFE7':'#F6E2DB';
+  fb.style.color=choice===c.a?'#2F7D5B':'#9E2B25';
+  fb.textContent=(choice===c.a?'Correct. ':'Not quite. ')+c.fb;
+  document.getElementById('dgScore').textContent='Score: '+dScore+' / '+dAns;
+}
+function nextDg(){ di=(di+1)%dgCases.length; loadDg(); }
+function resetDg(){ di=0; dScore=0; dAns=0; document.getElementById('dgScore').textContent='Score: 0 / 0'; loadDg(); }
+
+/* init */
+shuffleSeal();
+buildChips();
+buildABOTable();
+loadDg();
+</script>
+</body>
+</html>

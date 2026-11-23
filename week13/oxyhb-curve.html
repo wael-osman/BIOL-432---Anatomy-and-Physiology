@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Respiratory II — O₂–Hb Curve Explorer</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --ink:#22373B; --mute:#6C7E81; --cream:#F4F8F7; --card:#EEF4F3; --line:#D8E3E2;
+    --good:#3C8F72; --warn:#C97A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;padding:24px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:var(--dark);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:20px}
+  header .kick{font-size:12px;letter-spacing:2px;color:#9FC7CC;font-weight:700;text-transform:uppercase}
+  header h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:8px 0 4px}
+  header p{color:#CFE4E6;font-size:15px}
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{flex:1;min-width:150px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;color:var(--mute);text-align:center;transition:.15s}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px}
+  .panel.active{display:block}
+  h2{font-family:Cambria,Georgia,serif;color:var(--teal);font-size:22px;margin-bottom:6px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:20px}
+  .curvewrap{display:flex;gap:24px;flex-wrap:wrap}
+  .curvebox{flex:1;min-width:320px}
+  .controls{flex:1;min-width:240px}
+  svg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px}
+  .ctl{margin-bottom:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--cream)}
+  .ctl label{font-weight:600;font-size:14px;display:flex;justify-content:space-between}
+  .ctl .val{color:var(--accent);font-weight:700}
+  input[type=range]{width:100%;margin-top:8px;accent-color:var(--accent)}
+  .shift{margin-top:6px;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px;text-align:center}
+  .shift.right{background:#fbeee6;color:var(--accent)}
+  .shift.left{background:#e6f0ef;color:var(--teal)}
+  .shift.none{background:var(--card);color:var(--mute)}
+  .btn{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--mute)}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .preset{padding:8px 12px;border:1px solid var(--teal);border-radius:20px;background:#fff;color:var(--teal);font-size:12.5px;font-weight:600;cursor:pointer}
+  /* transport match */
+  .match{display:flex;gap:22px;flex-wrap:wrap}
+  .col{flex:1;min-width:240px}
+  .slot{padding:12px 14px;margin:8px 0;border:2px dashed var(--line);border-radius:10px;background:var(--card);min-height:56px;font-size:13.5px}
+  .slot .title{font-weight:700;color:var(--dark)}
+  .slot.filled{border-style:solid;border-color:var(--teal);background:#e6f0ef}
+  .chip{display:block;padding:10px 14px;margin:8px 0;border:1px solid var(--sea);border-radius:10px;background:#fff;color:var(--ink);font-size:13.5px;cursor:grab;user-select:none}
+  .chip.used{opacity:.3;pointer-events:none}
+  /* quiz */
+  .q{margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .q .stem{font-weight:600;margin-bottom:12px}
+  .opt{display:block;width:100%;text-align:left;padding:11px 14px;margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:14px;transition:.12s}
+  .opt:hover{border-color:var(--sea)}
+  .opt.correct{background:#e7f3ee;border-color:var(--good);color:#1f5e46}
+  .opt.wrong{background:#fbe9e4;border-color:var(--accent);color:#8f3a29}
+  .fb{margin-top:8px;font-size:13.5px;padding:10px 12px;border-radius:8px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#e7f3ee;color:#1f5e46}
+  .fb.no{background:#fbe9e4;color:#8f3a29}
+  .scorebar{margin-top:18px;padding:14px 18px;background:var(--dark);color:#fff;border-radius:12px;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+  .hint{font-size:12.5px;color:var(--mute);font-style:italic;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Anatomy &amp; Physiology</div>
+    <h1>Respiratory System II — O₂–Hb Curve Explorer</h1>
+    <p>Shift the dissociation curve with real physiological factors, match the gas-transport forms, and test yourself.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="curve">1 · Curve Explorer</div>
+    <div class="tab" data-tab="transport">2 · Gas Transport Match</div>
+    <div class="tab" data-tab="quiz">3 · Quick Quiz</div>
+  </div>
+
+  <!-- ============ CURVE ============ -->
+  <section class="panel active" id="curve">
+    <h2>The Oxygen–Hemoglobin Dissociation Curve</h2>
+    <p class="sub">Adjust temperature, pH, CO₂, and BPG. The teal reference curve stays put; the coral curve shows the live shift.</p>
+    <div class="presets">
+      <div class="preset" onclick="preset('rest')">Resting tissue</div>
+      <div class="preset" onclick="preset('exercise')">Exercising muscle</div>
+      <div class="preset" onclick="preset('lung')">Lung capillary</div>
+      <div class="preset" onclick="preset('reset')">Reset to normal</div>
+    </div>
+    <div class="curvewrap">
+      <div class="curvebox">
+        <svg id="svg" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="shift none" id="shiftLabel">No shift — curve at normal body conditions</div>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label>Temperature <span class="val" id="tVal">37 °C</span></label>
+          <input type="range" id="temp" min="30" max="43" value="37">
+        </div>
+        <div class="ctl">
+          <label>Blood pH <span class="val" id="phVal">7.4</span></label>
+          <input type="range" id="ph" min="70" max="76" value="74">
+        </div>
+        <div class="ctl">
+          <label>P<sub>CO₂</sub> <span class="val" id="cVal">40 mmHg</span></label>
+          <input type="range" id="co2" min="20" max="70" value="40">
+        </div>
+        <div class="ctl">
+          <label>BPG <span class="val" id="bVal">Normal</span></label>
+          <input type="range" id="bpg" min="0" max="100" value="50">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRANSPORT ============ -->
+  <section class="panel" id="transport">
+    <h2>Gas Transport Match</h2>
+    <p class="sub">Drag each description onto the transport form it belongs to.</p>
+    <div class="match">
+      <div class="col" id="slots"></div>
+      <div class="col" id="chips"></div>
+    </div>
+    <div class="scorebar">
+      <span id="matchScore">0 / 5 matched</span>
+      <button class="btn ghost" onclick="resetMatch()">Reset</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel" id="quiz">
+    <h2>Quick Quiz</h2>
+    <p class="sub">Immediate feedback explains each answer.</p>
+    <div id="quizHost"></div>
+    <div class="scorebar">
+      <span id="quizScore">Score: 0 / 5</span>
+      <button class="btn ghost" onclick="resetQuiz()">Reset quiz</button>
+    </div>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  };
+});
+
+// -------- Curve explorer --------
+const svg=document.getElementById('svg');
+const PAD=42, Wd=360, Ht=300, plotW=Wd-PAD-12, plotH=Ht-PAD-24;
+function px(po2){return PAD + (po2/100)*plotW;}
+function py(sat){return (Ht-PAD) - (sat/100)*plotH;}
+// baseline Hill-type saturation, P50 ~ 26.6
+function sat(po2,p50){const n=2.7;return 100*Math.pow(po2,n)/(Math.pow(po2,n)+Math.pow(p50,n));}
+function curvePath(p50){
+  let d='';
+  for(let x=0;x<=100;x+=2){const s=sat(x,p50);d+=(x===0?'M':'L')+px(x).toFixed(1)+','+py(s).toFixed(1)+' ';}
+  return d;
+}
+function drawAxes(){
+  let g='';
+  // grid
+  for(let s=0;s<=100;s+=20){g+='<line x1="'+PAD+'" y1="'+py(s)+'" x2="'+(PAD+plotW)+'" y2="'+py(s)+'" stroke="#E2E8E7" stroke-width="1"/>';
+    g+='<text x="'+(PAD-6)+'" y="'+(py(s)+3)+'" font-size="9" fill="#6C7E81" text-anchor="end">'+s+'</text>';}
+  for(let x=0;x<=100;x+=20){g+='<text x="'+px(x)+'" y="'+(Ht-PAD+14)+'" font-size="9" fill="#6C7E81" text-anchor="middle">'+x+'</text>';}
+  g+='<text x="'+(PAD+plotW/2)+'" y="'+(Ht-6)+'" font-size="10" fill="#22373B" text-anchor="middle">P O₂ (mmHg)</text>';
+  g+='<text x="12" y="'+(PAD+plotH/2)+'" font-size="10" fill="#22373B" text-anchor="middle" transform="rotate(-90 12 '+(PAD+plotH/2)+')">% Hb saturation</text>';
+  return g;
+}
+function render(){
+  const temp=+document.getElementById('temp').value;
+  const ph=+document.getElementById('ph').value/10;
+  const co2=+document.getElementById('co2').value;
+  const bpg=+document.getElementById('bpg').value;
+  document.getElementById('tVal').textContent=temp+' °C';
+  document.getElementById('phVal').textContent=ph.toFixed(1);
+  document.getElementById('cVal').textContent=co2+' mmHg';
+  document.getElementById('bVal').textContent = bpg<34?'Low':bpg>66?'High':'Normal';
+  // shift index: + = right shift (higher p50)
+  let idx=0;
+  idx+=(temp-37)*0.9;
+  idx+=(7.4-ph)*22;      // lower pH -> right
+  idx+=(co2-40)*0.18;
+  idx+=(bpg-50)*0.04;
+  const p50=Math.max(14,Math.min(45,26.6+idx));
+  const ref=curvePath(26.6), cur=curvePath(p50);
+  const shifted=Math.abs(p50-26.6)>0.8;
+  let html=drawAxes();
+  html+='<path d="'+ref+'" fill="none" stroke="#14606E" stroke-width="2" stroke-dasharray="4 3" opacity="0.55"/>';
+  html+='<path d="'+cur+'" fill="none" stroke="#D9644A" stroke-width="3"/>';
+  // P50 marker
+  html+='<line x1="'+px(p50)+'" y1="'+py(50)+'" x2="'+px(p50)+'" y2="'+(Ht-PAD)+'" stroke="#D9644A" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>';
+  html+='<circle cx="'+px(p50)+'" cy="'+py(50)+'" r="3.5" fill="#D9644A"/>';
+  svg.innerHTML=html;
+  const lab=document.getElementById('shiftLabel');
+  if(p50>27.4){lab.className='shift right';lab.textContent='RIGHT shift → lower O₂ affinity → MORE unloading (P₅₀ ≈ '+p50.toFixed(1)+' mmHg)';}
+  else if(p50<25.8){lab.className='shift left';lab.textContent='LEFT shift → higher O₂ affinity → LESS unloading (P₅₀ ≈ '+p50.toFixed(1)+' mmHg)';}
+  else{lab.className='shift none';lab.textContent='No shift — curve at normal body conditions (P₅₀ ≈ 26.6 mmHg)';}
+}
+['temp','ph','co2','bpg'].forEach(id=>document.getElementById(id).oninput=render);
+function preset(kind){
+  const set=(id,v)=>document.getElementById(id).value=v;
+  if(kind==='rest'){set('temp',37);set('ph',74);set('co2',40);set('bpg',50);}
+  if(kind==='exercise'){set('temp',41);set('ph',72);set('co2',60);set('bpg',66);}
+  if(kind==='lung'){set('temp',37);set('ph',75);set('co2',30);set('bpg',45);}
+  if(kind==='reset'){set('temp',37);set('ph',74);set('co2',40);set('bpg',50);}
+  render();
+}
+render();
+
+// -------- Transport match --------
+const pairs=[
+  {form:'Bicarbonate (HCO₃⁻) in plasma', desc:'~70% of CO₂ — formed via carbonic anhydrase, the dominant transport form'},
+  {form:'Carbaminohemoglobin', desc:'~20% of CO₂ — bound to the globin part of hemoglobin (not the iron site)'},
+  {form:'Dissolved CO₂ in plasma', desc:'~7–10% of CO₂ — sets the measured PCO₂'},
+  {form:'Oxyhemoglobin (HbO₂)', desc:'98.5% of O₂ — loosely bound to the iron of each heme group'},
+  {form:'Dissolved O₂ in plasma', desc:'1.5% of O₂ — small amount, but it sets the measured PO₂'}
+];
+let matched={};
+function buildMatch(){
+  const slots=document.getElementById('slots'), chips=document.getElementById('chips');
+  slots.innerHTML=''; chips.innerHTML=''; matched={};
+  pairs.forEach((p,i)=>{
+    const s=document.createElement('div'); s.className='slot'; s.id='slot'+i; s.dataset.answer=p.desc;
+    s.innerHTML='<div class="title">'+p.form+'</div><div class="drophint" style="color:#6C7E81;font-size:12px">drop the matching description here</div>';
+    s.ondragover=e=>e.preventDefault();
+    s.ondrop=e=>{e.preventDefault();
+      const d=e.dataTransfer.getData('text');
+      if(s.classList.contains('filled'))return;
+      if(d===p.desc){s.classList.add('filled');s.querySelector('.drophint').textContent=d;s.querySelector('.drophint').style.color='#22373B';matched[i]=true;
+        [...chips.children].forEach(c=>{if(c.dataset.desc===d)c.classList.add('used');});
+        document.getElementById('matchScore').textContent=Object.keys(matched).length+' / 5 matched';
+        if(Object.keys(matched).length===5)document.getElementById('matchScore').innerHTML='✓ All 5 matched correctly!';
+      } else {s.style.borderColor='#D9644A';setTimeout(()=>s.style.borderColor='',500);}
+    };
+    slots.appendChild(s);
+  });
+  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
+    const c=document.createElement('div'); c.className='chip'; c.draggable=true; c.textContent=p.desc; c.dataset.desc=p.desc;
+    c.ondragstart=e=>e.dataTransfer.setData('text',p.desc);
+    chips.appendChild(c);
+  });
+}
+function resetMatch(){buildMatch();document.getElementById('matchScore').textContent='0 / 5 matched';}
+buildMatch();
+
+// -------- Quiz --------
+const questions=[
+  {stem:'1. Most oxygen is transported in the blood…',
+   opts:['Dissolved in plasma','Bound to the iron of hemoglobin','As bicarbonate','Bound to plasma proteins'],
+   correct:1, fb:'98.5% of O₂ rides on the iron (heme) of hemoglobin; only ~1.5% is dissolved in plasma.'},
+  {stem:'2. Which change shifts the O₂–Hb curve to the RIGHT?',
+   opts:['Decreased temperature','Increased pH','Increased PCO₂ and H⁺','Decreased BPG'],
+   correct:2, fb:'Higher CO₂/H⁺ (plus heat and BPG) lower Hb affinity → right shift → more unloading in active tissue.'},
+  {stem:'3. The sigmoid (S-shape) of the curve is explained by…',
+   opts:['Dissolved O₂','Cooperative binding among the four heme sites','Carbonic anhydrase','The chloride shift'],
+   correct:1, fb:'Binding one O₂ changes Hb\'s shape and raises affinity for the next — cooperative binding makes the curve sigmoid.'},
+  {stem:'4. Most CO₂ travels in blood as…',
+   opts:['Dissolved gas','Carbaminohemoglobin','Bicarbonate ions','Carbon monoxide'],
+   correct:2, fb:'~70% of CO₂ is carried as bicarbonate, formed in RBCs by carbonic anhydrase.'},
+  {stem:'5. The primary everyday drive to breathe is sensing…',
+   opts:['Arterial O₂ only','CO₂ / H⁺ via central chemoreceptors','Blood pressure','Lung stretch'],
+   correct:1, fb:'Central chemoreceptors sensing CO₂/H⁺ set the normal drive; peripheral O₂ sensors dominate only when O₂ falls sharply (e.g. altitude).'}
+];
+let quizState={};
+function buildQuiz(){
+  const host=document.getElementById('quizHost'); host.innerHTML=''; quizState={};
+  questions.forEach((q,qi)=>{
+    const div=document.createElement('div'); div.className='q';
+    const stem=document.createElement('div'); stem.className='stem'; stem.textContent=q.stem; div.appendChild(stem);
+    q.opts.forEach((o,oi)=>{const b=document.createElement('button'); b.className='opt'; b.textContent=o; b.onclick=()=>answer(qi,oi,div,b,q); div.appendChild(b);});
+    const fb=document.createElement('div'); fb.className='fb'; fb.id='fb'+qi; div.appendChild(fb);
+    host.appendChild(div);
+  });
+  updateQuizScore();
+}
+function answer(qi,oi,div,btn,q){
+  if(quizState[qi]!==undefined)return;
+  quizState[qi]=oi;
+  const opts=div.querySelectorAll('.opt');
+  opts[q.correct].classList.add('correct');
+  const fb=document.getElementById('fb'+qi);
+  if(oi===q.correct){fb.className='fb show ok';fb.textContent='✓ Correct. '+q.fb;}
+  else{btn.classList.add('wrong');fb.className='fb show no';fb.textContent='✗ '+q.fb;}
+  updateQuizScore();
+}
+function updateQuizScore(){let s=0;questions.forEach((q,qi)=>{if(quizState[qi]===q.correct)s++;});document.getElementById('quizScore').textContent='Score: '+s+' / '+questions.length;}
+function resetQuiz(){buildQuiz();}
+buildQuiz();
+</script>
+</body>
+</html>

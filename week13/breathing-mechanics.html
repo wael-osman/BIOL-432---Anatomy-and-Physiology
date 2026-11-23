@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Respiratory I — Breathing Mechanics Self-Check</title>
+<style>
+  :root{
+    --dark:#0E3A40; --teal:#14606E; --accent:#D9644A; --sea:#4F8A8B;
+    --ink:#22373B; --mute:#6C7E81; --cream:#F4F8F7; --card:#EEF4F3; --line:#D8E3E2;
+    --good:#3C8F72; --warn:#C97A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;padding:24px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{background:var(--dark);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:20px}
+  header .kick{font-size:12px;letter-spacing:2px;color:#9FC7CC;font-weight:700;text-transform:uppercase}
+  header h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:8px 0 4px}
+  header p{color:#CFE4E6;font-size:15px}
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{flex:1;min-width:140px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;color:var(--mute);text-align:center;transition:.15s}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px}
+  .panel.active{display:block}
+  h2{font-family:Cambria,Georgia,serif;color:var(--teal);font-size:22px;margin-bottom:6px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:20px}
+  /* Boyle simulator */
+  .sim{display:flex;gap:26px;align-items:center;flex-wrap:wrap;justify-content:center;margin:10px 0 4px}
+  .chamber{width:150px;height:230px;border:3px solid var(--dark);border-radius:8px;position:relative;background:linear-gradient(#fff,#f2f7f6);overflow:hidden}
+  .piston{position:absolute;left:0;right:0;top:0;background:var(--teal);opacity:.14;transition:height .25s}
+  .molecule{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--teal);transition:.25s}
+  .readout{min-width:210px}
+  .readout .big{font-size:40px;font-weight:700;font-family:Cambria,serif;color:var(--dark)}
+  .readout .lbl{font-size:13px;color:var(--mute);margin-bottom:14px}
+  .flow{font-weight:700;font-size:16px;padding:8px 12px;border-radius:8px;display:inline-block;margin-top:6px}
+  .flow.in{background:#e6f0ef;color:var(--teal)}
+  .flow.out{background:#fbeee6;color:var(--accent)}
+  .flow.none{background:var(--card);color:var(--mute)}
+  input[type=range]{width:100%;margin:16px 0 4px;accent-color:var(--accent)}
+  .rangelab{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+  /* Quiz */
+  .q{margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .q .stem{font-weight:600;margin-bottom:12px}
+  .opt{display:block;width:100%;text-align:left;padding:11px 14px;margin-bottom:8px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:14px;transition:.12s}
+  .opt:hover{border-color:var(--sea)}
+  .opt.correct{background:#e7f3ee;border-color:var(--good);color:#1f5e46}
+  .opt.wrong{background:#fbe9e4;border-color:var(--accent);color:#8f3a29}
+  .fb{margin-top:8px;font-size:13.5px;padding:10px 12px;border-radius:8px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#e7f3ee;color:#1f5e46}
+  .fb.no{background:#fbe9e4;color:#8f3a29}
+  /* Label the airway */
+  .airway{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .tree{flex:1;min-width:250px}
+  .node{padding:10px 12px;margin:6px 0;border:2px dashed var(--line);border-radius:10px;background:var(--card);font-size:13px;color:var(--mute);min-height:42px;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .node.filled{border-style:solid;border-color:var(--teal);background:#e6f0ef;color:var(--dark);font-weight:600}
+  .node.zone-resp.filled{border-color:var(--accent);background:#fbeee6}
+  .bank{flex:1;min-width:220px}
+  .chip{display:inline-block;padding:9px 14px;margin:5px;border:1px solid var(--teal);border-radius:20px;background:#fff;color:var(--teal);font-size:13px;font-weight:600;cursor:grab;user-select:none}
+  .chip.used{opacity:.3;pointer-events:none}
+  .scorebar{margin-top:18px;padding:14px 18px;background:var(--dark);color:#fff;border-radius:12px;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--mute)}
+  .hint{font-size:12.5px;color:var(--mute);margin-top:6px;font-style:italic}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--mute);margin:8px 0 14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">BIOL 432 · Anatomy &amp; Physiology</div>
+    <h1>Respiratory System I — Self-Check</h1>
+    <p>Build a breath from Boyle's Law, label the airway tree, and test your grasp of the mechanics of breathing.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="boyle">1 · Boyle's Breath Lab</div>
+    <div class="tab" data-tab="airway">2 · Label the Airway</div>
+    <div class="tab" data-tab="quiz">3 · Quick Quiz</div>
+  </div>
+
+  <!-- ============ BOYLE ============ -->
+  <section class="panel active" id="boyle">
+    <h2>The Boyle's Law Breath Lab</h2>
+    <p class="sub">Drag the slider to change the <b>thoracic volume</b>. Watch what happens to intrapulmonary pressure — and which way air flows.</p>
+    <div class="sim">
+      <div>
+        <div class="chamber" id="chamber">
+          <div class="piston" id="piston"></div>
+        </div>
+        <div class="hint" style="text-align:center">Thoracic cavity</div>
+      </div>
+      <div class="readout">
+        <div class="lbl">Intrapulmonary pressure (relative to atmosphere)</div>
+        <div class="big" id="pressure">0.0</div>
+        <div class="lbl" style="margin-top:-6px">mm Hg</div>
+        <div id="flow" class="flow none">Equilibrium — no net airflow</div>
+        <div class="hint" id="phase" style="margin-top:12px">Move the slider to begin a breath.</div>
+      </div>
+    </div>
+    <input type="range" id="vol" min="0" max="100" value="50">
+    <div class="rangelab"><span>Small volume (exhaled)</span><span>Large volume (inhaled)</span></div>
+    <div class="scorebar" style="margin-top:20px">
+      <span id="boyleMsg">Try making the cavity <b>larger</b> — predict the pressure and airflow before you look.</span>
+    </div>
+  </section>
+
+  <!-- ============ AIRWAY ============ -->
+  <section class="panel" id="airway">
+    <h2>Label the Airway Tree</h2>
+    <p class="sub">Drag each structure to its correct position, from the throat down to the gas-exchange surface. Conducting-zone slots are teal; the respiratory-zone slot is coral.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:#14606E"></span> Conducting zone (no gas exchange)</span>
+      <span><span class="dot" style="background:#D9644A"></span> Respiratory zone (gas exchange)</span>
+    </div>
+    <div class="airway">
+      <div class="tree" id="tree"></div>
+      <div class="bank" id="bank"></div>
+    </div>
+    <div class="scorebar">
+      <span id="airwayScore">0 / 6 placed correctly</span>
+      <button class="btn ghost" onclick="resetAirway()">Reset</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel" id="quiz">
+    <h2>Quick Quiz</h2>
+    <p class="sub">One attempt logs per question. Immediate feedback explains the reasoning.</p>
+    <div id="quizHost"></div>
+    <div class="scorebar">
+      <span id="quizScore">Score: 0 / 5</span>
+      <button class="btn ghost" onclick="resetQuiz()">Reset quiz</button>
+    </div>
+  </section>
+</div>
+
+<script>
+// -------- tabs --------
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  };
+});
+
+// -------- Boyle lab --------
+const chamber=document.getElementById('chamber'), piston=document.getElementById('piston');
+const volS=document.getElementById('vol'), pressureEl=document.getElementById('pressure');
+const flowEl=document.getElementById('flow'), phaseEl=document.getElementById('phase'), boyleMsg=document.getElementById('boyleMsg');
+const mols=[];
+for(let i=0;i<10;i++){const m=document.createElement('div');m.className='molecule';chamber.appendChild(m);mols.push(m);}
+function renderBoyle(){
+  const v=+volS.value; // 0..100
+  // pressure inversely related to volume, centered so 50 -> 0
+  const p=((50-v)/50*3).toFixed(1);
+  pressureEl.textContent=(p>0?'+':'')+p;
+  // piston height: smaller volume = taller piston overlay from top
+  const pistonH=(100-v)/100*70;
+  piston.style.height=pistonH+'%';
+  // molecule spread: fewer packed when volume large
+  const usableTop=pistonH/100*230+14, usableH=230-usableTop-14;
+  const density=v/100; // higher vol = more spread
+  mols.forEach((m,i)=>{
+    const col=i%5, row=Math.floor(i/5);
+    const spreadW=40+density*80;
+    const cx=75-spreadW/2 + col*(spreadW/5);
+    const cy=usableTop + row*(usableH-14);
+    m.style.left=cx+'px'; m.style.top=cy+'px';
+    m.style.background = p>0.2?'#D9644A':(p<-0.2?'#14606E':'#4F8A8B');
+  });
+  if(p<-0.2){flowEl.className='flow in';flowEl.textContent='Pressure below atmosphere → AIR FLOWS IN (inspiration)';phaseEl.textContent='Diaphragm contracts & flattens, ribs lift → cavity enlarges → pressure drops.';}
+  else if(p>0.2){flowEl.className='flow out';flowEl.textContent='Pressure above atmosphere → AIR FLOWS OUT (expiration)';phaseEl.textContent='Inspiratory muscles relax, elastic lungs recoil → cavity shrinks → pressure rises.';}
+  else{flowEl.className='flow none';flowEl.textContent='Equilibrium — no net airflow';phaseEl.textContent='Intrapulmonary pressure equals atmospheric — the brief pause between phases.';}
+}
+volS.oninput=renderBoyle; renderBoyle();
+
+// -------- Airway drag --------
+const slots=[
+  {id:'s1',label:'Pharynx',zone:'cond'},
+  {id:'s2',label:'Larynx',zone:'cond'},
+  {id:'s3',label:'Trachea',zone:'cond'},
+  {id:'s4',label:'Primary bronchi',zone:'cond'},
+  {id:'s5',label:'Terminal bronchioles',zone:'cond'},
+  {id:'s6',label:'Alveoli',zone:'resp'}
+];
+const tree=document.getElementById('tree'), bank=document.getElementById('bank');
+let placed={};
+function buildAirway(){
+  tree.innerHTML=''; bank.innerHTML=''; placed={};
+  slots.forEach((s,i)=>{
+    const n=document.createElement('div');
+    n.className='node'+(s.zone==='resp'?' zone-resp':'');
+    n.id=s.id; n.dataset.answer=s.label;
+    n.textContent='Slot '+(i+1)+(s.zone==='resp'?' · respiratory zone':' · conducting zone');
+    n.ondragover=e=>e.preventDefault();
+    n.ondrop=e=>{e.preventDefault();dropChip(e,n);};
+    tree.appendChild(n);
+  });
+  const shuffled=[...slots].sort(()=>Math.random()-0.5);
+  shuffled.forEach(s=>{
+    const c=document.createElement('div');
+    c.className='chip'; c.draggable=true; c.textContent=s.label; c.dataset.label=s.label;
+    c.ondragstart=e=>e.dataTransfer.setData('text',s.label);
+    bank.appendChild(c);
+  });
+}
+function dropChip(e,node){
+  const label=e.dataTransfer.getData('text');
+  if(node.classList.contains('filled'))return;
+  if(label===node.dataset.answer){
+    node.classList.add('filled'); node.textContent=label;
+    placed[node.id]=true;
+    [...bank.children].forEach(c=>{if(c.dataset.label===label)c.classList.add('used');});
+    updateAirwayScore();
+  } else {
+    node.style.borderColor='#D9644A';
+    setTimeout(()=>{node.style.borderColor='';},500);
+  }
+}
+function updateAirwayScore(){
+  const n=Object.keys(placed).length;
+  document.getElementById('airwayScore').textContent=n+' / 6 placed correctly';
+  if(n===6)document.getElementById('airwayScore').innerHTML='✓ All 6 correct — you traced air from throat to gas-exchange surface!';
+}
+function resetAirway(){buildAirway();document.getElementById('airwayScore').textContent='0 / 6 placed correctly';}
+buildAirway();
+
+// -------- Quiz --------
+const questions=[
+  {stem:'1. Which process belongs to the CIRCULATORY system, not the respiratory system?',
+   opts:['Pulmonary ventilation','External respiration','Transport of O₂ and CO₂ in blood','Warming and humidifying air'],
+   correct:2, fb:'Transport of gases through the bloodstream is a circulatory-system job; ventilation and external respiration are respiratory.'},
+  {stem:'2. During quiet inspiration, what happens to intrapulmonary pressure?',
+   opts:['It rises above atmospheric','It falls below atmospheric','It stays exactly atmospheric','It equals intrapleural pressure'],
+   correct:1, fb:'Thoracic volume increases → by Boyle\'s Law pressure falls below atmospheric → air flows in.'},
+  {stem:'3. The anatomical dead space is the air sitting in the…',
+   opts:['Alveoli','Conducting zone','Pleural cavity','Pulmonary capillaries'],
+   correct:1, fb:'The conducting zone (~150 mL) only moves air — no gas exchange occurs there, so it is "dead space".'},
+  {stem:'4. Which structure keeps the lung pulled open against the chest wall?',
+   opts:['Positive intrapulmonary pressure','The negative intrapleural pressure','Surfactant alone','The diaphragm at rest'],
+   correct:1, fb:'The slightly negative intrapleural pressure creates the transpulmonary gradient that holds the lung inflated; lose it (pneumothorax) and the lung collapses.'},
+  {stem:'5. Quiet expiration is normally…',
+   opts:['An active process using the diaphragm','A passive process driven by elastic recoil','Powered by the external intercostals','Impossible without abdominal muscles'],
+   correct:1, fb:'At rest, expiration is passive — inspiratory muscles relax and the elastic lungs recoil. Forced expiration adds active muscle work.'}
+];
+let quizState={};
+function buildQuiz(){
+  const host=document.getElementById('quizHost'); host.innerHTML=''; quizState={};
+  questions.forEach((q,qi)=>{
+    const div=document.createElement('div'); div.className='q';
+    const stem=document.createElement('div'); stem.className='stem'; stem.textContent=q.stem; div.appendChild(stem);
+    q.opts.forEach((o,oi)=>{
+      const b=document.createElement('button'); b.className='opt'; b.textContent=o;
+      b.onclick=()=>answer(qi,oi,div,b,q);
+      div.appendChild(b);
+    });
+    const fb=document.createElement('div'); fb.className='fb'; fb.id='fb'+qi; div.appendChild(fb);
+    host.appendChild(div);
+  });
+  updateQuizScore();
+}
+function answer(qi,oi,div,btn,q){
+  if(quizState[qi]!==undefined)return;
+  quizState[qi]=oi;
+  const opts=div.querySelectorAll('.opt');
+  opts[q.correct].classList.add('correct');
+  const fb=document.getElementById('fb'+qi);
+  if(oi===q.correct){fb.className='fb show ok';fb.textContent='✓ Correct. '+q.fb;}
+  else{btn.classList.add('wrong');fb.className='fb show no';fb.textContent='✗ '+q.fb;}
+  updateQuizScore();
+}
+function updateQuizScore(){
+  let s=0; questions.forEach((q,qi)=>{if(quizState[qi]===q.correct)s++;});
+  document.getElementById('quizScore').textContent='Score: '+s+' / '+questions.length;
+}
+function resetQuiz(){buildQuiz();}
+buildQuiz();
+</script>
+</body>
+</html>

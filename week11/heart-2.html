@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Heart II — Interactive Activity</title>
+<style>
+  :root{
+    --ink:#13323A; --sub:#4A6670; --teal:#0E7C86; --teal-dk:#0A565E; --teal-xdk:#08434A;
+    --coral:#E0574C; --coral-dk:#BF4339; --seafoam:#4FB6A6; --mint:#8FD6C8;
+    --mist:#EFF7F6; --mist2:#E3F0EE; --coraltint:#FBEDEB; --amber:#E8A33D;
+    --ambertint:#FBF1DF; --paper:#FFFFFF; --line:#D2E3E0; --purple:#6E59A5; --purpletint:#EFEAF6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Calibri","Segoe UI",system-ui,sans-serif;background:linear-gradient(160deg,#F4FAF9,#E8F3F1);color:var(--ink);line-height:1.55;padding:24px 16px;min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto}
+  header.top{background:var(--teal-xdk);color:#fff;border-radius:16px;padding:26px 30px;box-shadow:0 10px 30px rgba(8,67,74,.22)}
+  header.top .kick{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint);font-weight:700}
+  header.top h1{font-family:"Cambria",Georgia,serif;font-size:1.85rem;margin:6px 0 4px}
+  header.top p{color:#CFE8E4;font-size:.95rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 18px}
+  .tab{flex:1;min-width:150px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:.95rem;font-weight:600;color:var(--teal-dk);transition:.18s;text-align:center}
+  .tab:hover{border-color:var(--seafoam)}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 6px 16px rgba(14,124,134,.25)}
+  .panel{display:none;background:#fff;border-radius:16px;padding:26px 28px;box-shadow:0 6px 22px rgba(8,67,74,.10);animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2.sec{font-family:"Cambria",Georgia,serif;color:var(--teal-xdk);font-size:1.4rem;margin-bottom:6px}
+  .lead{color:var(--sub);margin-bottom:18px;font-size:.97rem}
+  /* ECG explorer */
+  .ecgbox{background:#0C2E34;border-radius:12px;padding:16px;margin-bottom:16px}
+  svg{width:100%;height:auto;display:block}
+  .wavebtns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .wb{background:var(--mist);border:2px solid var(--line);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:.9rem;color:var(--teal-dk);transition:.15s}
+  .wb:hover{border-color:var(--seafoam)}
+  .wb.active{background:var(--coral);color:#fff;border-color:var(--coral)}
+  .info{background:var(--mist2);border-left:5px solid var(--seafoam);border-radius:9px;padding:14px 16px;font-size:.94rem;min-height:62px}
+  .info b{color:var(--teal-xdk)}
+  .seg{transition:.2s;cursor:pointer}
+  /* Cycle sequencer */
+  .scoreline{display:flex;justify-content:space-between;align-items:center;background:var(--mist2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-weight:600;color:var(--teal-dk)}
+  .scoreline .pts{color:var(--coral-dk)}
+  .pool{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .chip{background:var(--mist);border:2px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--ink);transition:.15s}
+  .chip:hover{border-color:var(--seafoam);transform:translateY(-1px)}
+  .chip.used{opacity:.32;pointer-events:none;background:#eee}
+  .track{min-height:54px;border:2px dashed var(--line);border-radius:12px;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#FBFEFE}
+  .step{background:var(--teal);color:#fff;border-radius:8px;padding:8px 12px;font-size:.86rem;font-weight:600;display:flex;align-items:center;gap:6px}
+  .step .n{background:rgba(255,255,255,.25);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+  .step.bad{background:var(--coral)}
+  .arrow{color:var(--seafoam);font-weight:700}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  button.act{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.15s}
+  button.act:hover{background:var(--coral-dk)}
+  button.ghost{background:#fff;color:var(--teal-dk);border:2px solid var(--line)}
+  button.ghost:hover{border-color:var(--seafoam)}
+  .feedback{margin-top:14px;padding:14px 16px;border-radius:10px;font-size:.94rem;display:none}
+  .feedback.show{display:block;animation:fade .2s}
+  .feedback.ok{background:var(--mist2);border-left:5px solid var(--seafoam);color:var(--teal-xdk)}
+  .feedback.no{background:var(--coraltint);border-left:5px solid var(--coral);color:var(--coral-dk)}
+  /* MCQ */
+  .q{background:var(--mist);border-radius:12px;padding:18px 20px;margin-bottom:16px;border-left:5px solid var(--teal)}
+  .q .stem{font-weight:600;margin-bottom:12px}
+  .q .stem .tag{display:inline-block;background:var(--teal);color:#fff;font-size:.72rem;border-radius:6px;padding:2px 8px;margin-right:8px;text-transform:uppercase;letter-spacing:.05em;vertical-align:middle}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:9px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:.93rem;color:var(--ink);transition:.13s}
+  .opt:hover{border-color:var(--seafoam)}
+  .opt.correct{background:var(--mist2);border-color:var(--seafoam);font-weight:600}
+  .opt.wrong{background:var(--coraltint);border-color:var(--coral)}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;padding:12px 14px;background:var(--ambertint);border-left:4px solid var(--amber);border-radius:8px;font-size:.9rem;color:#7a5210;display:none}
+  .explain.show{display:block}
+  .layla{background:var(--purpletint);border-left:5px solid var(--purple);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:.93rem;color:#3f3463}
+  .layla b{color:var(--purple)}
+  .done{text-align:center;padding:24px;background:var(--teal-xdk);color:#fff;border-radius:14px;margin-top:8px;display:none}
+  .done.show{display:block;animation:fade .3s}
+  .done .big{font-size:2.2rem;font-family:"Cambria",Georgia,serif}
+  footer{text-align:center;color:var(--sub);font-size:.82rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kick">BIOL 432 · Anatomy &amp; Physiology · Week 11</div>
+    <h1>The Heart II — Interactive Activity</h1>
+    <p>Read the ECG, sequence the cardiac cycle, and interpret rhythms. Electrical → Mechanical → Output.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="ecg">📈 ECG Explorer</div>
+    <div class="tab" data-tab="cycle">🔁 Cardiac-Cycle Sequencer</div>
+    <div class="tab" data-tab="rhythm">⚕ Rhythm &amp; Regulation</div>
+  </div>
+
+  <!-- PANEL 1: ECG -->
+  <div class="panel active" id="ecg">
+    <h2 class="sec">ECG Explorer</h2>
+    <p class="lead">Click a waveform or interval to see the electrical event it represents and its clinical significance.</p>
+    <div class="ecgbox">
+      <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" aria-label="ECG trace">
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M20 0H0V20" fill="none" stroke="#14454D" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="720" height="200" fill="url(#grid)"/>
+        <!-- baseline trace -->
+        <polyline fill="none" stroke="#6FE3CF" stroke-width="2.5" points="
+          10,120 90,120
+          110,108 130,120
+          150,120 175,120
+          185,128 195,55 205,165 215,108 225,120
+          250,120 300,120
+          315,95 345,95 360,120
+          400,120 460,120
+          480,108 500,120
+          520,120 560,120
+          575,128 585,55 595,165 605,108 615,120
+          640,120 700,120"/>
+        <!-- clickable hotspots -->
+        <rect class="seg" data-w="P" x="100" y="86" width="48" height="50" fill="#E0574C" opacity="0.0"/>
+        <rect class="seg" data-w="PR" x="100" y="40" width="92" height="120" fill="#E8A33D" opacity="0.0"/>
+        <rect class="seg" data-w="QRS" x="182" y="40" width="48" height="140" fill="#4FB6A6" opacity="0.0"/>
+        <rect class="seg" data-w="ST" x="248" y="86" width="70" height="44" fill="#8FD6C8" opacity="0.0"/>
+        <rect class="seg" data-w="T" x="312" y="76" width="54" height="60" fill="#E0574C" opacity="0.0"/>
+        <rect class="seg" data-w="QT" x="182" y="40" width="186" height="140" fill="#6E59A5" opacity="0.0"/>
+        <text x="124" y="150" fill="#9FE8DA" font-size="13" text-anchor="middle">P</text>
+        <text x="206" y="48" fill="#9FE8DA" font-size="13" text-anchor="middle">QRS</text>
+        <text x="339" y="150" fill="#9FE8DA" font-size="13" text-anchor="middle">T</text>
+      </svg>
+    </div>
+    <div class="wavebtns" id="waveBtns"></div>
+    <div class="info" id="ecgInfo"><b>Tap a wave above.</b> Each deflection maps to a specific electrical event — and the intervals reveal conduction through specific structures.</div>
+  </div>
+
+  <!-- PANEL 2: CYCLE SEQUENCER -->
+  <div class="panel" id="cycle">
+    <h2 class="sec">Cardiac-Cycle Sequencer</h2>
+    <p class="lead">Order the events of one heartbeat, starting from ventricular filling. Mind the heart sounds and valve events.</p>
+    <div class="scoreline"><span id="cycStatus">Pick the first event…</span><span class="pts" id="cycScore">0 / 7</span></div>
+    <div class="pool" id="cycPool"></div>
+    <div class="track" id="cycTrack"><span style="color:var(--sub);font-style:italic">Your sequence appears here</span></div>
+    <div class="btnrow">
+      <button class="act" id="cycCheck">Check sequence</button>
+      <button class="ghost act" id="cycReset">Reset</button>
+    </div>
+    <div class="feedback" id="cycFb"></div>
+  </div>
+
+  <!-- PANEL 3: RHYTHM -->
+  <div class="panel" id="rhythm">
+    <h2 class="sec">Rhythm &amp; Regulation</h2>
+    <p class="lead">Five vignettes spanning autorhythmicity, conduction, autonomic control, and cardiac output.</p>
+    <div class="layla">🏃 <b>Layla's link:</b> Her resting HR of 42 with normal exercise response is <b>physiological</b> athlete's bradycardia — high stroke volume plus strong vagal tone. Distinguish it from pathological bradycardia below.</div>
+    <div id="rhythmQs"></div>
+    <div class="done" id="rhythmDone"><div class="big" id="rhythmBig"></div><div id="rhythmMsg"></div></div>
+  </div>
+
+  <footer>BIOL 432 · Khalifa University · College of Medicine &amp; Health Sciences — interactive companion to the Heart II lecture</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // Tabs
+  var tabs=document.querySelectorAll('.tab');
+  for (var i=0;i<tabs.length;i++){
+    tabs[i].addEventListener('click', function(){
+      var t=this.getAttribute('data-tab');
+      var a=document.querySelectorAll('.tab'); for(var j=0;j<a.length;j++)a[j].classList.remove('active');
+      this.classList.add('active');
+      var p=document.querySelectorAll('.panel'); for(var k=0;k<p.length;k++)p[k].classList.remove('active');
+      document.getElementById(t).classList.add('active');
+    });
+  }
+
+  // ECG explorer
+  var WAVES={
+    P:{label:'P wave',text:'<b>Atrial depolarisation.</b> The SA-node impulse spreads across both atria, triggering atrial contraction (the "atrial kick", final 10–30% of filling). Normal duration &lt;0.12 s. A broad notched P (P mitrale) suggests left atrial enlargement; a tall peaked P (P pulmonale) suggests right atrial enlargement.'},
+    PR:{label:'PR interval',text:'<b>Atrial depolarisation + AV-nodal delay.</b> Normal 0.12–0.20 s. The deliberate AV delay lets the atria empty before the ventricles contract. Long PR (&gt;0.20 s) = first-degree AV block; short PR = pre-excitation (WPW).'},
+    QRS:{label:'QRS complex',text:'<b>Ventricular depolarisation</b> — the most powerful electrical event. Normal 0.06–0.10 s. A wide QRS (&gt;0.12 s) signals bundle branch block or a ventricular origin. Atrial repolarisation is hidden within it.'},
+    ST:{label:'ST segment',text:'<b>The plateau phase</b> — all ventricular cells are depolarised, so the segment is isoelectric. <b>ST elevation = STEMI</b> (emergency reperfusion, PCI &lt;90 min); ST depression = subendocardial ischemia. Any ST change is a cardiac emergency until proven otherwise.'},
+    T:{label:'T wave',text:'<b>Ventricular repolarisation.</b> Normally concordant with the QRS. Inversion suggests ischemia or strain; tall peaked "tented" T waves suggest hyperkalemia.'},
+    QT:{label:'QT interval',text:'<b>Total ventricular action-potential duration</b> (depolarisation + plateau + repolarisation). Corrected to QTc. Prolonged QTc risks early afterdepolarisations and Torsades de Pointes — watch for hypokalemia and QT-prolonging drugs.'}
+  };
+  var order=['P','PR','QRS','ST','T','QT'];
+  var wb=document.getElementById('waveBtns');
+  var info=document.getElementById('ecgInfo');
+  function selectWave(key){
+    var btns=wb.querySelectorAll('.wb');
+    for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-w')===key);
+    var segs=document.querySelectorAll('.seg');
+    for(var j=0;j<segs.length;j++) segs[j].setAttribute('opacity', segs[j].getAttribute('data-w')===key?'0.32':'0.0');
+    info.innerHTML='<b>'+WAVES[key].label+'.</b> '+WAVES[key].text;
+  }
+  order.forEach(function(k){
+    var b=document.createElement('button'); b.className='wb'; b.textContent=WAVES[k].label; b.setAttribute('data-w',k);
+    b.addEventListener('click', function(){ selectWave(k); });
+    wb.appendChild(b);
+  });
+  var segs=document.querySelectorAll('.seg');
+  for(var s=0;s<segs.length;s++){ (function(seg){ seg.addEventListener('click', function(){ selectWave(seg.getAttribute('data-w')); }); })(segs[s]); }
+
+  // Cycle sequencer
+  var CYC=[
+    'Ventricular filling — AV valves open (passive + atrial kick)',
+    'Isovolumetric contraction — AV valves close → S1 ("lub")',
+    'Semilunar valves open (LV pressure > aortic)',
+    'Rapid ventricular ejection (peak ~120 mmHg)',
+    'Reduced ejection (ESV ~60 mL remains)',
+    'Isovolumetric relaxation — semilunar valves close → S2 ("dub")',
+    'AV valves reopen → next cycle begins'
+  ];
+  var picked=[];
+  var pool=document.getElementById('cycPool'), track=document.getElementById('cycTrack'), fb=document.getElementById('cycFb');
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function renderPool(){
+    pool.innerHTML='';
+    shuffle(CYC).forEach(function(label){
+      var c=document.createElement('div'); c.className='chip'; c.textContent=label;
+      if(picked.indexOf(label)>-1) c.classList.add('used');
+      c.addEventListener('click', function(){ pickC(label); });
+      pool.appendChild(c);
+    });
+  }
+  function pickC(label){
+    if(picked.indexOf(label)>-1) return;
+    picked.push(label); renderTrackC(); renderPool();
+    document.getElementById('cycStatus').textContent = picked.length<7 ? ('Placed '+picked.length+' — keep going…') : 'All placed — check it!';
+    document.getElementById('cycScore').textContent=picked.length+' / 7';
+    fb.className='feedback';
+  }
+  function renderTrackC(){
+    track.innerHTML='';
+    if(!picked.length){track.innerHTML='<span style="color:var(--sub);font-style:italic">Your sequence appears here</span>';return;}
+    picked.forEach(function(p,i){
+      var s=document.createElement('span'); s.className='step'; s.innerHTML='<span class="n">'+(i+1)+'</span>'+p;
+      track.appendChild(s);
+      if(i<picked.length-1){var a=document.createElement('span');a.className='arrow';a.textContent='→';track.appendChild(a);}
+    });
+  }
+  document.getElementById('cycCheck').addEventListener('click', function(){
+    var steps=track.querySelectorAll('.step'), firstWrong=-1, ok=0;
+    for(var i=0;i<picked.length;i++){ if(picked[i]===CYC[i]){ok++;} else if(firstWrong<0){firstWrong=i;} }
+    for(var j=0;j<steps.length;j++){ steps[j].classList.toggle('bad', picked[j]!==CYC[j]); }
+    if(picked.length===7 && firstWrong<0){
+      fb.className='feedback show ok';
+      fb.innerHTML='<b>Correct cycle! ✓</b> S1 marks AV-valve closure at the start of systole; S2 marks semilunar closure at the start of diastole. Every valve moved on a pressure gradient.';
+    } else {
+      fb.className='feedback show no';
+      var hint=firstWrong>=0?(' First mismatch at position '+(firstWrong+1)+'. Remember: fill → contract (S1) → eject → relax (S2) → refill.'):'';
+      fb.innerHTML='<b>'+ok+' of 7 in order.</b>'+hint;
+    }
+  });
+  document.getElementById('cycReset').addEventListener('click', function(){
+    picked=[]; renderTrackC(); renderPool(); fb.className='feedback';
+    document.getElementById('cycStatus').textContent='Pick the first event…';
+    document.getElementById('cycScore').textContent='0 / 7';
+  });
+
+  // MCQ renderer
+  function buildQuiz(containerId, questions, doneId, bigId, msgId){
+    var container=document.getElementById(containerId); var answered=0, correct=0;
+    questions.forEach(function(q){
+      var box=document.createElement('div'); box.className='q';
+      var stem=document.createElement('div'); stem.className='stem'; stem.innerHTML='<span class="tag">'+q.tag+'</span>'+q.stem; box.appendChild(stem);
+      var exp=document.createElement('div'); exp.className='explain'; exp.innerHTML=q.explain;
+      q.opts.forEach(function(opt,oi){
+        var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+        b.addEventListener('click', function(){
+          var btns=box.querySelectorAll('.opt'); for(var x=0;x<btns.length;x++)btns[x].disabled=true;
+          if(oi===q.answer){b.classList.add('correct');correct++;} else {b.classList.add('wrong');btns[q.answer].classList.add('correct');}
+          exp.classList.add('show'); answered++;
+          if(answered===questions.length){
+            var d=document.getElementById(doneId);
+            document.getElementById(bigId).textContent=correct+' / '+questions.length;
+            document.getElementById(msgId).textContent = correct===questions.length?'Flawless — Electrical → Mechanical → Output mastered.':(correct>=questions.length*0.6?'Strong work. Review the highlighted notes.':'Revisit the companion and try again.');
+            d.classList.add('show');
+          }
+        });
+        box.appendChild(b);
+      });
+      box.appendChild(exp); container.appendChild(box);
+    });
+  }
+
+  buildQuiz('rhythmQs', [
+    { tag:'Autorhythmicity', stem:'In SA-node pacemaker cells, the Phase 0 upstroke is driven mainly by:',
+      opts:['Fast voltage-gated Na⁺ channels','L-type Ca²⁺ channels','Funny (HCN) channels alone','Cl⁻ channels'],
+      answer:1, explain:'Unlike contractile myocytes (fast Na⁺ upstroke), pacemaker cells depolarise via L-type Ca²⁺ channels at threshold (~−40 mV). The funny current drives the preceding Phase-4 drift, not the upstroke itself.' },
+    { tag:'Conduction', stem:'Why is the ~0.1 s AV-nodal delay physiologically essential?',
+      opts:['It speeds ventricular contraction','It lets the atria empty before the ventricles contract','It prevents the SA node from firing','It generates the T wave'],
+      answer:1, explain:'The delay ensures atrial systole completes — adding the atrial kick — before ventricular contraction begins. It appears as the PR interval (0.12–0.20 s).' },
+    { tag:'Autonomic', stem:'Layla\u2019s resting HR is 42 with a normal rise on exercise and no symptoms. This is best explained by:',
+      opts:['Sick sinus syndrome','High stroke volume plus strong resting vagal tone','Complete heart block','Hyperthyroidism'],
+      answer:1, explain:'Physiological athlete\u2019s bradycardia: endurance training raises SV (eccentric LV adaptation, higher EDV → Frank–Starling) and resting vagal tone, so the same CO is delivered at a lower rate. Normal exercise response and absence of symptoms rule out pathology.' },
+    { tag:'Cardiac output', stem:'In third-degree AV block at 38 bpm, why does cardiac output collapse despite a "normal" stroke volume?',
+      opts:['Stroke volume cannot rise','CO = HR × SV, and HR is the limiting factor','The aortic valve is stenosed','Preload is zero'],
+      answer:1, explain:'CO = HR × SV. At 38 bpm, even a maximal SV (~100 mL) yields only ~3.8 L/min — inadequate perfusion. The ventricles are driven by a slow Purkinje escape rhythm independent of the P waves.' },
+    { tag:'Repolarisation', stem:'Hypokalemia plus erythromycin plus haloperidol caused Torsades. The shared mechanism is:',
+      opts:['Increased Na⁺ influx','Blockade/impairment of IKr delaying Phase-3 repolarisation','Faster AV conduction','Loss of the plateau'],
+      answer:1, explain:'All three impair the rapid delayed-rectifier K⁺ current (IKr), delaying Phase-3 repolarisation → prolonged QT → early afterdepolarisations → Torsades. Treat with IV magnesium, correct K⁺, stop offending drugs, and increase rate.' }
+  ], 'rhythmDone','rhythmBig','rhythmMsg');
+
+  renderPool(); renderTrackC();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GI Hormones & Secretions — Reference · BIOL 432</title>
+<style>
+  :root{
+    --ink:#14323B; --teald:#0A4F5C; --teal:#0E7C8B; --seafoam:#12A594; --mint:#6FD3C2;
+    --mintlt:#CDEDE7; --coral:#EF6A50; --coraldk:#C24A34; --corallt:#FCE6E0;
+    --paper:#FFFFFF; --mist:#F1F8F8; --panel:#F7FBFB; --line:#CBE2E2; --mute:#5E777D; --gold:#E8A93B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 80% -10%,#e7f4f4 0%,var(--mist) 55%);min-height:100vh;line-height:1.5}
+  .wrap{max-width:1060px;margin:0 auto;padding:26px 20px 60px}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+  .badge{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--teal),var(--seafoam));
+    display:grid;place-items:center;font-size:26px;box-shadow:0 6px 18px rgba(14,124,139,.28)}
+  .eyebrow{font-size:12px;letter-spacing:2.5px;font-weight:700;color:var(--seafoam);text-transform:uppercase}
+  h1{font-family:Georgia,Cambria,serif;font-size:28px;color:var(--teald);line-height:1.15}
+  .sub{color:var(--mute);font-size:14.5px;margin:8px 0 20px;max-width:760px}
+  /* tabs */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{border:1px solid var(--line);background:var(--paper);color:var(--teald);font-weight:600;font-size:14px;
+    padding:10px 16px;border-radius:11px;cursor:pointer;transition:.18s;display:flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--seafoam);transform:translateY(-1px)}
+  .tab.active{background:var(--teald);color:#fff;border-color:var(--teald);box-shadow:0 6px 16px rgba(10,79,92,.25)}
+  .tab .n{width:22px;height:22px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:12px;
+    display:grid;place-items:center;font-weight:700}
+  .tab.active .n{background:var(--mint);color:var(--teald)}
+  .panel{display:none;animation:fade .3s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:0 8px 24px rgba(20,50,59,.06)}
+  h2{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:4px}
+  .lead{color:var(--mute);font-size:14px;margin-bottom:16px}
+  /* journey */
+  .journey{display:grid;grid-template-columns:230px 1fr;gap:20px}
+  @media(max-width:720px){.journey{grid-template-columns:1fr}}
+  .rail{display:flex;flex-direction:column;gap:0;position:relative}
+  .station{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;
+    border:1px solid transparent;transition:.16s}
+  .station:hover{background:var(--mist)}
+  .station.on{background:var(--mist);border-color:var(--line)}
+  .dot{width:34px;height:34px;border-radius:50%;background:var(--paper);border:2px solid var(--teal);
+    display:grid;place-items:center;font-size:16px;flex:none;transition:.16s}
+  .station.on .dot{background:var(--teal);color:#fff;border-color:var(--teal);transform:scale(1.06)}
+  .station .lbl{font-weight:700;font-size:14.5px;color:var(--teald)}
+  .rail::before{content:"";position:absolute;left:29px;top:34px;bottom:34px;width:2px;background:var(--line);z-index:0}
+  .station,.dot{position:relative;z-index:1}
+  .detail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;min-height:250px}
+  .detail h3{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:6px}
+  .detail .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--seafoam);background:var(--mintlt);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+  .detail ul{list-style:none;margin-top:8px}
+  .detail li{padding:7px 0 7px 26px;position:relative;font-size:14.5px}
+  .detail li::before{content:"●";position:absolute;left:0;color:var(--seafoam);font-size:11px;top:9px}
+  .clin{margin-top:14px;background:var(--corallt);border-left:5px solid var(--coral);border-radius:0 10px 10px 0;
+    padding:12px 14px;font-size:13.5px;color:#7A3C2E}
+  .clin b{color:var(--coraldk)}
+  /* layer builder */
+  .lb-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px}
+  @media(max-width:720px){.lb-wrap{grid-template-columns:1fr}}
+  .pool{display:flex;flex-direction:column;gap:10px}
+  .chipbtn{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:13px 15px;text-align:left;
+    cursor:pointer;font-size:14.5px;font-weight:600;color:var(--teald);transition:.15s;display:flex;justify-content:space-between;align-items:center}
+  .chipbtn:hover:not(:disabled){border-color:var(--seafoam);transform:translateX(3px)}
+  .chipbtn:disabled{opacity:.4;cursor:default}
+  .chipbtn .mini{font-size:12px;color:var(--mute);font-weight:500}
+  .slots{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .slots .hd{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:700;margin-bottom:4px}
+  .slot{border:1.5px dashed var(--line);border-radius:10px;padding:11px 12px;margin-top:9px;min-height:44px;
+    display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);transition:.15s}
+  .slot .idx{width:20px;height:20px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:11px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .slot.filled{border-style:solid;color:var(--teald);font-weight:600;background:var(--paper)}
+  .slot.ok{border-color:var(--seafoam);background:#eafaf6}
+  .slot.bad{border-color:var(--coral);background:var(--corallt)}
+  /* sequencer */
+  .seq{display:grid;grid-template-columns:1fr 320px;gap:20px}
+  @media(max-width:720px){.seq{grid-template-columns:1fr}}
+  .stage{background:var(--teald);border-radius:16px;padding:18px;color:#fff;min-height:280px;position:relative;overflow:hidden}
+  .stage h4{font-family:Georgia,serif;color:#fff;margin-bottom:6px}
+  .throat{position:relative;height:210px;margin-top:10px}
+  .part{position:absolute;border-radius:8px;transition:all .6s ease;font-size:11px;font-weight:700;
+    display:grid;place-items:center;text-align:center;color:#04343d}
+  #nasal{left:14%;top:6px;width:120px;height:26px;background:var(--mint)}
+  #palate{left:34%;top:36px;width:60px;height:14px;background:var(--gold);color:#3a2a00;border-radius:20px}
+  #epiglottis{left:20%;top:120px;width:52px;height:12px;background:var(--coral);color:#fff;border-radius:20px;transform-origin:left center}
+  #glottis{left:16%;top:150px;width:70px;height:22px;background:#2A6470;color:#cdeee7;font-size:10px}
+  #bolus{left:60%;top:20px;width:36px;height:36px;border-radius:50%;background:var(--seafoam);color:#04343d}
+  .caption{position:absolute;bottom:12px;left:16px;right:16px;font-size:12.5px;color:var(--mintlt);min-height:34px}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btn.primary{background:var(--seafoam);color:#fff}
+  .btn.primary:hover{background:var(--teal)}
+  .btn.ghost{background:var(--paper);color:var(--teald);border:1px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .steps{list-style:none}
+  .steps li{padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;font-size:13.5px;
+    background:var(--paper);cursor:pointer;display:flex;gap:10px;align-items:center;transition:.15s}
+  .steps li:hover:not(.used){border-color:var(--seafoam);transform:translateX(3px)}
+  .steps li.used{opacity:.4;cursor:default}
+  .steps li .order{width:22px;height:22px;border-radius:50%;background:var(--mist);color:var(--mute);font-size:12px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .steps li.used .order{background:var(--seafoam);color:#fff}
+  /* quiz */
+  .q{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .qtext{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--ink)}
+  .qtext .qn{color:var(--seafoam);font-family:Georgia,serif}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;
+    padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14px;transition:.13s;color:var(--ink)}
+  .opt:hover:not(.locked){border-color:var(--seafoam);background:var(--mist)}
+  .opt.correct{border-color:var(--seafoam);background:#eafaf6;font-weight:600}
+  .opt.wrong{border-color:var(--coral);background:var(--corallt)}
+  .opt.locked{cursor:default}
+  .fb{font-size:13px;margin-top:6px;padding:9px 12px;border-radius:9px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eafaf6;color:#0c6b5f}
+  .fb.bad{background:var(--corallt);color:#7A3C2E}
+  .scorebar{position:sticky;bottom:0;margin-top:18px;background:var(--teald);color:#fff;border-radius:14px;
+    padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -6px 20px rgba(10,79,92,.2)}
+  .scorebar b{font-size:22px;font-family:Georgia,serif}
+  .foot{text-align:center;color:var(--mute);font-size:12.5px;margin-top:26px}
+  .reveal{margin-top:12px}
+  .msg{font-size:13.5px;font-weight:600;margin-top:10px;min-height:20px}
+  .msg.ok{color:var(--teal)}.msg.bad{color:var(--coraldk)}
+</style><style>
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .fchip{border:1px solid var(--line);background:var(--paper);color:var(--teald);font-weight:600;font-size:13px;
+    padding:7px 14px;border-radius:20px;cursor:pointer;transition:.15s}
+  .fchip:hover{border-color:var(--seafoam)}
+  .fchip.on{background:var(--seafoam);color:#fff;border-color:var(--seafoam)}
+  table.ref{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.ref th{background:var(--teald);color:#fff;text-align:left;padding:10px 12px;font-family:Georgia,serif;font-weight:600;font-size:13px}
+  table.ref th:first-child{border-radius:10px 0 0 0}
+  table.ref th:last-child{border-radius:0 10px 0 0}
+  table.ref td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.ref tr:nth-child(even) td{background:var(--mist)}
+  table.ref tr:hover td{background:#eafaf6}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;white-space:nowrap}
+  .hcard{border:1px solid var(--line);border-radius:16px;padding:0;overflow:hidden;box-shadow:0 8px 24px rgba(20,50,59,.06);margin-bottom:14px}
+  .hcard .hd{padding:14px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+  .hcard .hd h3{font-family:Georgia,serif;font-size:20px}
+  .hcard .hd .src{font-size:12px;opacity:.9;font-weight:600}
+  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media(max-width:640px){.hgrid{grid-template-columns:1fr}}
+  .hgrid .cell{padding:14px 18px;border-top:1px solid var(--line)}
+  .hgrid .cell:nth-child(odd){border-right:1px solid var(--line)}
+  .hgrid .cell .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:700;margin-bottom:4px}
+  .hgrid .cell .v{font-size:14px;color:var(--ink)}
+  .phase{border-left:5px solid var(--seafoam);background:var(--panel);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:12px}
+  .phase h4{font-family:Georgia,serif;color:var(--teald);font-size:17px;margin-bottom:3px}
+  .phase .when{font-size:12px;color:var(--seafoam);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .phase p{font-size:14px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge">🔬</div>
+    <div>
+      <div class="eyebrow">BIOL 432 · Digestive System · Reference</div>
+      <h1>GI Hormones &amp; Secretions</h1>
+    </div>
+  </header>
+  <p class="sub">A cross-lecture cheat-sheet for the whole digestive suite: the hormone triad, who secretes what along the tract, and the three phases of gastric control. Built to keep open while you revise — offline, nothing saved.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="horm"><span class="n">1</span>Hormones</button>
+    <button class="tab" data-tab="secr"><span class="n">2</span>Secretions by Source</button>
+    <button class="tab" data-tab="phase"><span class="n">3</span>Secretion Phases</button>
+  </div>
+
+  <section class="panel active" id="horm">
+    <div class="card">
+      <h2>The GI hormone cast</h2>
+      <p class="lead">The messengers that coordinate secretion and motility across the tract. Gastrin, secretin, and CCK are the must-knows.</p>
+      <div id="hormBox"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="secr">
+    <div class="card">
+      <h2>Who secretes what</h2>
+      <p class="lead">Filter by source organ, then scan cell → secretion → function. Covers Lectures 1–2 (and previews Lecture 3).</p>
+      <div class="filters" id="secrFilters"></div>
+      <div style="overflow-x:auto"><table class="ref" id="secrTable"></table></div>
+    </div>
+  </section>
+
+  <section class="panel" id="phase">
+    <div class="card">
+      <h2>Three phases of gastric secretion</h2>
+      <p class="lead">The same events, viewed as a timeline from “thinking about food” to “chyme in the duodenum.”</p>
+      <div id="phaseBox"></div>
+    </div>
+  </section>
+
+  <p class="foot">BIOL 432 Physiology · Dr. Wael M. Osman · Khalifa University — Digestive System reference</p>
+</div>
+<script>
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
+    document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    document.getElementById(t.getAttribute("data-tab")).classList.add("active");
+  });
+});
+
+/* ---------- hormones ---------- */
+var HORM=[
+  {name:"Gastrin",color:"#0E7C8B",src:"G-cells · stomach antrum",
+   stim:"Stomach distension, peptides/amino acids, vagal input",
+   target:"Parietal cells, gastric mucosa",
+   action:"↑ HCl secretion; stimulates growth of the gastric mucosa",
+   note:"The engine of the gastric phase \u2014 roughly two-thirds of gastric secretion."},
+  {name:"Secretin",color:"#12A594",src:"S-cells · duodenum",
+   stim:"Acidic chyme in the duodenum (pH < 4.5)",
+   target:"Pancreatic duct cells, liver, stomach",
+   action:"↑ bicarbonate-rich pancreatic & biliary juice; mildly inhibits gastric secretion",
+   note:"The neutraliser \u2014 raises duodenal pH so intestinal enzymes can work."},
+  {name:"Cholecystokinin (CCK)",color:"#EF6A50",src:"I-cells · duodenum",
+   stim:"Fatty acids and amino acids in the duodenum",
+   target:"Gallbladder, pancreatic acini, pyloric sphincter",
+   action:"Gallbladder contracts + sphincter of Oddi relaxes; ↑ pancreatic enzymes; slows gastric emptying",
+   note:"The fat manager \u2014 why fatty meals empty slowest and feel filling."},
+  {name:"GIP (glucose-dependent insulinotropic peptide)",color:"#B7841F",src:"K-cells · duodenum & jejunum",
+   stim:"Fats, glucose in the small intestine",
+   target:"Pancreatic beta cells; stomach",
+   action:"Stimulates insulin release (incretin effect); mildly inhibits gastric activity",
+   note:"An incretin \u2014 primes insulin before glucose fully hits the blood."},
+  {name:"Motilin",color:"#5E777D",src:"M-cells · small intestine",
+   stim:"Fasting state, between meals",
+   target:"GI smooth muscle",
+   action:"Triggers the migrating motor complex \u2014 the \u2018housekeeping\u2019 sweep",
+   note:"Clears residue between meals; that mid-morning stomach growl."}
+];
+(function(){
+  var box=document.getElementById("hormBox");
+  HORM.forEach(function(h){
+    var d=document.createElement("div"); d.className="hcard";
+    d.innerHTML=
+      '<div class="hd" style="background:'+h.color+'"><h3>'+h.name+'</h3><span class="src">'+h.src+'</span></div>'+
+      '<div class="hgrid">'+
+        '<div class="cell"><div class="k">Stimulus</div><div class="v">'+h.stim+'</div></div>'+
+        '<div class="cell"><div class="k">Main target</div><div class="v">'+h.target+'</div></div>'+
+        '<div class="cell"><div class="k">Action</div><div class="v">'+h.action+'</div></div>'+
+        '<div class="cell"><div class="k">Remember</div><div class="v">'+h.note+'</div></div>'+
+      '</div>';
+    box.appendChild(d);
+  });
+})();
+
+/* ---------- secretions by source ---------- */
+var SRC_COLORS={"Salivary glands":"#0E7C8B","Stomach":"#12A594","Pancreas":"#EF6A50","Liver / gallbladder":"#B7841F","Small intestine":"#5E777D"};
+var SECR=[
+  {src:"Salivary glands",cell:"Serous & mucous acini",sec:"Salivary amylase",fn:"Begins starch digestion in the mouth"},
+  {src:"Salivary glands",cell:"Acinar cells",sec:"Lingual lipase, mucus, lysozyme",fn:"Starts fat digestion; lubricates; antibacterial"},
+  {src:"Stomach",cell:"Parietal cells",sec:"Hydrochloric acid (HCl)",fn:"Activates pepsin; denatures protein; kills microbes"},
+  {src:"Stomach",cell:"Parietal cells",sec:"Intrinsic factor",fn:"Required for vitamin B\u2081\u2082 absorption in the ileum"},
+  {src:"Stomach",cell:"Chief cells",sec:"Pepsinogen \u2192 pepsin",fn:"Begins protein digestion once activated by HCl"},
+  {src:"Stomach",cell:"Chief cells",sec:"Gastric lipase",fn:"Minor fat digestion"},
+  {src:"Stomach",cell:"Mucous (neck & surface) cells",sec:"Alkaline mucus + bicarbonate",fn:"Protects the wall from acid and pepsin"},
+  {src:"Stomach",cell:"G-cells (enteroendocrine)",sec:"Gastrin",fn:"Drives HCl secretion (hormone, into blood)"},
+  {src:"Pancreas",cell:"Acinar cells",sec:"Trypsinogen, chymotrypsinogen, procarboxypeptidase",fn:"Protein digestion \u2014 secreted inactive, activated in duodenum"},
+  {src:"Pancreas",cell:"Acinar cells",sec:"Pancreatic amylase & lipase, nucleases",fn:"Digest carbohydrate, fat, and nucleic acids"},
+  {src:"Pancreas",cell:"Duct cells",sec:"Bicarbonate (pH-8 juice)",fn:"Neutralises acidic chyme (driven by secretin)"},
+  {src:"Pancreas",cell:"Islet beta / alpha cells",sec:"Insulin / glucagon",fn:"Blood-glucose control (hormones, into blood)"},
+  {src:"Liver / gallbladder",cell:"Hepatocytes",sec:"Bile salts",fn:"Emulsify fats \u2014 physical, not chemical, digestion"},
+  {src:"Liver / gallbladder",cell:"Hepatocytes",sec:"Bilirubin (in bile)",fn:"Excretes heme breakdown product; colours bile & faeces"},
+  {src:"Liver / gallbladder",cell:"Gallbladder epithelium",sec:"Concentrated bile (stored)",fn:"Stores and concentrates bile up to 10-fold; released on CCK"},
+  {src:"Small intestine",cell:"Duodenal (Brunner) glands",sec:"Alkaline mucus",fn:"Protects duodenum from acidic chyme"},
+  {src:"Small intestine",cell:"S / I / K cells",sec:"Secretin, CCK, GIP",fn:"Coordinate pancreas, gallbladder, and emptying"},
+  {src:"Small intestine",cell:"Brush-border enterocytes",sec:"Enteropeptidase; brush-border enzymes",fn:"Activate trypsinogen; finish carbohydrate & protein digestion"}
+];
+(function(){
+  var order=["All","Salivary glands","Stomach","Pancreas","Liver / gallbladder","Small intestine"];
+  var fbox=document.getElementById("secrFilters"); var current="All";
+  order.forEach(function(o){
+    var b=document.createElement("button"); b.className="fchip"+(o==="All"?" on":""); b.textContent=o;
+    b.addEventListener("click",function(){
+      current=o; document.querySelectorAll("#secrFilters .fchip").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); render();
+    });
+    fbox.appendChild(b);
+  });
+  function render(){
+    var rows=SECR.filter(function(r){return current==="All"||r.src===current;});
+    var html='<tr><th>Source</th><th>Cell / structure</th><th>Secretion</th><th>Function</th></tr>';
+    rows.forEach(function(r){
+      html+='<tr><td><span class="pill" style="background:'+SRC_COLORS[r.src]+'">'+r.src+'</span></td>'+
+        '<td>'+r.cell+'</td><td><b>'+r.sec+'</b></td><td>'+r.fn+'</td></tr>';
+    });
+    document.getElementById("secrTable").innerHTML=html;
+  }
+  render();
+})();
+
+/* ---------- phases ---------- */
+var PHASES=[
+  {name:"Cephalic phase",when:"before food arrives",color:"#0E7C8B",
+   text:"The sight, smell, thought, or taste of food triggers the vagus nerve to prime the stomach \u2014 secretion begins in anticipation, driven neurally."},
+  {name:"Gastric phase",when:"food in the stomach",color:"#12A594",
+   text:"Distension and peptides raise the pH and stimulate G-cells to release gastrin \u2014 the peak of HCl and pepsinogen output, and about two-thirds of total secretion."},
+  {name:"Intestinal phase",when:"chyme enters the duodenum",color:"#EF6A50",
+   text:"A brief excitatory start, then the brakes: the enterogastric reflex plus secretin and CCK slow gastric secretion and emptying so the small intestine can keep up."}
+];
+(function(){
+  var box=document.getElementById("phaseBox");
+  PHASES.forEach(function(p,i){
+    var d=document.createElement("div"); d.className="phase"; d.style.borderLeftColor=p.color;
+    d.innerHTML='<h4>'+(i+1)+'. '+p.name+'</h4><div class="when" style="color:'+p.color+'">'+p.when+'</div><p>'+p.text+'</p>';
+    box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

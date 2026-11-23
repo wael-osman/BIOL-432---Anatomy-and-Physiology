@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circulation 1 — Interactive Lab · BIOL 432</title>
+<style>
+  :root{
+    --ink:#12343B; --teal:#0E6A78; --tealDeep:#0B505C; --tealMid:#12889A;
+    --seafoam:#5FC9C0; --seafoamLt:#DCEFEC; --mint:#8FE3D8;
+    --coral:#E26D5C; --coralDeep:#C8503F; --coralLt:#FBE4DF;
+    --body:#24343A; --muted:#5C7077; --gold:#E0A458; --goldLt:#FBEFD9;
+    --paper:#F7FBFB; --line:#CFE0DD;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;color:var(--body);
+    background:linear-gradient(160deg,#eef6f5,#f7fbfb 40%);padding:24px 16px;line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto}
+  header.top{border-bottom:3px solid var(--coral);padding-bottom:14px;margin-bottom:18px}
+  .kicker{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--coralDeep);text-transform:uppercase}
+  h1{font-family:Cambria,Georgia,serif;color:var(--tealDeep);font-size:30px;margin:4px 0 2px}
+  .sub{font-family:Cambria,Georgia,serif;font-style:italic;color:var(--teal);font-size:17px}
+  .tabs{display:flex;gap:8px;margin:18px 0 16px;flex-wrap:wrap}
+  .tab{font-family:Calibri,'Segoe UI',sans-serif;font-size:15px;font-weight:700;cursor:pointer;
+    border:1.5px solid var(--line);background:#fff;color:var(--teal);padding:10px 18px;border-radius:10px;
+    transition:.15s}
+  .tab:hover{border-color:var(--seafoam)}
+  .tab.active{background:var(--tealDeep);color:#fff;border-color:var(--tealDeep)}
+  .panel{display:none;animation:fade .25s}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .vcard{cursor:pointer;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:14px 12px;
+    text-align:center;transition:.15s}
+  .vcard:hover{border-color:var(--seafoam);transform:translateY(-2px);box-shadow:0 6px 16px rgba(14,106,120,.10)}
+  .vcard.sel{border-color:var(--tealDeep);background:var(--seafoamLt);box-shadow:0 6px 16px rgba(14,106,120,.16)}
+  .vcard .ring{width:54px;height:54px;border-radius:50%;margin:0 auto 8px;display:block}
+  .vcard .vn{font-weight:700;color:var(--tealDeep);font-size:14px}
+  .vcard .vp{font-size:12px;color:var(--muted)}
+  .detail{border:1.5px solid var(--line);border-left:6px solid var(--teal);background:#fff;border-radius:12px;
+    padding:18px 20px;min-height:120px}
+  .detail h3{font-family:Cambria,Georgia,serif;color:var(--tealDeep);font-size:21px;margin-bottom:4px}
+  .detail .tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:var(--teal);
+    padding:2px 10px;border-radius:20px;margin-bottom:10px}
+  .detail .row{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+  .detail .col{flex:1;min-width:220px}
+  .detail .lab{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--coralDeep);margin-bottom:2px}
+  .detail p{font-size:14px;margin-bottom:8px}
+  .clin{margin-top:10px;border-left:4px solid var(--coral);background:var(--coralLt);padding:8px 12px;border-radius:6px;font-size:13px}
+  .clin b{color:var(--coralDeep)}
+  /* tunic bar */
+  .tunics{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:8px 0;border:1px solid var(--line)}
+  .tunics span{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  /* lab */
+  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.lab-grid{grid-template-columns:1fr}}
+  .controls{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--tealDeep);margin-bottom:4px}
+  .ctrl label .val{color:var(--coralDeep);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--teal);height:6px}
+  .hint{font-size:12px;color:var(--muted);margin-top:2px}
+  .readout{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column}
+  .big{font-family:Cambria,Georgia,serif;font-size:15px;color:var(--muted);margin-bottom:2px}
+  .metric{display:flex;align-items:baseline;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .metric .mn{font-weight:700;color:var(--tealDeep)}
+  .metric .mv{font-family:Cambria,Georgia,serif;font-size:24px;color:var(--coralDeep);font-variant-numeric:tabular-nums}
+  .barwrap{margin-top:14px}
+  .barlab{font-size:12px;color:var(--muted);margin-bottom:4px}
+  .bar{height:22px;background:var(--seafoamLt);border-radius:6px;overflow:hidden}
+  .bar > div{height:100%;background:linear-gradient(90deg,var(--teal),var(--coral));border-radius:6px;width:10%;transition:width .2s}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .preset{cursor:pointer;font-size:13px;font-weight:700;border:1.5px solid var(--line);background:#fff;
+    color:var(--teal);padding:7px 14px;border-radius:20px;transition:.15s}
+  .preset:hover{border-color:var(--seafoam)}
+  .preset.layla{border-color:var(--coral);color:var(--coralDeep)}
+  .laylabox{margin-top:14px;border-left:4px solid var(--teal);background:var(--seafoamLt);padding:10px 14px;border-radius:6px;font-size:13px;display:none}
+  .laylabox.show{display:block}
+  .laylabox b{color:var(--tealDeep)}
+  .eq{font-family:Cambria,Georgia,serif;text-align:center;background:var(--goldLt);border:1px solid #ecdcb6;
+    border-radius:8px;padding:10px;margin:6px 0 14px;font-size:16px;color:var(--ink)}
+  footer{margin-top:22px;border-top:1px solid var(--line);padding-top:10px;font-size:12px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  .quiz{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:16px;margin-top:16px}
+  .quiz .q{font-weight:700;color:var(--tealDeep);margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:8px;
+    padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--body);transition:.12s}
+  .opt:hover{border-color:var(--seafoam)}
+  .opt.right{border-color:var(--teal);background:var(--seafoamLt)}
+  .opt.wrong{border-color:var(--coral);background:var(--coralLt)}
+  .fb{font-size:13px;margin-top:6px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">BIOL 432 · Circulation 1 · Interactive Lab</div>
+    <h1>Vessels &amp; the Physics of Flow</h1>
+    <div class="sub">Explore vessel architecture, then put Poiseuille's law to work</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="explorer">Vessel Explorer</div>
+    <div class="tab" data-tab="lab">Poiseuille r⁴ Lab</div>
+    <div class="tab" data-tab="check">Quick Check</div>
+  </div>
+
+  <!-- ============ EXPLORER ============ -->
+  <section class="panel active" data-panel="explorer">
+    <div class="card-grid" id="vcards"></div>
+    <div class="detail" id="vdetail"></div>
+  </section>
+
+  <!-- ============ LAB ============ -->
+  <section class="panel" data-panel="lab">
+    <div class="eq">R&nbsp;∝&nbsp;(η&nbsp;·&nbsp;L)&nbsp;/&nbsp;r⁴&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;Q&nbsp;=&nbsp;ΔP&nbsp;/&nbsp;R</div>
+    <div class="presets">
+      <div class="preset" data-preset="rest">Resting baseline</div>
+      <div class="preset" data-preset="dilate">Arteriolar dilation</div>
+      <div class="preset" data-preset="constrict">Arteriolar constriction</div>
+      <div class="preset layla" data-preset="layla">Layla at altitude</div>
+    </div>
+    <div class="lab-grid">
+      <div class="controls">
+        <div class="ctrl">
+          <label>Vessel radius <span class="val" id="rVal">1.00 ×</span></label>
+          <input type="range" id="r" min="40" max="200" value="100">
+          <div class="hint">Relative to baseline. Resistance scales with 1/r⁴.</div>
+        </div>
+        <div class="ctrl">
+          <label>Blood viscosity (η) <span class="val" id="vVal">1.00 ×</span></label>
+          <input type="range" id="v" min="70" max="220" value="100">
+          <div class="hint">Driven mainly by hematocrit.</div>
+        </div>
+        <div class="ctrl">
+          <label>Vessel length (L) <span class="val" id="lVal">1.00 ×</span></label>
+          <input type="range" id="l" min="50" max="200" value="100">
+          <div class="hint">Roughly fixed in the body.</div>
+        </div>
+        <div class="ctrl">
+          <label>Pressure gradient (ΔP) <span class="val" id="pVal">1.00 ×</span></label>
+          <input type="range" id="p" min="50" max="200" value="100">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="big">Live result</div>
+        <div class="metric"><span class="mn">Resistance (R)</span><span class="mv" id="outR">1.00 ×</span></div>
+        <div class="metric"><span class="mn">Flow (Q)</span><span class="mv" id="outQ">1.00 ×</span></div>
+        <div class="barwrap">
+          <div class="barlab">Relative resistance (log scale)</div>
+          <div class="bar"><div id="rbar"></div></div>
+        </div>
+        <div class="laylabox" id="laylabox">
+          <b>Layla's altitude trade-off.</b> Six weeks at altitude raised her hematocrit toward 55%.
+          Oxygen-carrying capacity climbs — but viscosity rises too, so resistance and cardiac workload increase.
+          Push hematocrit too far (EPO doping toward 60–70%) and the viscosity penalty turns dangerous.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUICK CHECK ============ -->
+  <section class="panel" data-panel="check">
+    <div id="quizMount"></div>
+  </section>
+
+  <footer>
+    <span>BIOL 432 · Anatomy &amp; Physiology · Khalifa University</span>
+    <span>Dr. Wael M. Osman</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---------- TABS ----------
+  var tabs = document.querySelectorAll(".tab");
+  var panels = document.querySelectorAll(".panel");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      var key = t.getAttribute("data-tab");
+      tabs.forEach(function(x){ x.classList.toggle("active", x===t); });
+      panels.forEach(function(p){ p.classList.toggle("active", p.getAttribute("data-panel")===key); });
+    });
+  });
+
+  // ---------- VESSEL DATA ----------
+  var vessels = [
+    { id:"elastic", name:"Elastic artery", prop:"Aorta · pulmonary trunk", color:"#C8503F",
+      tag:"Conducting",
+      tunics:[["Intima",10,"#0E6A78"],["Media (elastin)",70,"#E26D5C"],["Externa",20,"#5FC9C0"]],
+      structure:"Thick, elastin-dominated media (40–70 lamellae). Wide lumen, low resistance.",
+      function:"Windkessel effect: stretches in systole to store stroke volume, recoils in diastole to keep flow continuous and protect the diastolic pressure (~80 mmHg).",
+      clin:"<b>Aortic stiffening</b> with age reduces buffering → isolated systolic hypertension and wide pulse pressure." },
+    { id:"muscular", name:"Muscular artery", prop:"Brachial · renal · coronary", color:"#0E6A78",
+      tag:"Distributing",
+      tunics:[["Intima",12,"#0E6A78"],["Media (smooth muscle)",60,"#E26D5C"],["Externa",28,"#5FC9C0"]],
+      structure:"Thick smooth-muscle media (up to 40 layers) with prominent internal elastic membrane.",
+      function:"Routes cardiac output to specific organs by constricting and dilating; in exercise, skeletal muscle can claim 85–90% of output.",
+      clin:"<b>Peripheral arterial disease</b>: atherosclerosis here causes claudication; ankle–brachial index is the key test." },
+    { id:"arteriole", name:"Arteriole", prop:"Resistance vessels", color:"#0B505C",
+      tag:"Resistance",
+      tunics:[["Intima",14,"#0E6A78"],["Media (smooth muscle)",66,"#E26D5C"],["Externa",20,"#5FC9C0"]],
+      structure:"Small (10–100 µm), high muscle-to-lumen ratio; able to change diameter dramatically.",
+      function:"The master regulators: ~50% of systemic resistance. Small radius changes cause enormous flow changes (r⁴ law). Set blood pressure and route local flow.",
+      clin:"<b>Essential hypertension</b> reflects inappropriately high arteriolar tone — the target of most antihypertensives." },
+    { id:"capillary", name:"Capillary", prop:"Exchange vessels", color:"#12889A",
+      tag:"Exchange",
+      tunics:[["Endothelium only",100,"#12889A"]],
+      structure:"A single endothelial cell thick (~0.5 µm). Huge total cross-section → slowest velocity, ideal for exchange.",
+      function:"All gas, nutrient and waste exchange. Three types: continuous (tight), fenestrated (kidney, gut), sinusoidal (liver, marrow).",
+      clin:"<b>Diabetic microangiopathy</b> thickens the basement membrane → retinopathy and nephropathy." },
+    { id:"venule", name:"Venule", prop:"Post-capillary", color:"#5FC9C0",
+      tag:"Capacitance",
+      tunics:[["Endothelium",30,"#12889A"],["Thin wall",70,"#5FC9C0"]],
+      structure:"Thin-walled, porous; postcapillary venules are the most leaky segment.",
+      function:"Drain capillaries and, under histamine, widen and leak — the site of inflammatory swelling and leukocyte exit.",
+      clin:"<b>Anaphylaxis</b>: histamine opens venule gaps → plasma leak, angioedema and falling effective volume." },
+    { id:"vein", name:"Vein", prop:"Capacitance reservoir", color:"#3FA89C",
+      tag:"Capacitance",
+      tunics:[["Intima",10,"#0E6A78"],["Thin media",30,"#E26D5C"],["Thick externa",60,"#5FC9C0"]],
+      structure:"Thin media, large lumen, valves. Hold 60–65% of total blood volume.",
+      function:"Variable reservoir. Venoconstriction provides built-in autotransfusion; valves + muscular and respiratory pumps drive venous return.",
+      clin:"<b>Varicose veins / venous ulcers</b>: incompetent valves → venous hypertension → edema and skin breakdown." }
+  ];
+
+  var cardWrap = document.getElementById("vcards");
+  var detail = document.getElementById("vdetail");
+  vessels.forEach(function(v, i){
+    var c = document.createElement("div");
+    c.className = "vcard" + (i===0 ? " sel" : "");
+    c.setAttribute("data-v", v.id);
+    c.innerHTML =
+      '<span class="ring" style="background:radial-gradient(circle at center,#fff 18%,'+v.color+' 22%,'+v.color+' 60%,#fff 64%);border:2px solid '+v.color+'"></span>'+
+      '<div class="vn">'+v.name+'</div><div class="vp">'+v.prop+'</div>';
+    c.addEventListener("click", function(){
+      document.querySelectorAll(".vcard").forEach(function(x){ x.classList.remove("sel"); });
+      c.classList.add("sel");
+      showVessel(v);
+    });
+    cardWrap.appendChild(c);
+  });
+
+  function showVessel(v){
+    var tun = v.tunics.map(function(t){
+      return '<span style="width:'+t[1]+'%;background:'+t[2]+'">'+(t[1]>=20?t[0]:"")+'</span>';
+    }).join("");
+    detail.innerHTML =
+      '<span class="tag">'+v.tag+'</span>'+
+      '<h3>'+v.name+'</h3>'+
+      '<div class="lab">Wall composition (relative thickness)</div>'+
+      '<div class="tunics">'+tun+'</div>'+
+      '<div class="row"><div class="col"><div class="lab">Structure</div><p>'+v.structure+'</p></div>'+
+      '<div class="col"><div class="lab">Function</div><p>'+v.function+'</p></div></div>'+
+      '<div class="clin">'+v.clin+'</div>';
+  }
+  showVessel(vessels[0]);
+
+  // ---------- POISEUILLE LAB ----------
+  var R = document.getElementById("r"), V = document.getElementById("v"),
+      L = document.getElementById("l"), P = document.getElementById("p");
+  var rVal=document.getElementById("rVal"), vVal=document.getElementById("vVal"),
+      lVal=document.getElementById("lVal"), pVal=document.getElementById("pVal");
+  var outR=document.getElementById("outR"), outQ=document.getElementById("outQ"),
+      rbar=document.getElementById("rbar"), laylabox=document.getElementById("laylabox");
+
+  function fmt(x){
+    if(x>=100) return Math.round(x)+" ×";
+    if(x>=10) return x.toFixed(1)+" ×";
+    if(x>=1) return x.toFixed(2)+" ×";
+    return x.toFixed(3)+" ×";
+  }
+  function recompute(){
+    var r=R.value/100, v=V.value/100, l=L.value/100, p=P.value/100;
+    rVal.textContent=r.toFixed(2)+" ×"; vVal.textContent=v.toFixed(2)+" ×";
+    lVal.textContent=l.toFixed(2)+" ×"; pVal.textContent=p.toFixed(2)+" ×";
+    var res = (v*l)/Math.pow(r,4);   // relative resistance
+    var q = p/res;                    // relative flow
+    outR.textContent=fmt(res);
+    outQ.textContent=fmt(q);
+    // log-scaled bar: map res in [~0.06 .. ~340] to 2%..100%
+    var pct = (Math.log(res)/Math.log(340) ) * 50 + 50;
+    pct = Math.max(3, Math.min(100, pct));
+    rbar.style.width = pct + "%";
+  }
+  [R,V,L,P].forEach(function(s){ s.addEventListener("input", recompute); });
+
+  var presets = {
+    rest:    {r:100,v:100,l:100,p:100, layla:false},
+    dilate:  {r:150,v:100,l:100,p:100, layla:false},
+    constrict:{r:65,v:100,l:100,p:100, layla:false},
+    layla:   {r:100,v:175,l:100,p:115, layla:true}
+  };
+  document.querySelectorAll(".preset").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var p = presets[btn.getAttribute("data-preset")];
+      R.value=p.r; V.value=p.v; L.value=p.l; P.value=p.p;
+      laylabox.classList.toggle("show", p.layla);
+      recompute();
+    });
+  });
+  recompute();
+
+  // ---------- QUICK CHECK ----------
+  var quiz = [
+    { q:"Halving an arteriole's radius (other factors constant) changes its resistance by roughly what factor?",
+      opts:["×2","×4","×8","×16"], a:3,
+      fb:"Resistance ∝ 1/r⁴, so halving radius multiplies resistance by 2⁴ = 16. This is why arterioles are such powerful flow regulators." },
+    { q:"Which vessel layer is dominant in an elastic (conducting) artery?",
+      opts:["Tunica intima","Tunica media (elastin)","Tunica externa","Endothelium only"], a:1,
+      fb:"The elastin-rich tunica media is dominant — it stores stroke volume in systole (the Windkessel effect)." },
+    { q:"Where does blood velocity reach its slowest, and why?",
+      opts:["Aorta — highest pressure","Arterioles — most muscle","Capillaries — largest total cross-section","Venae cavae — largest lumen"], a:2,
+      fb:"Velocity is inversely related to total cross-sectional area, which peaks in the capillaries — perfect for exchange." },
+    { q:"Layla's hematocrit rises at altitude. The direct circulatory cost is:",
+      opts:["Lower viscosity","Higher viscosity → higher resistance","Lower resistance","No change in flow"], a:1,
+      fb:"More red cells raise viscosity (η). Since R ∝ η, resistance and cardiac workload climb — the trade-off behind blood-doping danger." }
+  ];
+  var mount = document.getElementById("quizMount");
+  quiz.forEach(function(item, qi){
+    var box = document.createElement("div");
+    box.className="quiz";
+    var opts = item.opts.map(function(o, oi){
+      return '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+    }).join("");
+    box.innerHTML = '<div class="q">'+(qi+1)+'. '+item.q+'</div>'+opts+'<div class="fb" id="fb'+qi+'"></div>';
+    mount.appendChild(box);
+  });
+  mount.querySelectorAll(".opt").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var qi=+btn.getAttribute("data-q"), oi=+btn.getAttribute("data-o");
+      var item=quiz[qi], fb=document.getElementById("fb"+qi);
+      var sibs=mount.querySelectorAll('.opt[data-q="'+qi+'"]');
+      sibs.forEach(function(s){ s.classList.remove("right","wrong"); s.disabled=false; });
+      if(oi===item.a){ btn.classList.add("right"); fb.style.color="#0B505C"; fb.innerHTML="✓ "+item.fb; }
+      else{ btn.classList.add("wrong"); sibs[item.a].classList.add("right"); fb.style.color="#C8503F"; fb.innerHTML="✗ "+item.fb; }
+    });
+  });
+})();
+</script>
+</body>
+</html>

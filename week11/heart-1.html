@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 432 · Heart I — Interactive Activity</title>
+<style>
+  :root{
+    --ink:#13323A; --sub:#4A6670; --teal:#0E7C86; --teal-dk:#0A565E; --teal-xdk:#08434A;
+    --coral:#E0574C; --coral-dk:#BF4339; --seafoam:#4FB6A6; --mint:#8FD6C8;
+    --mist:#EFF7F6; --mist2:#E3F0EE; --coraltint:#FBEDEB; --amber:#E8A33D;
+    --ambertint:#FBF1DF; --paper:#FFFFFF; --line:#D2E3E0; --purple:#6E59A5; --purpletint:#EFEAF6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Calibri","Segoe UI",system-ui,sans-serif;background:linear-gradient(160deg,#F4FAF9,#E8F3F1);color:var(--ink);line-height:1.55;padding:24px 16px;min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto}
+  header.top{background:var(--teal-xdk);color:#fff;border-radius:16px;padding:26px 30px;box-shadow:0 10px 30px rgba(8,67,74,.22)}
+  header.top .kick{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint);font-weight:700}
+  header.top h1{font-family:"Cambria",Georgia,serif;font-size:1.85rem;margin:6px 0 4px}
+  header.top p{color:#CFE8E4;font-size:.95rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 18px}
+  .tab{flex:1;min-width:150px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:.95rem;font-weight:600;color:var(--teal-dk);transition:.18s;text-align:center}
+  .tab:hover{border-color:var(--seafoam)}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 6px 16px rgba(14,124,134,.25)}
+  .panel{display:none;background:#fff;border-radius:16px;padding:26px 28px;box-shadow:0 6px 22px rgba(8,67,74,.10);animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2.sec{font-family:"Cambria",Georgia,serif;color:var(--teal-xdk);font-size:1.4rem;margin-bottom:6px}
+  .lead{color:var(--sub);margin-bottom:18px;font-size:.97rem}
+  .scoreline{display:flex;justify-content:space-between;align-items:center;background:var(--mist2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-weight:600;color:var(--teal-dk)}
+  .scoreline .pts{color:var(--coral-dk)}
+  /* Blood flow tracer */
+  .pool{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+  .chip{background:var(--mist);border:2px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--ink);transition:.15s;user-select:none}
+  .chip:hover{border-color:var(--seafoam);transform:translateY(-1px)}
+  .chip.used{opacity:.35;pointer-events:none;background:#eee}
+  .track{min-height:54px;border:2px dashed var(--line);border-radius:12px;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#FBFEFE}
+  .step{background:var(--teal);color:#fff;border-radius:8px;padding:8px 12px;font-size:.88rem;font-weight:600;display:flex;align-items:center;gap:6px;animation:fade .2s}
+  .step .n{background:rgba(255,255,255,.25);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem}
+  .step.bad{background:var(--coral)}
+  .arrow{color:var(--seafoam);font-weight:700}
+  .btnrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button.act{background:var(--coral);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.15s}
+  button.act:hover{background:var(--coral-dk)}
+  button.ghost{background:#fff;color:var(--teal-dk);border:2px solid var(--line)}
+  button.ghost:hover{border-color:var(--seafoam)}
+  .feedback{margin-top:16px;padding:14px 16px;border-radius:10px;font-size:.95rem;display:none}
+  .feedback.show{display:block;animation:fade .2s}
+  .feedback.ok{background:var(--mist2);border-left:5px solid var(--seafoam);color:var(--teal-xdk)}
+  .feedback.no{background:var(--coraltint);border-left:5px solid var(--coral);color:var(--coral-dk)}
+  /* Quiz / clinical */
+  .q{background:var(--mist);border-radius:12px;padding:18px 20px;margin-bottom:16px;border-left:5px solid var(--teal)}
+  .q .stem{font-weight:600;margin-bottom:12px}
+  .q .stem .tag{display:inline-block;background:var(--teal);color:#fff;font-size:.72rem;border-radius:6px;padding:2px 8px;margin-right:8px;text-transform:uppercase;letter-spacing:.05em;vertical-align:middle}
+  .opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:9px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:.93rem;color:var(--ink);transition:.13s}
+  .opt:hover{border-color:var(--seafoam)}
+  .opt.correct{background:var(--mist2);border-color:var(--seafoam);font-weight:600}
+  .opt.wrong{background:var(--coraltint);border-color:var(--coral)}
+  .opt:disabled{cursor:default}
+  .explain{margin-top:10px;padding:12px 14px;background:var(--ambertint);border-left:4px solid var(--amber);border-radius:8px;font-size:.9rem;color:#7a5210;display:none}
+  .explain.show{display:block}
+  .layla{background:var(--purpletint);border-left:5px solid var(--purple);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:.93rem;color:#3f3463}
+  .layla b{color:var(--purple)}
+  .done{text-align:center;padding:24px;background:var(--teal-xdk);color:#fff;border-radius:14px;margin-top:8px;display:none}
+  .done.show{display:block;animation:fade .3s}
+  .done .big{font-size:2.2rem;font-family:"Cambria",Georgia,serif}
+  footer{text-align:center;color:var(--sub);font-size:.82rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kick">BIOL 432 · Anatomy &amp; Physiology · Week 11</div>
+    <h1>The Heart I — Interactive Activity</h1>
+    <p>Trace the circulation, link structure to function, and reason through the clinic. Self-paced; no sign-in.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="flow">🩸 Blood-Flow Tracer</div>
+    <div class="tab" data-tab="explore">🔎 Structure &amp; Function</div>
+    <div class="tab" data-tab="clinic">⚕ Clinical Challenge</div>
+  </div>
+
+  <!-- PANEL 1: BLOOD FLOW -->
+  <div class="panel active" id="flow">
+    <h2 class="sec">Blood-Flow Tracer</h2>
+    <p class="lead">Click the structures in the order a red blood cell travels, starting from the body's systemic veins. Build the full pulmonary-then-systemic loop.</p>
+    <div class="scoreline"><span id="flowStatus">Pick the first structure…</span><span class="pts" id="flowScore">0 / 9</span></div>
+    <div class="pool" id="flowPool"></div>
+    <div class="track" id="flowTrack"><span style="color:var(--sub);font-style:italic">Your pathway appears here</span></div>
+    <div class="btnrow">
+      <button class="act" id="flowCheck">Check pathway</button>
+      <button class="ghost act" id="flowReset">Reset</button>
+    </div>
+    <div class="feedback" id="flowFb"></div>
+  </div>
+
+  <!-- PANEL 2: STRUCTURE / FUNCTION -->
+  <div class="panel" id="explore">
+    <h2 class="sec">Structure &amp; Function</h2>
+    <p class="lead">Each structural feature exists to answer a physiological demand. Choose the best explanation.</p>
+    <div class="layla">🏃 <b>Layla's link:</b> Layla's endurance-trained left ventricle is enlarged and efficient — <b>eccentric, adaptive</b> hypertrophy. Watch for the contrast with the <b>concentric, pathological</b> hypertrophy in the clinical tab.</div>
+    <div id="exploreQs"></div>
+    <div class="done" id="exploreDone"><div class="big" id="exploreBig"></div><div id="exploreMsg"></div></div>
+  </div>
+
+  <!-- PANEL 3: CLINICAL -->
+  <div class="panel" id="clinic">
+    <h2 class="sec">Clinical Challenge</h2>
+    <p class="lead">Five vignettes from the lecture's assessment bank. Reason from anatomy to diagnosis.</p>
+    <div id="clinicQs"></div>
+    <div class="done" id="clinicDone"><div class="big" id="clinicBig"></div><div id="clinicMsg"></div></div>
+  </div>
+
+  <footer>BIOL 432 · Khalifa University · College of Medicine &amp; Health Sciences — interactive companion to the Heart I lecture</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- Tabs ----
+  var tabs = document.querySelectorAll('.tab');
+  for (var i=0;i<tabs.length;i++){
+    tabs[i].addEventListener('click', function(){
+      var t = this.getAttribute('data-tab');
+      var all = document.querySelectorAll('.tab');
+      for (var j=0;j<all.length;j++) all[j].classList.remove('active');
+      this.classList.add('active');
+      var panels = document.querySelectorAll('.panel');
+      for (var k=0;k<panels.length;k++) panels[k].classList.remove('active');
+      document.getElementById(t).classList.add('active');
+    });
+  }
+
+  // ---- Blood flow tracer ----
+  var CORRECT = [
+    "Venae cavae (SVC & IVC)","Right atrium","Tricuspid valve → Right ventricle",
+    "Pulmonary semilunar valve → Pulmonary trunk","Pulmonary capillaries (gas exchange)",
+    "Pulmonary veins → Left atrium","Mitral valve → Left ventricle",
+    "Aortic valve → Aorta","Systemic capillaries (O₂ delivery)"
+  ];
+  var picked = [];
+  var pool = document.getElementById('flowPool');
+  var track = document.getElementById('flowTrack');
+  var fb = document.getElementById('flowFb');
+
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+  function renderPool(){
+    pool.innerHTML='';
+    var order = shuffle(CORRECT);
+    for (var i=0;i<order.length;i++){
+      (function(label){
+        var c=document.createElement('div');
+        c.className='chip'; c.textContent=label;
+        c.setAttribute('data-label',label);
+        if (picked.indexOf(label)>-1) c.classList.add('used');
+        c.addEventListener('click', function(){ pick(label); });
+        pool.appendChild(c);
+      })(order[i]);
+    }
+  }
+  function pick(label){
+    if (picked.indexOf(label)>-1) return;
+    picked.push(label);
+    renderTrack(); renderPool();
+    document.getElementById('flowStatus').textContent = picked.length<9 ? ('Placed '+picked.length+' — keep going…') : 'All placed — check your pathway!';
+    document.getElementById('flowScore').textContent = picked.length+' / 9';
+    fb.className='feedback';
+  }
+  function renderTrack(){
+    track.innerHTML='';
+    if (!picked.length){ track.innerHTML='<span style="color:var(--sub);font-style:italic">Your pathway appears here</span>'; return; }
+    for (var i=0;i<picked.length;i++){
+      var s=document.createElement('span'); s.className='step';
+      s.innerHTML='<span class="n">'+(i+1)+'</span>'+picked[i];
+      track.appendChild(s);
+      if (i<picked.length-1){var a=document.createElement('span');a.className='arrow';a.textContent='→';track.appendChild(a);}
+    }
+  }
+  document.getElementById('flowCheck').addEventListener('click', function(){
+    var steps = track.querySelectorAll('.step');
+    var firstWrong=-1, correctCount=0;
+    for (var i=0;i<picked.length;i++){
+      if (picked[i]===CORRECT[i]){correctCount++;} else if (firstWrong<0){firstWrong=i;}
+    }
+    for (var j=0;j<steps.length;j++){ steps[j].classList.toggle('bad', picked[j]!==CORRECT[j]); }
+    if (picked.length===9 && firstWrong<0){
+      fb.className='feedback show ok';
+      fb.innerHTML='<b>Perfect loop! ✓</b> You traced the complete double circuit — pulmonary first (the only arteries carrying deoxygenated blood), then systemic. Notice every valve opened on a pressure gradient.';
+    } else {
+      fb.className='feedback show no';
+      var hint = firstWrong>=0 ? (' The first mismatch is at position '+(firstWrong+1)+'. Remember: blood returns to the <b>right</b> heart, goes to the <b>lungs</b>, returns to the <b>left</b> heart, then out to the body.') : '';
+      fb.innerHTML='<b>'+correctCount+' of 9 in the right place.</b>'+hint;
+    }
+  });
+  document.getElementById('flowReset').addEventListener('click', function(){
+    picked=[]; renderTrack(); renderPool(); fb.className='feedback';
+    document.getElementById('flowStatus').textContent='Pick the first structure…';
+    document.getElementById('flowScore').textContent='0 / 9';
+  });
+
+  // ---- Generic MCQ renderer ----
+  function buildQuiz(containerId, questions, doneId, bigId, msgId){
+    var container=document.getElementById(containerId);
+    var answered=0, correct=0;
+    questions.forEach(function(q,qi){
+      var box=document.createElement('div'); box.className='q';
+      var stem=document.createElement('div'); stem.className='stem';
+      stem.innerHTML='<span class="tag">'+q.tag+'</span>'+q.stem;
+      box.appendChild(stem);
+      var exp=document.createElement('div'); exp.className='explain'; exp.innerHTML=q.explain;
+      q.opts.forEach(function(opt,oi){
+        var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+        b.addEventListener('click', function(){
+          var btns=box.querySelectorAll('.opt');
+          for (var x=0;x<btns.length;x++){ btns[x].disabled=true; }
+          if (oi===q.answer){ b.classList.add('correct'); correct++; }
+          else { b.classList.add('wrong'); btns[q.answer].classList.add('correct'); }
+          exp.classList.add('show');
+          answered++;
+          if (answered===questions.length){
+            var d=document.getElementById(doneId);
+            document.getElementById(bigId).textContent=correct+' / '+questions.length;
+            document.getElementById(msgId).textContent = correct===questions.length ? 'Flawless — you are reasoning from structure to function.' : (correct>=questions.length*0.6 ? 'Strong work. Review the highlighted explanations.' : 'Revisit the lecture companion and try again.');
+            d.classList.add('show');
+          }
+        });
+        box.appendChild(b);
+      });
+      box.appendChild(exp);
+      container.appendChild(box);
+    });
+  }
+
+  // Structure/function questions
+  buildQuiz('exploreQs', [
+    { tag:'Walls', stem:'The left ventricular wall is ~3× thicker than the right. Why?',
+      opts:['It holds more blood per beat','It must generate ~120 mmHg against high systemic resistance','It contracts more often than the right ventricle','It contains the SA node'],
+      answer:1, explain:'Both ventricles eject the same stroke volume, but the LV must overcome high systemic resistance (~120 mmHg) vs the RV’s ~25 mmHg. Greater pressure work demands a thicker myocardium — structure following workload.' },
+    { tag:'Microscopy', stem:'Which intercalated-disc junction allows the myocardium to act as a functional syncytium?',
+      opts:['Desmosomes','Fascia adherens','Gap junctions','Tight junctions'],
+      answer:2, explain:'Gap junctions (connexons) pass ions cell-to-cell with near-zero resistance, so an SA-node impulse spreads across the whole syncytium in milliseconds. Desmosomes provide mechanical anchoring; fascia adherens transmit force.' },
+    { tag:'Pericardium', stem:'Why does acute hemopericardium of only 150–200 mL cause tamponade, while a slow effusion can reach 1–2 L without it?',
+      opts:['Blood is denser than serous fluid','The fibrous pericardium is inelastic and cannot expand quickly','The myocardium absorbs slow effusions','Slow effusions drain into the coronary sinus'],
+      answer:1, explain:'The inelastic fibrous pericardium cannot accommodate rapid accumulation, so pressure spikes and compresses the chambers. Given time, it gradually stretches — the anatomical property dictates the clinical tempo.' },
+    { tag:'Valves', stem:'Heart valves open and close because of:',
+      opts:['Active muscular contraction of the leaflets','Pressure gradients across them','Direct autonomic nerve signals','The SA node firing'],
+      answer:1, explain:'Valves are entirely passive — AV valves close when ventricular pressure exceeds atrial pressure; semilunar valves open when ventricular pressure exceeds arterial pressure. Chordae tendineae merely prevent prolapse.' },
+    { tag:'Coronaries', stem:'The myocardium extracts 70–80% of delivered O₂ at rest. The main implication is:',
+      opts:['It can easily extract more O₂ during exercise','Increasing flow is the only way to raise O₂ delivery','It tolerates ischemia well','It relies mainly on anaerobic metabolism'],
+      answer:1, explain:'With almost no extraction reserve, the heart can only get more oxygen by increasing coronary flow — which is why coronary occlusion is immediately threatening and the coronaries fill during diastole.' }
+  ], 'exploreDone','exploreBig','exploreMsg');
+
+  // Clinical questions
+  buildQuiz('clinicQs', [
+    { tag:'Case 1', stem:'72-year-old: exertional chest pain, syncope, dyspnea; harsh crescendo–decrescendo systolic murmur at the right upper sternal border radiating to the carotids; calcified valve, area 0.7 cm².',
+      opts:['Mitral regurgitation','Aortic stenosis','Tricuspid endocarditis','Patent ductus arteriosus'],
+      answer:1, explain:'Aortic stenosis. Outflow obstruction → concentric LV hypertrophy (pressure overload). Angina, syncope, and heart failure are the classic triad; the systolic ejection murmur radiates along the jet into the carotids.' },
+    { tag:'Case 2', stem:'Both ventricles share the same stroke volume, yet the LV wall is 12 mm and the RV wall is 4 mm. The best single explanation is:',
+      opts:['The RV beats less often','The LV performs far more pressure work against systemic resistance','The RV has no papillary muscles','The LV has thicker endocardium'],
+      answer:1, explain:'Work = pressure × volume. Equal volume but ~120 vs ~25 mmHg means the LV does roughly 7× the pressure work — reflected in the ~3:1 wall ratio and its circular cross-section.' },
+    { tag:'Case 3', stem:'28-year-old after a high-speed crash: enlarged cardiac silhouette, BP 80/60, elevated JVP, muffled heart sounds, large echo-free space around the heart.',
+      opts:['Aortic dissection','Cardiac tamponade','Massive pulmonary embolism','Mitral stenosis'],
+      answer:1, explain:'Cardiac tamponade from traumatic hemopericardium. The inelastic fibrous pericardium cannot expand; rising pressure compresses the chambers. Beck’s triad: hypotension, muffled sounds, elevated JVP. Treat with pericardiocentesis.' },
+    { tag:'Case 4', stem:'45-year-old who injects drugs: fever, new holosystolic murmur at the lower left sternal border, S. aureus bacteremia, mobile vegetation on the tricuspid valve. Why the tricuspid?',
+      opts:['Oral bacteria reach it first','Venous-borne organisms reach the right heart first','It is the highest-pressure valve','It lacks chordae tendineae'],
+      answer:1, explain:'Injected organisms enter peripheral veins and reach the right heart first (RA → tricuspid → RV). Vegetations can embolise to the lungs. Left-sided endocarditis more often follows oral organisms entering the arterial side.' },
+    { tag:'Case 5', stem:'6-year-old: poor growth, continuous "machinery" murmur at the left infraclavicular area; echo confirms a patent ductus arteriosus. The shunt direction is:',
+      opts:['Right-to-left (cyanotic)','Left-to-right, because aortic pressure exceeds pulmonary pressure','Bidirectional from birth','No shunt — the duct is closed'],
+      answer:1, explain:'Higher aortic pressure drives continuous left-to-right flow through the patent duct → increased pulmonary flow and LV volume overload. The duct normally closes after birth to become the ligamentum arteriosum.' }
+  ], 'clinicDone','clinicBig','clinicMsg');
+
+  // init
+  renderPool(); renderTrack();
+})();
+</script>
+</body>
+</html>

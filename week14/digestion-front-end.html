@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digestive System 1 — Front-End Study Station · BIOL 432</title>
+<style>
+  :root{
+    --ink:#14323B; --teald:#0A4F5C; --teal:#0E7C8B; --seafoam:#12A594; --mint:#6FD3C2;
+    --mintlt:#CDEDE7; --coral:#EF6A50; --coraldk:#C24A34; --corallt:#FCE6E0;
+    --paper:#FFFFFF; --mist:#F1F8F8; --panel:#F7FBFB; --line:#CBE2E2; --mute:#5E777D; --gold:#E8A93B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 80% -10%,#e7f4f4 0%,var(--mist) 55%);min-height:100vh;line-height:1.5}
+  .wrap{max-width:1060px;margin:0 auto;padding:26px 20px 60px}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+  .badge{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--teal),var(--seafoam));
+    display:grid;place-items:center;font-size:26px;box-shadow:0 6px 18px rgba(14,124,139,.28)}
+  .eyebrow{font-size:12px;letter-spacing:2.5px;font-weight:700;color:var(--seafoam);text-transform:uppercase}
+  h1{font-family:Georgia,Cambria,serif;font-size:28px;color:var(--teald);line-height:1.15}
+  .sub{color:var(--mute);font-size:14.5px;margin:8px 0 20px;max-width:760px}
+  /* tabs */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{border:1px solid var(--line);background:var(--paper);color:var(--teald);font-weight:600;font-size:14px;
+    padding:10px 16px;border-radius:11px;cursor:pointer;transition:.18s;display:flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--seafoam);transform:translateY(-1px)}
+  .tab.active{background:var(--teald);color:#fff;border-color:var(--teald);box-shadow:0 6px 16px rgba(10,79,92,.25)}
+  .tab .n{width:22px;height:22px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:12px;
+    display:grid;place-items:center;font-weight:700}
+  .tab.active .n{background:var(--mint);color:var(--teald)}
+  .panel{display:none;animation:fade .3s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:0 8px 24px rgba(20,50,59,.06)}
+  h2{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:4px}
+  .lead{color:var(--mute);font-size:14px;margin-bottom:16px}
+  /* journey */
+  .journey{display:grid;grid-template-columns:230px 1fr;gap:20px}
+  @media(max-width:720px){.journey{grid-template-columns:1fr}}
+  .rail{display:flex;flex-direction:column;gap:0;position:relative}
+  .station{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;
+    border:1px solid transparent;transition:.16s}
+  .station:hover{background:var(--mist)}
+  .station.on{background:var(--mist);border-color:var(--line)}
+  .dot{width:34px;height:34px;border-radius:50%;background:var(--paper);border:2px solid var(--teal);
+    display:grid;place-items:center;font-size:16px;flex:none;transition:.16s}
+  .station.on .dot{background:var(--teal);color:#fff;border-color:var(--teal);transform:scale(1.06)}
+  .station .lbl{font-weight:700;font-size:14.5px;color:var(--teald)}
+  .rail::before{content:"";position:absolute;left:29px;top:34px;bottom:34px;width:2px;background:var(--line);z-index:0}
+  .station,.dot{position:relative;z-index:1}
+  .detail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;min-height:250px}
+  .detail h3{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:6px}
+  .detail .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--seafoam);background:var(--mintlt);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+  .detail ul{list-style:none;margin-top:8px}
+  .detail li{padding:7px 0 7px 26px;position:relative;font-size:14.5px}
+  .detail li::before{content:"●";position:absolute;left:0;color:var(--seafoam);font-size:11px;top:9px}
+  .clin{margin-top:14px;background:var(--corallt);border-left:5px solid var(--coral);border-radius:0 10px 10px 0;
+    padding:12px 14px;font-size:13.5px;color:#7A3C2E}
+  .clin b{color:var(--coraldk)}
+  /* layer builder */
+  .lb-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px}
+  @media(max-width:720px){.lb-wrap{grid-template-columns:1fr}}
+  .pool{display:flex;flex-direction:column;gap:10px}
+  .chipbtn{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:13px 15px;text-align:left;
+    cursor:pointer;font-size:14.5px;font-weight:600;color:var(--teald);transition:.15s;display:flex;justify-content:space-between;align-items:center}
+  .chipbtn:hover:not(:disabled){border-color:var(--seafoam);transform:translateX(3px)}
+  .chipbtn:disabled{opacity:.4;cursor:default}
+  .chipbtn .mini{font-size:12px;color:var(--mute);font-weight:500}
+  .slots{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .slots .hd{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:700;margin-bottom:4px}
+  .slot{border:1.5px dashed var(--line);border-radius:10px;padding:11px 12px;margin-top:9px;min-height:44px;
+    display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);transition:.15s}
+  .slot .idx{width:20px;height:20px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:11px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .slot.filled{border-style:solid;color:var(--teald);font-weight:600;background:var(--paper)}
+  .slot.ok{border-color:var(--seafoam);background:#eafaf6}
+  .slot.bad{border-color:var(--coral);background:var(--corallt)}
+  /* sequencer */
+  .seq{display:grid;grid-template-columns:1fr 320px;gap:20px}
+  @media(max-width:720px){.seq{grid-template-columns:1fr}}
+  .stage{background:var(--teald);border-radius:16px;padding:18px;color:#fff;min-height:280px;position:relative;overflow:hidden}
+  .stage h4{font-family:Georgia,serif;color:#fff;margin-bottom:6px}
+  .throat{position:relative;height:210px;margin-top:10px}
+  .part{position:absolute;border-radius:8px;transition:all .6s ease;font-size:11px;font-weight:700;
+    display:grid;place-items:center;text-align:center;color:#04343d}
+  #nasal{left:14%;top:6px;width:120px;height:26px;background:var(--mint)}
+  #palate{left:34%;top:36px;width:60px;height:14px;background:var(--gold);color:#3a2a00;border-radius:20px}
+  #epiglottis{left:20%;top:120px;width:52px;height:12px;background:var(--coral);color:#fff;border-radius:20px;transform-origin:left center}
+  #glottis{left:16%;top:150px;width:70px;height:22px;background:#2A6470;color:#cdeee7;font-size:10px}
+  #bolus{left:60%;top:20px;width:36px;height:36px;border-radius:50%;background:var(--seafoam);color:#04343d}
+  .caption{position:absolute;bottom:12px;left:16px;right:16px;font-size:12.5px;color:var(--mintlt);min-height:34px}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btn.primary{background:var(--seafoam);color:#fff}
+  .btn.primary:hover{background:var(--teal)}
+  .btn.ghost{background:var(--paper);color:var(--teald);border:1px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .steps{list-style:none}
+  .steps li{padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;font-size:13.5px;
+    background:var(--paper);cursor:pointer;display:flex;gap:10px;align-items:center;transition:.15s}
+  .steps li:hover:not(.used){border-color:var(--seafoam);transform:translateX(3px)}
+  .steps li.used{opacity:.4;cursor:default}
+  .steps li .order{width:22px;height:22px;border-radius:50%;background:var(--mist);color:var(--mute);font-size:12px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .steps li.used .order{background:var(--seafoam);color:#fff}
+  /* quiz */
+  .q{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .qtext{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--ink)}
+  .qtext .qn{color:var(--seafoam);font-family:Georgia,serif}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;
+    padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14px;transition:.13s;color:var(--ink)}
+  .opt:hover:not(.locked){border-color:var(--seafoam);background:var(--mist)}
+  .opt.correct{border-color:var(--seafoam);background:#eafaf6;font-weight:600}
+  .opt.wrong{border-color:var(--coral);background:var(--corallt)}
+  .opt.locked{cursor:default}
+  .fb{font-size:13px;margin-top:6px;padding:9px 12px;border-radius:9px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eafaf6;color:#0c6b5f}
+  .fb.bad{background:var(--corallt);color:#7A3C2E}
+  .scorebar{position:sticky;bottom:0;margin-top:18px;background:var(--teald);color:#fff;border-radius:14px;
+    padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -6px 20px rgba(10,79,92,.2)}
+  .scorebar b{font-size:22px;font-family:Georgia,serif}
+  .foot{text-align:center;color:var(--mute);font-size:12.5px;margin-top:26px}
+  .reveal{margin-top:12px}
+  .msg{font-size:13.5px;font-weight:600;margin-top:10px;min-height:20px}
+  .msg.ok{color:var(--teal)}.msg.bad{color:var(--coraldk)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge">🍽️</div>
+    <div>
+      <div class="eyebrow">BIOL 432 · Digestive System · Lecture 1</div>
+      <h1>Front-End Study Station</h1>
+    </div>
+  </header>
+  <p class="sub">Four ways to drill the mouth-to-esophagus material: walk the journey, build the gut wall, sequence a safe swallow, then test yourself. Everything runs offline — no sign-in, nothing saved.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="journey"><span class="n">1</span>The Journey</button>
+    <button class="tab" data-tab="wall"><span class="n">2</span>Build the Wall</button>
+    <button class="tab" data-tab="swallow"><span class="n">3</span>Swallow Sequencer</button>
+    <button class="tab" data-tab="quiz"><span class="n">4</span>Self-Quiz</button>
+  </div>
+
+  <!-- ===================== JOURNEY ===================== -->
+  <section class="panel active" id="journey">
+    <div class="card">
+      <h2>Walk the front end of the pipeline</h2>
+      <p class="lead">Click each station to see what it does — and where it goes wrong.</p>
+      <div class="journey">
+        <div class="rail" id="rail"></div>
+        <div class="detail" id="stationDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WALL ===================== -->
+  <section class="panel" id="wall">
+    <div class="card">
+      <h2>Build the canal wall — lumen to serosa</h2>
+      <p class="lead">Click the layers in the correct order, starting from the lumen (inside). Get it right and the wall locks in.</p>
+      <div class="lb-wrap">
+        <div class="pool" id="layerPool"></div>
+        <div class="slots" id="layerSlots">
+          <div class="hd">Wall, inside → out</div>
+        </div>
+      </div>
+      <div class="msg" id="wallMsg"></div>
+      <div class="btnrow"><button class="btn ghost" id="wallReset">Reset</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== SWALLOW ===================== -->
+  <section class="panel" id="swallow">
+    <div class="card">
+      <h2>Sequence a safe swallow</h2>
+      <p class="lead">Click the five events in the order they occur during deglutition. Correct choices animate the airway sealing shut.</p>
+      <div class="seq">
+        <div>
+          <ul class="steps" id="stepList"></ul>
+          <div class="btnrow"><button class="btn ghost" id="swReset">Reset</button></div>
+          <div class="msg" id="swMsg"></div>
+        </div>
+        <div class="stage">
+          <h4>Pharynx — live view</h4>
+          <div class="throat">
+            <div class="part" id="nasal">Nasopharynx</div>
+            <div class="part" id="palate">Soft palate</div>
+            <div class="part" id="bolus">Bolus</div>
+            <div class="part" id="epiglottis">Epiglottis</div>
+            <div class="part" id="glottis">Glottis / airway</div>
+          </div>
+          <div class="caption" id="swCaption">Awaiting the swallow…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="panel" id="quiz">
+    <div class="card">
+      <h2>Self-quiz</h2>
+      <p class="lead">Six questions. Immediate feedback; your score updates as you go.</p>
+      <div id="quizBody"></div>
+      <div class="scorebar"><span>Score</span><b><span id="scoreNum">0</span> / <span id="scoreTot">0</span></b></div>
+    </div>
+  </section>
+
+  <p class="foot">BIOL 432 Physiology · Dr. Wael M. Osman · Khalifa University — Digestive System, Lecture 1</p>
+</div>
+
+<script>
+"use strict";
+/* -------- tab switching (matching tab/panel ids) -------- */
+var tabs = document.querySelectorAll(".tab");
+for (var i=0;i<tabs.length;i++){
+  tabs[i].addEventListener("click", function(){
+    var id=this.getAttribute("data-tab");
+    var alltabs=document.querySelectorAll(".tab");
+    for(var j=0;j<alltabs.length;j++) alltabs[j].classList.remove("active");
+    this.classList.add("active");
+    var panels=document.querySelectorAll(".panel");
+    for(var k=0;k<panels.length;k++) panels[k].classList.remove("active");
+    document.getElementById(id).classList.add("active");
+  });
+}
+
+/* -------- JOURNEY -------- */
+var stations=[
+  {key:"mouth",icon:"👄",lbl:"Oral cavity",tag:"Mechanical + chemical",
+   points:["Teeth chew (mastication); the tongue forms a bolus.",
+           "Salivary amylase begins starch digestion; lingual lipase starts on fats.",
+           "1.0–1.5 L saliva/day from parotid, submandibular, sublingual glands.",
+           "Taste receptors assess the food before it goes further."],
+   clin:"<b>Xerostomia:</b> sympathetic drive, drugs, or radiation cut serous saliva → dry mouth, caries, and trouble swallowing."},
+  {key:"saliva",icon:"💧",lbl:"Salivary glands",tag:"Secretion",
+   points:["Parotid: largest, watery serous (enzyme-rich).",
+           "Submandibular: mixed serous + mucous.",
+           "Sublingual: predominantly mucous (lubricating).",
+           "Protective cargo: lysozyme, IgA, defensins, nitric oxide."],
+   clin:"<b>Reflex control:</b> food (unconditioned) or the sight/smell of food (conditioned, Pavlov) drives parasympathetic secretion via CN VII & IX."},
+  {key:"pharynx",icon:"🔀",lbl:"Pharynx",tag:"Propulsion",
+   points:["Shared passage for food, fluid, and air.",
+           "Stratified squamous epithelium resists abrasion.",
+           "Inner longitudinal muscle elevates the pharynx.",
+           "Outer constrictors squeeze the bolus downward."],
+   clin:"<b>Crossroads risk:</b> because the airway and food-way cross here, every swallow must seal the airway — see the Swallow Sequencer."},
+  {key:"esophagus",icon:"🧵",lbl:"Esophagus",tag:"Propulsion",
+   points:["25 cm tube; pierces the diaphragm at the hiatus (T10).",
+           "Muscle grades top→bottom: skeletal → mixed → smooth.",
+           "Peristalsis carries the bolus to the stomach.",
+           "Lower esophageal (cardiac) sphincter guards the entrance."],
+   clin:"<b>GORD → Barrett’s:</b> a weak sphincter lets acid reflux; chronic injury drives metaplasia and cancer risk."}
+];
+var rail=document.getElementById("rail");
+var stationDetail=document.getElementById("stationDetail");
+function showStation(idx){
+  var st=stations[idx];
+  var kids=rail.children;
+  for(var m=0;m<kids.length;m++) kids[m].classList.toggle("on", m===idx);
+  var html='<span class="tag">'+st.tag+'</span><h3>'+st.icon+"  "+st.lbl+"</h3><ul>";
+  for(var p=0;p<st.points.length;p++) html+="<li>"+st.points[p]+"</li>";
+  html+="</ul><div class='clin'>"+st.clin+"</div>";
+  stationDetail.innerHTML=html;
+}
+for(var s=0;s<stations.length;s++){
+  (function(idx){
+    var d=document.createElement("div");
+    d.className="station";
+    d.innerHTML='<div class="dot">'+stations[idx].icon+'</div><div class="lbl">'+stations[idx].lbl+'</div>';
+    d.addEventListener("click",function(){showStation(idx);});
+    rail.appendChild(d);
+  })(s);
+}
+showStation(0);
+
+/* -------- WALL BUILDER -------- */
+var layers=[
+  {name:"Mucosa",mini:"epithelium — secretes, absorbs, protects"},
+  {name:"Submucosa",mini:"vessels + Meissner’s plexus"},
+  {name:"Muscularis externa",mini:"circular + longitudinal muscle"},
+  {name:"Serosa",mini:"outer visceral peritoneum"}
+];
+var correctOrder=["Mucosa","Submucosa","Muscularis externa","Serosa"];
+var layerPool=document.getElementById("layerPool");
+var layerSlots=document.getElementById("layerSlots");
+var wallMsg=document.getElementById("wallMsg");
+var placed=[];
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function renderWall(){
+  layerPool.innerHTML="";
+  var order=shuffle(layers);
+  for(var i=0;i<order.length;i++){
+    (function(L){
+      var b=document.createElement("button");
+      b.className="chipbtn";
+      b.innerHTML='<span>'+L.name+'</span><span class="mini">'+L.mini+'</span>';
+      b.addEventListener("click",function(){placeLayer(L.name,b);});
+      layerPool.appendChild(b);
+    })(order[i]);
+  }
+  // slots
+  var slotHtml='<div class="hd">Wall, inside → out</div>';
+  for(var k=0;k<4;k++) slotHtml+='<div class="slot" id="slot'+k+'"><span class="idx">'+(k+1)+'</span><span>lumen side ↓</span></div>';
+  layerSlots.innerHTML=slotHtml;
+  document.getElementById("slot0").querySelector("span:last-child").textContent="click a layer (lumen)";
+  placed=[];
+  wallMsg.textContent="";wallMsg.className="msg";
+}
+function placeLayer(name,btn){
+  if(placed.length>=4) return;
+  var slot=document.getElementById("slot"+placed.length);
+  slot.classList.add("filled");
+  slot.querySelector("span:last-child").textContent=name;
+  placed.push(name);
+  btn.disabled=true;
+  if(placed.length===4) checkWall();
+}
+function checkWall(){
+  var allok=true;
+  for(var i=0;i<4;i++){
+    var slot=document.getElementById("slot"+i);
+    if(placed[i]===correctOrder[i]) slot.classList.add("ok");
+    else {slot.classList.add("bad");allok=false;}
+  }
+  if(allok){wallMsg.textContent="✓ Wall built correctly — mucosa faces the lumen, serosa faces out.";wallMsg.className="msg ok";}
+  else {wallMsg.textContent="Not quite — red slots are out of order. Reset and remember: mucosa → submucosa → muscularis externa → serosa.";wallMsg.className="msg bad";}
+}
+document.getElementById("wallReset").addEventListener("click",renderWall);
+renderWall();
+
+/* -------- SWALLOW SEQUENCER -------- */
+var swSteps=[
+  {t:"Tongue pushes the bolus into the oropharynx (buccal, voluntary)",fx:"bolus"},
+  {t:"Soft palate rises and seals the nasopharynx",fx:"palate"},
+  {t:"Larynx elevates; epiglottis tips to cover the glottis",fx:"epiglottis"},
+  {t:"Breathing is briefly inhibited (swallow apnoea)",fx:"apnoea"},
+  {t:"UOS relaxes; constrictors drive the bolus into the esophagus",fx:"down"}
+];
+var stepList=document.getElementById("stepList");
+var swMsg=document.getElementById("swMsg");
+var swCaption=document.getElementById("swCaption");
+var swNext=0;
+function renderSteps(){
+  stepList.innerHTML="";swNext=0;
+  swMsg.textContent="";swMsg.className="msg";
+  swCaption.textContent="Awaiting the swallow…";
+  resetStage();
+  var order=shuffle(swSteps.map(function(s,i){return i;}));
+  for(var i=0;i<order.length;i++){
+    (function(origIdx){
+      var li=document.createElement("li");
+      li.innerHTML='<span class="order">?</span><span>'+swSteps[origIdx].t+'</span>';
+      li.addEventListener("click",function(){pickStep(origIdx,li);});
+      stepList.appendChild(li);
+    })(order[i]);
+  }
+}
+function resetStage(){
+  document.getElementById("palate").style.transform="";
+  document.getElementById("epiglottis").style.transform="";
+  document.getElementById("bolus").style.left="60%";
+  document.getElementById("bolus").style.top="20px";
+  document.getElementById("bolus").style.opacity="1";
+  document.getElementById("glottis").style.opacity="1";
+}
+function applyFx(fx){
+  if(fx==="palate") document.getElementById("palate").style.transform="translateY(-30px) rotate(-8deg)";
+  if(fx==="epiglottis"){document.getElementById("epiglottis").style.transform="rotate(58deg) translateX(20px)";}
+  if(fx==="apnoea"){document.getElementById("glottis").style.opacity="0.35";}
+  if(fx==="bolus"){document.getElementById("bolus").style.left="40%";document.getElementById("bolus").style.top="70px";}
+  if(fx==="down"){var b=document.getElementById("bolus");b.style.top="185px";b.style.left="30%";b.style.opacity="0.3";}
+}
+function pickStep(origIdx,li){
+  if(li.classList.contains("used")) return;
+  if(origIdx===swNext){
+    li.classList.add("used");
+    li.querySelector(".order").textContent=(swNext+1);
+    applyFx(swSteps[origIdx].fx);
+    swCaption.textContent=swSteps[origIdx].t+".";
+    swNext++;
+    if(swNext===swSteps.length){swMsg.textContent="✓ Perfect sequence — the airway stayed protected the whole way down.";swMsg.className="msg ok";}
+  } else {
+    swMsg.textContent="✗ Out of order. The correct next event is step "+(swNext+1)+". Think: what protects the airway before the bolus moves down?";
+    swMsg.className="msg bad";
+  }
+}
+document.getElementById("swReset").addEventListener("click",renderSteps);
+renderSteps();
+
+/* -------- QUIZ -------- */
+var quiz=[
+  {q:"Which enzyme in saliva begins carbohydrate digestion?",
+   opts:["Lingual lipase","Salivary amylase","Pepsin","Trypsin"],a:1,
+   fb:"Salivary amylase starts on starch in the mouth; lingual lipase begins fat digestion."},
+  {q:"Which plexus of the enteric nervous system coordinates motility?",
+   opts:["Meissner’s (submucosal)","Auerbach’s (myenteric)","Celiac plexus","Sacral plexus"],a:1,
+   fb:"Auerbach’s (myenteric) plexus, between the muscle layers, drives peristalsis and segmentation. Meissner’s handles secretion."},
+  {q:"How does the muscle type change along the esophagus, top to bottom?",
+   opts:["Smooth → mixed → skeletal","Skeletal → mixed → smooth","Skeletal throughout","Smooth throughout"],a:1,
+   fb:"Upper ⅓ skeletal, middle ⅓ mixed, lower ⅓ smooth."},
+  {q:"During the pharyngeal phase, what covers the glottis to protect the airway?",
+   opts:["Soft palate","Uvula","Epiglottis","Lower esophageal sphincter"],a:2,
+   fb:"The larynx elevates and the epiglottis tips over the glottis; the soft palate seals the nasopharynx separately."},
+  {q:"Which swallowing phase is under voluntary control?",
+   opts:["Buccal","Pharyngeal","Esophageal","None — all reflex"],a:0,
+   fb:"Only the buccal phase is voluntary. Once the bolus reaches the oropharynx, the medulla takes over."},
+  {q:"A chronically incompetent lower esophageal sphincter most directly risks:",
+   opts:["Lactose intolerance","Barrett’s oesophagus","Gallstones","Acute pancreatitis"],a:1,
+   fb:"Acid reflux (GORD) chronically injures the lining, driving metaplasia — Barrett’s oesophagus."}
+];
+var quizBody=document.getElementById("quizBody");
+var answered=[];
+var score=0;
+document.getElementById("scoreTot").textContent=quiz.length;
+for(var qi=0;qi<quiz.length;qi++){
+  (function(idx){
+    var item=quiz[idx];
+    var div=document.createElement("div");
+    div.className="q";
+    var h='<div class="qtext"><span class="qn">Q'+(idx+1)+'.</span> '+item.q+'</div>';
+    for(var o=0;o<item.opts.length;o++) h+='<button class="opt" data-q="'+idx+'" data-o="'+o+'">'+item.opts[o]+'</button>';
+    h+='<div class="fb" id="fb'+idx+'"></div>';
+    div.innerHTML=h;
+    quizBody.appendChild(div);
+  })(qi);
+}
+quizBody.addEventListener("click",function(e){
+  var t=e.target;
+  if(!t.classList.contains("opt")) return;
+  var qidx=parseInt(t.getAttribute("data-q"),10);
+  var oidx=parseInt(t.getAttribute("data-o"),10);
+  if(answered[qidx]) return;
+  answered[qidx]=true;
+  var item=quiz[qidx];
+  var opts=quizBody.querySelectorAll('.opt[data-q="'+qidx+'"]');
+  for(var i=0;i<opts.length;i++){
+    opts[i].classList.add("locked");
+    if(i===item.a) opts[i].classList.add("correct");
+  }
+  var fb=document.getElementById("fb"+qidx);
+  if(oidx===item.a){score++;fb.className="fb show good";fb.textContent="✓ Correct. "+item.fb;}
+  else {t.classList.add("wrong");fb.className="fb show bad";fb.textContent="✗ "+item.fb;}
+  document.getElementById("scoreNum").textContent=score;
+});
+</script>
+</body>
+</html>

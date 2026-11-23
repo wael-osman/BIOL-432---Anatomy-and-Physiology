@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hematology Lab · Blood Part 1 · BIOL 432</title>
+<style>
+  :root{
+    --deep:#0E3A40; --teal:#14606E; --coral:#D9644A; --sea:#4F8A8B;
+    --paper:#F5F3EC; --card:#FFFFFF; --ink:#1C2B2E; --mute:#5C6B6D;
+    --line:#D8D2C4; --tealT:#E3ECEC; --coralT:#F6E2DB; --crimson:#9E2B25;
+    --good:#2F7D5B; --gold:#C98A2B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Calibri,'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+  header{background:var(--deep);color:#fff;border-radius:16px;padding:26px 28px;position:relative;overflow:hidden}
+  header .eye{color:var(--coral);font-weight:700;letter-spacing:2px;font-size:13px}
+  header h1{font-family:Cambria,Georgia,serif;font-size:34px;margin:4px 0 6px}
+  header p{color:#CFE0E0;font-size:15px;max-width:640px}
+  header .blob{position:absolute;width:220px;height:220px;border-radius:50%;background:#14606E;top:-70px;right:-40px;opacity:.55}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 14px}
+  .tab{border:none;background:var(--card);color:var(--teal);font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;cursor:pointer;border:1px solid var(--line)}
+  .tab:hover{background:var(--tealT)}
+  .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+  .panel.show{display:block;animation:f .25s ease}
+  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-family:Cambria,Georgia,serif;color:var(--deep);font-size:22px;margin-bottom:4px}
+  .sub{color:var(--mute);font-size:14px;margin-bottom:16px}
+  .row{display:flex;gap:18px;flex-wrap:wrap}
+  .col{flex:1;min-width:240px}
+  label{font-weight:700;color:var(--teal);font-size:14px}
+  input[type=range]{width:100%;accent-color:var(--coral);margin-top:8px}
+  .tube{width:90px;height:300px;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;margin:0 auto;display:flex;flex-direction:column}
+  .plasma{background:#F2E6B8}.buffy{background:#E9E3D2;min-height:6px}.rbc{background:var(--crimson)}
+  .readout{background:var(--tealT);border-radius:12px;padding:16px 18px;margin-top:14px}
+  .readout b{color:var(--deep)}
+  .big{font-family:Cambria,serif;font-size:30px;font-weight:700;color:var(--coral)}
+  .verdict{margin-top:10px;font-weight:700;padding:10px 14px;border-radius:10px}
+  .vgood{background:#E2EFE7;color:var(--good)} .vwarn{background:var(--coralT);color:var(--crimson)} .vneutral{background:var(--tealT);color:var(--teal)}
+  .casebox{background:var(--deep);color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px}
+  .casebox .q{font-size:16px;font-weight:700}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .opt{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-weight:600;color:var(--ink);text-align:left}
+  .opt:hover{border-color:var(--teal);background:var(--tealT)}
+  .opt.correct{background:#E2EFE7;border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:var(--coralT);border-color:var(--crimson);color:var(--crimson)}
+  .fb{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:14px;display:none}
+  .fb.show{display:block}
+  .stepwrap{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:grab;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .step .badge{background:var(--tealT);color:var(--teal);border-radius:6px;padding:2px 8px;font-size:12px}
+  .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .btn{background:var(--coral);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn.sec{background:var(--teal)}
+  .reflib{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .refcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .refcard h3{font-family:Cambria,serif;color:var(--teal);font-size:16px;margin-bottom:4px}
+  .refcard p{font-size:13.5px;color:var(--ink)}
+  .score{font-weight:700;color:var(--teal);margin-top:10px}
+  .note{font-size:12.5px;color:var(--mute);font-style:italic;margin-top:14px}
+  @media(max-width:640px){.opts{grid-template-columns:1fr}.reflib{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="blob"></div>
+    <div class="eye">BIOL 432 · BLOOD · PART 1</div>
+    <h1>Hematology Lab</h1>
+    <p>Four hands-on stations: spin a tube to see how hematocrit really works, read a differential count like a clinician, build a red cell from stem to circulation, and check your facts. Layla's case threads through.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="centrifuge" onclick="showTab('centrifuge')">The Centrifuge</button>
+    <button class="tab" data-tab="differential" onclick="showTab('differential')">Differential Detective</button>
+    <button class="tab" data-tab="build" onclick="showTab('build')">Build a Red Cell</button>
+    <button class="tab" data-tab="reference" onclick="showTab('reference')">Reference</button>
+  </div>
+
+  <!-- CENTRIFUGE -->
+  <div class="panel show" id="panel-centrifuge">
+    <h2>The Centrifuge — hematocrit is a ratio</h2>
+    <div class="sub">Drag the sliders to change how much plasma and how many red cells are in the blood. Watch the hematocrit — and notice you can raise it two completely different ways.</div>
+    <div class="row">
+      <div class="col" style="max-width:160px">
+        <div class="tube" id="tube">
+          <div class="plasma" id="plasmaBar" style="height:55%"></div>
+          <div class="buffy"></div>
+          <div class="rbc" id="rbcBar" style="height:44%"></div>
+        </div>
+      </div>
+      <div class="col">
+        <label>Red-cell mass <span id="rbcVal">Normal</span></label>
+        <input type="range" id="rbcSlider" min="60" max="140" value="100" oninput="updateTube()">
+        <label style="margin-top:14px;display:block">Plasma volume <span id="plasmaVal">Normal</span></label>
+        <input type="range" id="plasmaSlider" min="60" max="140" value="100" oninput="updateTube()">
+        <div class="readout">
+          <div>Hematocrit: <span class="big" id="hctVal">44%</span></div>
+          <div style="margin-top:6px">Estimated viscosity: <b id="viscVal">normal</b></div>
+          <div class="verdict vneutral" id="hctVerdict">A normal tube. Move the sliders to explore.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note">Teaching point: dehydration (low plasma) and true polycythemia (high red-cell mass) both raise hematocrit — but only one means more oxygen-carrying cells. Hematocrit alone can't tell them apart.</div>
+  </div>
+
+  <!-- DIFFERENTIAL -->
+  <div class="panel" id="panel-differential">
+    <h2>Differential Detective</h2>
+    <div class="sub">Read each case and predict which white cell rises. The differential count is diagnostic vocabulary — each cell points somewhere specific.</div>
+    <div class="casebox">
+      <div class="q" id="caseText">Loading case…</div>
+    </div>
+    <div class="opts" id="diffOpts"></div>
+    <div class="fb" id="diffFb"></div>
+    <div class="controls">
+      <button class="btn" onclick="nextCase()">Next case →</button>
+      <button class="btn sec" onclick="resetDiff()">Restart</button>
+    </div>
+    <div class="score" id="diffScore">Score: 0 / 0</div>
+  </div>
+
+  <!-- BUILD -->
+  <div class="panel" id="panel-build">
+    <h2>Build a Red Cell</h2>
+    <div class="sub">Put erythropoiesis in order, from stem cell to circulating cell. Use the ▲ ▼ buttons to move each stage, then check.</div>
+    <div class="stepwrap" id="stepList"></div>
+    <div class="controls">
+      <button class="btn" onclick="checkOrder()">Check order</button>
+      <button class="btn sec" onclick="shuffleSteps()">Shuffle</button>
+    </div>
+    <div class="fb" id="buildFb"></div>
+  </div>
+
+  <!-- REFERENCE -->
+  <div class="panel" id="panel-reference">
+    <h2>Quick Reference</h2>
+    <div class="sub">The high-yield facts from Blood, Part 1.</div>
+    <div class="reflib">
+      <div class="refcard"><h3>Composition</h3><p>Plasma ~55% · buffy coat &lt;1% (WBCs+platelets) · red cells ~45% = hematocrit (♂47±5, ♀42±5).</p></div>
+      <div class="refcard"><h3>Hemoglobin</h3><p>4 globin chains (2α+2β) + 4 heme; 1 Hb carries 4 O₂. ♂13–18, ♀12–16 g/dL.</p></div>
+      <div class="refcard"><h3>Erythropoiesis</h3><p>Kidney senses low O₂ → EPO → marrow. ~2 million red cells made per second; lifespan 100–120 days.</p></div>
+      <div class="refcard"><h3>Differential (N L M E B)</h3><p>Neutrophils 50–70% · Lymphocytes 25–45% · Monocytes 3–8% · Eosinophils 2–4% · Basophils 0.5–1%.</p></div>
+      <div class="refcard"><h3>WBC jobs</h3><p>Neutrophil→bacteria; Eosinophil→parasite/allergy; Basophil→histamine; Lymphocyte→adaptive; Monocyte→macrophage.</p></div>
+      <div class="refcard"><h3>The spleen</h3><p>Quality-control filter for aging red cells (recycles iron) and an immune-surveillance organ.</p></div>
+    </div>
+    <div class="note">Layla's labs (Hb 10.4, low ferritin, small pale cells) = iron-deficiency anemia in an endurance athlete: the marrow has the EPO signal but lacks iron to build hemoglobin.</div>
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  var tabs=document.getElementById('tabs').getElementsByClassName('tab');
+  for(var i=0;i<tabs.length;i++){ tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tab')===name); }
+  var panels=['centrifuge','differential','build','reference'];
+  panels.forEach(function(p){ document.getElementById('panel-'+p).classList.toggle('show', p===name); });
+}
+
+/* ---- Centrifuge ---- */
+function updateTube(){
+  var rbcMass=parseInt(document.getElementById('rbcSlider').value,10);
+  var plasma=parseInt(document.getElementById('plasmaSlider').value,10);
+  // baseline: rbc 45 units, plasma 55 units at 100/100
+  var rbcUnits=45*(rbcMass/100);
+  var plasmaUnits=55*(plasma/100);
+  var total=rbcUnits+plasmaUnits;
+  var hct=Math.round(rbcUnits/total*100);
+  document.getElementById('rbcBar').style.height=(rbcUnits/total*100)+'%';
+  document.getElementById('plasmaBar').style.height=(plasmaUnits/total*100)+'%';
+  document.getElementById('hctVal').textContent=hct+'%';
+  document.getElementById('rbcVal').textContent = rbcMass>112?'High':rbcMass<88?'Low':'Normal';
+  document.getElementById('plasmaVal').textContent = plasma>112?'High':plasma<88?'Low':'Normal';
+  var visc = hct>=52?'high (thick, sluggish)':hct<=36?'low':'normal';
+  document.getElementById('viscVal').textContent=visc;
+  var v=document.getElementById('hctVerdict');
+  if(hct>=52 && plasma<88){ v.className='verdict vwarn'; v.textContent='High hematocrit from LOW PLASMA — dehydration. The red-cell count is unchanged; the blood just looks concentrated. Rehydrate and it falls.'; }
+  else if(hct>=52 && rbcMass>112){ v.className='verdict vwarn'; v.textContent='High hematocrit from HIGH RED-CELL MASS — true polycythemia (e.g. altitude/EPO). More oxygen carriers, but thicker blood and clot risk.'; }
+  else if(hct<=36){ v.className='verdict vwarn'; v.textContent='Low hematocrit — anemia pattern: reduced oxygen-carrying capacity. This is Layla after her iron stores fell.'; }
+  else { v.className='verdict vneutral'; v.textContent='Hematocrit in range. Remember: it is a RATIO, so both plasma and red-cell changes move it.'; }
+}
+
+/* ---- Differential Detective ---- */
+var cases=[
+  {t:"A patient with bacterial pneumonia and a fever. Which white cell would you expect to surge?",a:"Neutrophils",opts:["Neutrophils","Lymphocytes","Eosinophils","Basophils"],fb:"Neutrophils are the first responders to bacterial infection — often with a 'left shift' of immature forms."},
+  {t:"A student with asthma and allergic rhinitis. Which cell is typically elevated?",a:"Eosinophils",opts:["Eosinophils","Neutrophils","Monocytes","Lymphocytes"],fb:"Eosinophils rise in allergy/asthma and in parasitic infection — specialised, not random."},
+  {t:"A viral flu-like illness. Which cell class typically shifts upward?",a:"Lymphocytes",opts:["Lymphocytes","Neutrophils","Eosinophils","Basophils"],fb:"Lymphocytes carry the adaptive antiviral response — viruses often produce a relative lymphocyte shift."},
+  {t:"A traveller with an intestinal parasite. Which white cell rises?",a:"Eosinophils",opts:["Eosinophils","Neutrophils","Lymphocytes","Monocytes"],fb:"Eosinophil granules are tuned to large multicellular parasites — eosinophilia is a classic clue."},
+  {t:"Which cell becomes a tissue macrophage after leaving the blood?",a:"Monocytes",opts:["Monocytes","Basophils","Neutrophils","Lymphocytes"],fb:"Monocytes circulate, then settle into tissues as macrophages — the 'big eaters'."},
+  {t:"Chemotherapy has suppressed this patient's marrow; they keep getting infections. Which finding fits?",a:"Low total WBCs (leukopenia)",opts:["Low total WBCs (leukopenia)","High eosinophils","High basophils","Normal count"],fb:"Marrow suppression → leukopenia → too few immune cells → recurrent infection."}
+];
+var ci=0, cScore=0, cAnswered=0;
+function loadCase(){
+  var c=cases[ci];
+  document.getElementById('caseText').textContent=c.t;
+  var box=document.getElementById('diffOpts'); box.innerHTML='';
+  c.opts.forEach(function(o){
+    var b=document.createElement('button'); b.className='opt'; b.textContent=o;
+    b.onclick=function(){ chooseDiff(b,o); };
+    box.appendChild(b);
+  });
+  document.getElementById('diffFb').className='fb';
+}
+function chooseDiff(btn,choice){
+  var c=cases[ci];
+  var opts=document.getElementById('diffOpts').getElementsByClassName('opt');
+  for(var i=0;i<opts.length;i++){ opts[i].onclick=null;
+    if(opts[i].textContent===c.a) opts[i].classList.add('correct');
+  }
+  cAnswered++;
+  if(choice===c.a){ cScore++; }
+  else { btn.classList.add('wrong'); }
+  var fb=document.getElementById('diffFb'); fb.className='fb show';
+  fb.style.background = choice===c.a ? '#E2EFE7' : '#F6E2DB';
+  fb.style.color = choice===c.a ? '#2F7D5B' : '#9E2B25';
+  fb.textContent=(choice===c.a?'Correct. ':'Not quite. ')+c.fb;
+  document.getElementById('diffScore').textContent='Score: '+cScore+' / '+cAnswered;
+}
+function nextCase(){ ci=(ci+1)%cases.length; loadCase(); }
+function resetDiff(){ ci=0; cScore=0; cAnswered=0; document.getElementById('diffScore').textContent='Score: 0 / 0'; loadCase(); }
+
+/* ---- Build a Red Cell ---- */
+var correctOrder=[
+  {k:"Hemocytoblast", d:"Hematopoietic stem cell"},
+  {k:"Proerythroblast", d:"Commits to the red line"},
+  {k:"Ribosome-synthesis phase", d:"Builds protein machinery"},
+  {k:"Hemoglobin accumulation", d:"Fills with hemoglobin"},
+  {k:"Reticulocyte", d:"Ejects nucleus, enters blood"},
+  {k:"Erythrocyte", d:"Mature circulating red cell"}
+];
+var order=[];
+function renderSteps(){
+  var list=document.getElementById('stepList'); list.innerHTML='';
+  order.forEach(function(st,idx){
+    var d=document.createElement('div'); d.className='step';
+    d.innerHTML='<span><b>'+st.k+'</b> — '+st.d+'</span>';
+    var ctr=document.createElement('span');
+    var up=document.createElement('button'); up.className='badge'; up.textContent='▲'; up.style.cursor='pointer'; up.style.marginRight='6px'; up.onclick=function(){ moveStep(idx,-1); };
+    var dn=document.createElement('button'); dn.className='badge'; dn.textContent='▼'; dn.style.cursor='pointer'; dn.onclick=function(){ moveStep(idx,1); };
+    ctr.appendChild(up); ctr.appendChild(dn);
+    d.appendChild(ctr); list.appendChild(d);
+  });
+}
+function moveStep(i,dir){
+  var j=i+dir; if(j<0||j>=order.length) return;
+  var tmp=order[i]; order[i]=order[j]; order[j]=tmp; renderSteps();
+  document.getElementById('buildFb').className='fb';
+}
+function shuffleSteps(){
+  order=correctOrder.slice();
+  for(var i=order.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=order[i]; order[i]=order[j]; order[j]=t; }
+  renderSteps(); document.getElementById('buildFb').className='fb';
+}
+function checkOrder(){
+  var ok=order.every(function(st,i){ return st.k===correctOrder[i].k; });
+  var fb=document.getElementById('buildFb'); fb.className='fb show';
+  if(ok){ fb.style.background='#E2EFE7'; fb.style.color='#2F7D5B';
+    fb.textContent='Correct! Stem cell → commit → build ribosomes → fill with hemoglobin → eject nucleus (reticulocyte) → mature erythrocyte. ~2 million made every second.'; }
+  else { fb.style.background='#F6E2DB'; fb.style.color='#9E2B25';
+    fb.textContent='Not yet. Remember the logic: commit first, build the machinery, fill with hemoglobin, THEN eject the nucleus. The nucleus leaves near the end.'; }
+}
+
+/* init */
+updateTube();
+loadCase();
+shuffleSteps();
+</script>
+</body>
+</html>

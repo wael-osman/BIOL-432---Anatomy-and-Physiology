@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Kidney — Interactive Lab · BIOL 432</title>
+<style>
+  :root{
+    --ink:#12363D; --teal:#0E7C86; --tealDk:#0A5A62; --tealXd:#083F46;
+    --sea:#3FA99C; --coral:#E4664F; --coralDk:#C24A36; --gold:#E1A23B;
+    --muted:#5E7175; --tint:#E9F3F4; --tint2:#FBEDE8; --tintGold:#FBF2DF;
+    --line:#CFE0E1; --paper:#FFFFFF;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:"Segoe UI",Calibri,system-ui,sans-serif; color:var(--ink);
+    background:linear-gradient(160deg,#F4FAFA,#E9F3F4); line-height:1.5; }
+  .wrap{ max-width:1080px; margin:0 auto; padding:0 20px 60px; }
+  header.hero{ background:var(--tealXd); color:#fff; padding:34px 0 30px; }
+  .hero .wrap{ padding-bottom:0; }
+  .eyebrow{ font-size:12px; letter-spacing:.22em; font-weight:700; color:#9FD0CC; text-transform:uppercase; }
+  .hero h1{ font-family:Cambria,Georgia,serif; font-size:38px; margin:8px 0 6px; }
+  .hero p{ margin:0; color:#D7EBEA; font-size:16px; max-width:680px; }
+  .pill{ display:inline-block; background:var(--coral); color:#fff; font-size:11px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; border-radius:20px; margin-bottom:12px; }
+  nav.tabs{ display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 22px; }
+  .tab{ border:1px solid var(--line); background:#fff; color:var(--tealDk); font-weight:600; font-size:14px;
+    padding:11px 18px; border-radius:10px; cursor:pointer; transition:all .16s; font-family:inherit; }
+  .tab:hover{ border-color:var(--teal); }
+  .tab.active{ background:var(--teal); color:#fff; border-color:var(--teal); box-shadow:0 4px 14px rgba(14,124,134,.28); }
+  .panel{ display:none; animation:fade .28s ease; }
+  .panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:18px;
+    box-shadow:0 6px 20px rgba(18,54,61,.06); }
+  .card h2{ font-family:Cambria,Georgia,serif; margin:0 0 6px; font-size:23px; color:var(--tealXd); }
+  .lead{ color:var(--muted); font-size:14.5px; margin:0 0 18px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+  @media(max-width:760px){ .grid2{ grid-template-columns:1fr; } .hero h1{font-size:30px;} }
+  label.ctl{ display:block; font-weight:700; font-size:13.5px; margin:16px 0 4px; }
+  label.ctl span{ float:right; font-weight:700; color:var(--teal); font-variant-numeric:tabular-nums; }
+  input[type=range]{ width:100%; accent-color:var(--teal); height:6px; }
+  .readout{ background:var(--tealXd); color:#fff; border-radius:14px; padding:20px; text-align:center; }
+  .readout .big{ font-family:Cambria,serif; font-size:52px; font-weight:700; line-height:1; }
+  .readout .unit{ color:#BFDBDA; font-size:14px; margin-top:4px; }
+  .status{ margin-top:14px; padding:11px 14px; border-radius:10px; font-weight:700; font-size:14px; }
+  .status.ok{ background:rgba(63,169,156,.22); color:#EAF6F5; }
+  .status.warn{ background:rgba(228,102,79,.28); color:#fff; }
+  .eq{ font-family:Consolas,monospace; font-size:15px; background:var(--tint); border-radius:10px; padding:14px 16px; color:var(--ink); }
+  .eq b{ color:var(--coralDk); }
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 4px; }
+  .preset{ border:1px solid var(--line); background:var(--tint); color:var(--tealDk); font-weight:600; font-size:12.5px;
+    padding:8px 13px; border-radius:20px; cursor:pointer; font-family:inherit; }
+  .preset:hover{ background:var(--teal); color:#fff; border-color:var(--teal); }
+  .explain{ background:var(--tint); border-left:5px solid var(--teal); border-radius:0 10px 10px 0; padding:14px 16px; font-size:14px; margin-top:14px; }
+  .explain.coral{ background:var(--tint2); border-left-color:var(--coral); }
+  /* glomerulus svg */
+  svg{ display:block; margin:0 auto; max-width:100%; }
+  /* tubule tour */
+  .seglist{ display:flex; flex-direction:column; gap:9px; }
+  .seg{ display:flex; align-items:center; gap:12px; border:1px solid var(--line); background:#fff; border-radius:12px;
+    padding:13px 16px; cursor:pointer; transition:all .15s; font-family:inherit; text-align:left; width:100%; }
+  .seg:hover{ border-color:var(--teal); transform:translateX(3px); }
+  .seg.active{ background:var(--teal); border-color:var(--teal); }
+  .seg.active .segname,.seg.active .segsub{ color:#fff; }
+  .segdot{ width:34px; height:34px; border-radius:50%; flex:0 0 34px; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-family:Cambria,serif; }
+  .segname{ font-weight:700; font-size:15px; color:var(--ink); }
+  .segsub{ font-size:12px; color:var(--muted); }
+  .segdetail{ background:var(--tint); border-radius:14px; padding:20px; min-height:230px; }
+  .segdetail h3{ font-family:Cambria,serif; margin:0 0 4px; color:var(--tealXd); font-size:20px; }
+  .segdetail .tag{ display:inline-block; background:var(--teal); color:#fff; font-size:11px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; padding:4px 10px; border-radius:16px; margin-bottom:12px; }
+  .rowlbl{ font-weight:700; color:var(--coralDk); font-size:13px; margin:12px 0 3px; }
+  /* detective */
+  .qbox{ background:var(--tint); border-radius:14px; padding:20px; }
+  .mech{ font-size:15px; margin:0 0 16px; }
+  .mech b{ color:var(--tealDk); }
+  .opts{ display:grid; gap:10px; }
+  .opt{ border:1px solid var(--line); background:#fff; border-radius:11px; padding:13px 16px; cursor:pointer; font-size:14px;
+    font-family:inherit; text-align:left; transition:all .14s; }
+  .opt:hover{ border-color:var(--teal); }
+  .opt.correct{ background:rgba(63,169,156,.18); border-color:var(--sea); font-weight:600; }
+  .opt.wrong{ background:var(--tint2); border-color:var(--coral); }
+  .opt.reveal-correct{ border-color:var(--sea); }
+  .scorebar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .score{ font-weight:700; color:var(--teal); font-size:15px; }
+  .fb{ margin-top:14px; font-size:14px; padding:12px 15px; border-radius:10px; min-height:20px; }
+  .fb.good{ background:rgba(63,169,156,.18); color:var(--tealDk); }
+  .fb.bad{ background:var(--tint2); color:var(--coralDk); }
+  .nextbtn{ margin-top:16px; background:var(--teal); color:#fff; border:none; border-radius:10px; padding:11px 22px;
+    font-weight:700; font-size:14px; cursor:pointer; font-family:inherit; }
+  .nextbtn:hover{ background:var(--tealDk); }
+  footer{ text-align:center; color:var(--muted); font-size:12.5px; margin-top:30px; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">BIOL 432 · Human Anatomy &amp; Physiology</div>
+    <span class="pill">Week 15 · Interactive Lab</span>
+    <h1>The Kidney — Interactive Lab</h1>
+    <p>Four hands-on models for the capstone lecture: tune the glomerulus, regulate GFR, tour the nephron, and diagnose what goes wrong.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs">
+    <button class="tab active" data-tab="nfp">① Glomerulus &amp; NFP</button>
+    <button class="tab" data-tab="gfr">② GFR Regulator</button>
+    <button class="tab" data-tab="tubule">③ Nephron Tour</button>
+    <button class="tab" data-tab="detective">④ Clinical Detective</button>
+  </nav>
+
+  <!-- ========== TAB 1: NFP ========== -->
+  <section class="panel active" data-panel="nfp">
+    <div class="card">
+      <h2>Net Filtration Pressure Lab</h2>
+      <p class="lead">Filtration is a tug-of-war: one outward force pushes filtrate out, two inward forces hold it back. Move the sliders and watch NFP — and whether the glomerulus is filtering at all.</p>
+      <div class="grid2">
+        <div>
+          <label class="ctl">Glomerular hydrostatic pressure — HP<sub>gc</sub> <span id="hpgcV">55</span></label>
+          <input type="range" id="hpgc" min="20" max="75" value="55">
+          <label class="ctl">Capsular hydrostatic pressure — HP<sub>cs</sub> <span id="hpcsV">15</span></label>
+          <input type="range" id="hpcs" min="0" max="40" value="15">
+          <label class="ctl">Colloid osmotic pressure — OP<sub>gc</sub> <span id="opgcV">30</span></label>
+          <input type="range" id="opgc" min="10" max="45" value="30">
+          <div class="presets">
+            <button class="preset" data-nfp="normal">Normal</button>
+            <button class="preset" data-nfp="obstruct">Ureter obstruction</button>
+            <button class="preset" data-nfp="hypoprotein">Low plasma protein</button>
+            <button class="preset" data-nfp="shock">Hypotensive shock</button>
+          </div>
+          <div class="eq">NFP = HP<sub>gc</sub> − (HP<sub>cs</sub> + OP<sub>gc</sub>)<br>= <b id="eqLine">55 − (15 + 30) = 10 mmHg</b></div>
+        </div>
+        <div>
+          <svg id="glomSvg" viewBox="0 0 300 260" width="300" height="260" aria-label="glomerulus schematic">
+            <ellipse cx="150" cy="130" rx="95" ry="82" fill="#FBF6E6" stroke="#E1A23B" stroke-width="2"/>
+            <ellipse id="tuft" cx="150" cy="128" rx="58" ry="46" fill="#E4664F"/>
+            <rect x="10" y="150" width="60" height="18" rx="4" fill="#E4664F"/>
+            <text x="40" y="184" font-size="9" fill="#5E7175" text-anchor="middle">afferent</text>
+            <rect x="240" y="96" width="52" height="11" rx="3" fill="#C24A36"/>
+            <text x="266" y="90" font-size="9" fill="#C24A36" text-anchor="middle">efferent</text>
+            <polygon id="arrOut" points="120,120 178,120 178,112 196,128 178,144 178,136 120,136" fill="#2F3C7E"/>
+            <polygon id="arrIn1" points="180,146 128,146 128,140 112,153 128,166 128,160 180,160" fill="#8E44AD"/>
+            <text x="150" y="245" font-size="10" fill="#5E7175" text-anchor="middle">outward (blue) vs inward (purple)</text>
+          </svg>
+          <div class="readout">
+            <div class="big" id="nfpBig">10</div>
+            <div class="unit">mmHg net filtration pressure</div>
+            <div class="status ok" id="nfpStatus">Filtering — ~125 mL/min</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TAB 2: GFR REGULATOR ========== -->
+  <section class="panel" data-panel="gfr">
+    <div class="card">
+      <h2>GFR Regulator — the two arterioles</h2>
+      <p class="lead">GFR is set by glomerular pressure, and pressure is set by the balance of the two arterioles. Constricting the <b>afferent</b> lowers pressure; constricting the <b>efferent</b> raises it. Try the presets to see how the body defends GFR — or trades it away.</p>
+      <div class="grid2">
+        <div>
+          <label class="ctl">Afferent arteriole <span id="affV">normal</span></label>
+          <input type="range" id="aff" min="-3" max="3" value="0">
+          <label class="ctl">Efferent arteriole <span id="effV">normal</span></label>
+          <input type="range" id="eff" min="-3" max="3" value="0">
+          <div class="presets">
+            <button class="preset" data-gfr="rest">Rest</button>
+            <button class="preset" data-gfr="myogenic">High BP (myogenic)</button>
+            <button class="preset" data-gfr="haemorrhage">Haemorrhage (sympathetic)</button>
+            <button class="preset" data-gfr="angii">Angiotensin II</button>
+            <button class="preset" data-gfr="acei">ACE inhibitor</button>
+          </div>
+        </div>
+        <div>
+          <div class="readout">
+            <div class="big" id="gfrBig">100%</div>
+            <div class="unit">relative GFR</div>
+            <div class="status ok" id="gfrStatus">Normal filtration</div>
+          </div>
+          <div class="explain" id="gfrExplain">At rest both arterioles are relaxed; GFR sits at its baseline ~125 mL/min.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TAB 3: NEPHRON TOUR ========== -->
+  <section class="panel" data-panel="tubule">
+    <div class="card">
+      <h2>Nephron Tour — follow the filtrate</h2>
+      <p class="lead">Click each segment to see what it does to the filtrate as it flows toward urine.</p>
+      <div class="grid2">
+        <div class="seglist" id="seglist"></div>
+        <div class="segdetail" id="segdetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TAB 4: DETECTIVE ========== -->
+  <section class="panel" data-panel="detective">
+    <div class="card">
+      <h2>Clinical Detective</h2>
+      <p class="lead">Each case gives you the mechanism. Pick the consequence that follows from the physiology.</p>
+      <div class="scorebar">
+        <div class="score" id="score">Score: 0 / 0</div>
+        <div class="score" id="qcount"></div>
+      </div>
+      <div class="qbox">
+        <p class="mech" id="mech"></p>
+        <div class="opts" id="opts"></div>
+        <div class="fb" id="fb"></div>
+        <button class="nextbtn" id="nextBtn" style="display:none;">Next case →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>BIOL 432 · The Kidney · Interactive Lab — Dr. Wael M. Osman, Khalifa University</footer>
+</div>
+
+<script>
+// ---------- tabs ----------
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+    document.querySelectorAll(".panel").forEach(function(x){ x.classList.remove("active"); });
+    t.classList.add("active");
+    document.querySelector('[data-panel="' + t.getAttribute("data-tab") + '"]').classList.add("active");
+  });
+});
+
+// ---------- TAB 1: NFP ----------
+var hpgc = document.getElementById("hpgc");
+var hpcs = document.getElementById("hpcs");
+var opgc = document.getElementById("opgc");
+function updNFP(){
+  var g = +hpgc.value, c = +hpcs.value, o = +opgc.value;
+  var nfp = g - (c + o);
+  document.getElementById("hpgcV").textContent = g;
+  document.getElementById("hpcsV").textContent = c;
+  document.getElementById("opgcV").textContent = o;
+  document.getElementById("eqLine").textContent = g + " − (" + c + " + " + o + ") = " + nfp + " mmHg";
+  document.getElementById("nfpBig").textContent = nfp;
+  var st = document.getElementById("nfpStatus");
+  var tuft = document.getElementById("tuft");
+  if(nfp <= 0){
+    st.className = "status warn";
+    st.textContent = "Filtration has STOPPED (NFP ≤ 0)";
+    tuft.setAttribute("fill", "#9AA6A6");
+  } else if(nfp < 6){
+    st.className = "status warn";
+    st.textContent = "Filtration impaired — GFR falling";
+    tuft.setAttribute("fill", "#D98C6A");
+  } else {
+    st.className = "status ok";
+    st.textContent = "Filtering — ~125 mL/min";
+    tuft.setAttribute("fill", "#E4664F");
+  }
+  // scale outward arrow with HPgc
+  var w = 30 + (g - 20) * 1.5;
+  document.getElementById("arrOut").setAttribute("points",
+    "120,120 " + (120+w) + ",120 " + (120+w) + ",112 " + (138+w) + ",128 " + (120+w) + ",144 " + (120+w) + ",136 120,136");
+}
+[hpgc,hpcs,opgc].forEach(function(s){ s.addEventListener("input", updNFP); });
+var nfpPresets = {
+  normal:[55,15,30], obstruct:[55,32,30], hypoprotein:[55,15,16], shock:[32,15,30]
+};
+document.querySelectorAll("[data-nfp]").forEach(function(b){
+  b.addEventListener("click", function(){
+    var p = nfpPresets[b.getAttribute("data-nfp")];
+    hpgc.value=p[0]; hpcs.value=p[1]; opgc.value=p[2]; updNFP();
+  });
+});
+updNFP();
+
+// ---------- TAB 2: GFR ----------
+var aff = document.getElementById("aff");
+var eff = document.getElementById("eff");
+var toneWord = function(v){ return v<0 ? "constricted" : v>0 ? "dilated" : "normal"; };
+function updGFR(){
+  var a = +aff.value, e = +eff.value;
+  // slider: negative = constricted, positive = dilated (see toneWord)
+  // afferent dilation raises GFR (+a); efferent dilation lowers GFR (−e)
+  var gfr = 100 + a*22 - e*18;
+  if(gfr < 0) gfr = 0;
+  gfr = Math.round(gfr);
+  document.getElementById("affV").textContent = toneWord(a) + (a?" ("+(a>0?"+":"")+a+")":"");
+  document.getElementById("effV").textContent = toneWord(e) + (e?" ("+(e>0?"+":"")+e+")":"");
+  document.getElementById("gfrBig").textContent = gfr + "%";
+  var st = document.getElementById("gfrStatus");
+  if(gfr < 45){ st.className="status warn"; st.textContent="GFR low — risk of oliguria / AKI"; }
+  else if(gfr > 145){ st.className="status warn"; st.textContent="GFR high — hyperfiltration"; }
+  else { st.className="status ok"; st.textContent="GFR within functional range"; }
+}
+[aff,eff].forEach(function(s){ s.addEventListener("input", updGFR); });
+var gfrPresets = {
+  rest:[0,0,"At rest both arterioles are relaxed; GFR sits at its baseline ~125 mL/min."],
+  myogenic:[-1,0,"Rising systemic BP stretches the afferent arteriole, which constricts automatically (myogenic response). Shown in isolation the constriction trims GFR — but in the body it exactly offsets the higher inflow pressure of high BP, so the net GFR stays near normal. That cancelling act IS autoregulation."],
+  haemorrhage:[-3,0,"Severe haemorrhage triggers strong sympathetic afferent constriction. GFR and urine output fall sharply (oliguria) — the body sacrifices filtration to preserve circulating volume and blood pressure."],
+  angii:[0,-1,"Angiotensin II preferentially constricts the EFFERENT arteriole. This raises glomerular hydrostatic pressure and defends GFR even when overall renal blood flow is low — the kidney protecting its own filtration."],
+  acei:[0,2,"An ACE inhibitor blocks Angiotensin II, so the efferent arteriole dilates. Glomerular pressure and GFR fall. Usually protective long-term — but dangerous in bilateral renal artery stenosis, where efferent tone was the only thing holding GFR up."]
+};
+document.querySelectorAll("[data-gfr]").forEach(function(b){
+  b.addEventListener("click", function(){
+    var p = gfrPresets[b.getAttribute("data-gfr")];
+    aff.value=p[0]; eff.value=p[1]; updGFR();
+    var ex = document.getElementById("gfrExplain");
+    ex.textContent = p[2];
+    ex.className = (b.getAttribute("data-gfr")==="acei"||b.getAttribute("data-gfr")==="haemorrhage") ? "explain coral" : "explain";
+  });
+});
+updGFR();
+
+// ---------- TAB 3: NEPHRON TOUR ----------
+var segments = [
+  { name:"Renal corpuscle", sub:"Filtration begins", color:"#E4664F", tag:"Glomerular filtration",
+    what:"Plasma is filtered across the three-layer membrane into Bowman’s capsule, producing a cell- and protein-free filtrate at ~125 mL/min.",
+    rows:[["Produces","Filtrate = plasma minus proteins"],["Driven by","NFP ≈ 10 mmHg"],["Key cells","Podocytes form the filtration slits"]] },
+  { name:"Proximal tubule (PCT)", sub:"Bulk reclaim", color:"#0E7C86", tag:"Reabsorption 65%",
+    what:"The workhorse: about 65% of the filtrate is reabsorbed here — Na⁺, water, glucose, amino acids and HCO₃⁻ all return to the blood.",
+    rows:[["Reabsorbs","Na⁺, water, glucose, amino acids, HCO₃⁻"],["Glucose via","SGLT2 — saturates at ~180 mg/dL"],["Clinical","Above threshold → glucosuria in diabetes"]] },
+  { name:"Loop of Henle", sub:"The concentrator", color:"#3FA99C", tag:"Osmotic gradient",
+    what:"Builds the medullary gradient. The descending limb is permeable to water only; the ascending limb pumps out Na⁺/K⁺/Cl⁻ — together creating 300 → 1200 mOsm/kg.",
+    rows:[["Descending limb","Water leaves — filtrate concentrates"],["Ascending limb","Pumps out salt — impermeable to water"],["Result","Medullary gradient for concentrating urine"]] },
+  { name:"Distal tubule (DCT)", sub:"Fine tuning", color:"#0A5A62", tag:"Hormone control",
+    what:"Selective, hormone-regulated adjustment. Aldosterone drives Na⁺ reabsorption and K⁺ secretion; PTH boosts Ca²⁺ reabsorption; H⁺ and NH₄⁺ are secreted for acid–base balance.",
+    rows:[["Aldosterone","↑ Na⁺ in, ↑ K⁺ out"],["PTH","↑ Ca²⁺ reabsorption"],["Secretes","H⁺, NH₄⁺ for pH control"]] },
+  { name:"Collecting duct", sub:"Final say", color:"#E1A23B", tag:"Water balance",
+    what:"Sets the final urine concentration. ADH inserts aquaporin-2 channels so water is reabsorbed; with no ADH the urine stays dilute. Aldosterone continues Na⁺/K⁺ handling here.",
+    rows:[["ADH present","AQP2 inserted → water reabsorbed → concentrated urine"],["No ADH","Dilute urine (up to >10 L/day in diabetes insipidus)"],["Output","Final urine — <1% of the original filtrate"]] }
+];
+var seglist = document.getElementById("seglist");
+segments.forEach(function(sg, i){
+  var b = document.createElement("button");
+  b.className = "seg" + (i===0?" active":"");
+  b.innerHTML = '<span class="segdot" style="background:'+sg.color+'">'+(i+1)+'</span>'+
+    '<span><span class="segname">'+sg.name+'</span><br><span class="segsub">'+sg.sub+'</span></span>';
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".seg").forEach(function(x){ x.classList.remove("active"); });
+    b.classList.add("active");
+    showSeg(i);
+  });
+  seglist.appendChild(b);
+});
+function showSeg(i){
+  var sg = segments[i];
+  var rows = sg.rows.map(function(r){ return '<div class="rowlbl">'+r[0]+'</div><div>'+r[1]+'</div>'; }).join("");
+  document.getElementById("segdetail").innerHTML =
+    '<span class="tag" style="background:'+sg.color+'">'+sg.tag+'</span>'+
+    '<h3>'+sg.name+'</h3><p style="margin:0 0 6px;font-size:14px;">'+sg.what+'</p>'+rows;
+}
+showSeg(0);
+
+// ---------- TAB 4: DETECTIVE ----------
+var cases = [
+  { mech:"Chronic kidney disease destroys the peritubular fibroblasts that normally sense hypoxia.",
+    opts:["Too little erythropoietin → anaemia","Too little renin → low blood pressure","Excess calcitriol → high calcium"], correct:0,
+    good:"Right — those fibroblasts make EPO. Without it, red-cell production falls and the patient becomes anaemic, tired and pale." },
+  { mech:"A diabetic patient’s plasma glucose is chronically above 180 mg/dL.",
+    opts:["Glucose fully reabsorbed, none in urine","SGLT2 saturates → glucose spills into urine","Kidney stops filtering glucose"], correct:1,
+    good:"Correct — SGLT2 transporters saturate at their transport maximum (~180 mg/dL). Filtered glucose beyond that capacity appears in the urine." },
+  { mech:"A patient with bilateral renal artery stenosis is started on an ACE inhibitor.",
+    opts:["Efferent constricts → GFR rises","Efferent dilates → GFR falls → AKI","No effect on the glomerulus"], correct:1,
+    good:"Exactly — Angiotensin II was holding GFR up via efferent constriction. Blocking it dilates the efferent, HP_gc drops, and GFR can fall into acute kidney injury." },
+  { mech:"A pituitary problem means no ADH reaches the collecting duct.",
+    opts:["Concentrated urine, low volume","No AQP2 inserted → massive dilute urine","Excess Na⁺ reabsorption"], correct:1,
+    good:"Right — without ADH there is no aquaporin-2 in the collecting duct, so water cannot be reabsorbed: diabetes insipidus, with >10 L of dilute urine per day." },
+  { mech:"Long-standing CKD leaves the kidney unable to excrete H⁺ or regenerate HCO₃⁻.",
+    opts:["Metabolic acidosis; lungs hyperventilate","Metabolic alkalosis","No change in blood pH"], correct:0,
+    good:"Correct — acid accumulates and bicarbonate is not regenerated, so blood pH falls (metabolic acidosis). The lungs compensate by blowing off CO₂." },
+  { mech:"A stroke destroys the cortical pathways that normally inhibit the pontine micturition centre.",
+    opts:["Urinary retention — cannot void","Urge incontinence — involuntary voiding","No effect on bladder control"], correct:1,
+    good:"Right — the reflex arc still fires when the bladder fills, but the cortex can no longer veto it, so voiding happens involuntarily and without warning." }
+];
+var ci = 0, correct = 0, answered = 0;
+function loadCase(){
+  var c = cases[ci];
+  document.getElementById("mech").innerHTML = "<b>Mechanism:</b> " + c.mech;
+  document.getElementById("qcount").textContent = "Case " + (ci+1) + " / " + cases.length;
+  document.getElementById("fb").textContent = "";
+  document.getElementById("fb").className = "fb";
+  document.getElementById("nextBtn").style.display = "none";
+  var box = document.getElementById("opts");
+  box.innerHTML = "";
+  c.opts.forEach(function(txt, idx){
+    var b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = txt;
+    b.addEventListener("click", function(){ pick(idx, b); });
+    box.appendChild(b);
+  });
+}
+function pick(idx, btn){
+  var c = cases[ci];
+  var buttons = document.querySelectorAll("#opts .opt");
+  if(document.getElementById("nextBtn").style.display === "block") return; // already answered
+  answered++;
+  buttons.forEach(function(b, i){
+    b.style.pointerEvents = "none";
+    if(i === c.correct) b.classList.add("reveal-correct");
+  });
+  var fb = document.getElementById("fb");
+  if(idx === c.correct){
+    btn.classList.add("correct"); correct++;
+    fb.className = "fb good"; fb.textContent = "✓ " + c.good;
+  } else {
+    btn.classList.add("wrong");
+    buttons[c.correct].classList.add("correct");
+    fb.className = "fb bad"; fb.textContent = "Not quite. " + c.good;
+  }
+  document.getElementById("score").textContent = "Score: " + correct + " / " + answered;
+  document.getElementById("nextBtn").style.display = ci < cases.length-1 ? "block" : "none";
+  if(ci === cases.length-1){
+    fb.textContent += "  —  Final score: " + correct + " / " + cases.length + ". End of the case set.";
+  }
+}
+document.getElementById("nextBtn").addEventListener("click", function(){
+  if(ci < cases.length-1){ ci++; loadCase(); }
+});
+loadCase();
+</script>
+</body>
+</html>

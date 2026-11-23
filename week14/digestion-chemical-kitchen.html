@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digestive System 2 — The Chemical Kitchen · BIOL 432</title>
+<style>
+  :root{
+    --ink:#14323B; --teald:#0A4F5C; --teal:#0E7C8B; --seafoam:#12A594; --mint:#6FD3C2;
+    --mintlt:#CDEDE7; --coral:#EF6A50; --coraldk:#C24A34; --corallt:#FCE6E0;
+    --paper:#FFFFFF; --mist:#F1F8F8; --panel:#F7FBFB; --line:#CBE2E2; --mute:#5E777D; --gold:#E8A93B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 80% -10%,#e7f4f4 0%,var(--mist) 55%);min-height:100vh;line-height:1.5}
+  .wrap{max-width:1060px;margin:0 auto;padding:26px 20px 60px}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+  .badge{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--teal),var(--seafoam));
+    display:grid;place-items:center;font-size:26px;box-shadow:0 6px 18px rgba(14,124,139,.28)}
+  .eyebrow{font-size:12px;letter-spacing:2.5px;font-weight:700;color:var(--seafoam);text-transform:uppercase}
+  h1{font-family:Georgia,Cambria,serif;font-size:28px;color:var(--teald);line-height:1.15}
+  .sub{color:var(--mute);font-size:14.5px;margin:8px 0 20px;max-width:760px}
+  /* tabs */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{border:1px solid var(--line);background:var(--paper);color:var(--teald);font-weight:600;font-size:14px;
+    padding:10px 16px;border-radius:11px;cursor:pointer;transition:.18s;display:flex;align-items:center;gap:8px}
+  .tab:hover{border-color:var(--seafoam);transform:translateY(-1px)}
+  .tab.active{background:var(--teald);color:#fff;border-color:var(--teald);box-shadow:0 6px 16px rgba(10,79,92,.25)}
+  .tab .n{width:22px;height:22px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:12px;
+    display:grid;place-items:center;font-weight:700}
+  .tab.active .n{background:var(--mint);color:var(--teald)}
+  .panel{display:none;animation:fade .3s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:0 8px 24px rgba(20,50,59,.06)}
+  h2{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:4px}
+  .lead{color:var(--mute);font-size:14px;margin-bottom:16px}
+  /* journey */
+  .journey{display:grid;grid-template-columns:230px 1fr;gap:20px}
+  @media(max-width:720px){.journey{grid-template-columns:1fr}}
+  .rail{display:flex;flex-direction:column;gap:0;position:relative}
+  .station{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;
+    border:1px solid transparent;transition:.16s}
+  .station:hover{background:var(--mist)}
+  .station.on{background:var(--mist);border-color:var(--line)}
+  .dot{width:34px;height:34px;border-radius:50%;background:var(--paper);border:2px solid var(--teal);
+    display:grid;place-items:center;font-size:16px;flex:none;transition:.16s}
+  .station.on .dot{background:var(--teal);color:#fff;border-color:var(--teal);transform:scale(1.06)}
+  .station .lbl{font-weight:700;font-size:14.5px;color:var(--teald)}
+  .rail::before{content:"";position:absolute;left:29px;top:34px;bottom:34px;width:2px;background:var(--line);z-index:0}
+  .station,.dot{position:relative;z-index:1}
+  .detail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;min-height:250px}
+  .detail h3{font-family:Georgia,Cambria,serif;color:var(--teald);font-size:20px;margin-bottom:6px}
+  .detail .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--seafoam);background:var(--mintlt);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+  .detail ul{list-style:none;margin-top:8px}
+  .detail li{padding:7px 0 7px 26px;position:relative;font-size:14.5px}
+  .detail li::before{content:"●";position:absolute;left:0;color:var(--seafoam);font-size:11px;top:9px}
+  .clin{margin-top:14px;background:var(--corallt);border-left:5px solid var(--coral);border-radius:0 10px 10px 0;
+    padding:12px 14px;font-size:13.5px;color:#7A3C2E}
+  .clin b{color:var(--coraldk)}
+  /* layer builder */
+  .lb-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px}
+  @media(max-width:720px){.lb-wrap{grid-template-columns:1fr}}
+  .pool{display:flex;flex-direction:column;gap:10px}
+  .chipbtn{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:13px 15px;text-align:left;
+    cursor:pointer;font-size:14.5px;font-weight:600;color:var(--teald);transition:.15s;display:flex;justify-content:space-between;align-items:center}
+  .chipbtn:hover:not(:disabled){border-color:var(--seafoam);transform:translateX(3px)}
+  .chipbtn:disabled{opacity:.4;cursor:default}
+  .chipbtn .mini{font-size:12px;color:var(--mute);font-weight:500}
+  .slots{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .slots .hd{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mute);font-weight:700;margin-bottom:4px}
+  .slot{border:1.5px dashed var(--line);border-radius:10px;padding:11px 12px;margin-top:9px;min-height:44px;
+    display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);transition:.15s}
+  .slot .idx{width:20px;height:20px;border-radius:50%;background:var(--mintlt);color:var(--teald);font-size:11px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .slot.filled{border-style:solid;color:var(--teald);font-weight:600;background:var(--paper)}
+  .slot.ok{border-color:var(--seafoam);background:#eafaf6}
+  .slot.bad{border-color:var(--coral);background:var(--corallt)}
+  /* sequencer */
+  .seq{display:grid;grid-template-columns:1fr 320px;gap:20px}
+  @media(max-width:720px){.seq{grid-template-columns:1fr}}
+  .stage{background:var(--teald);border-radius:16px;padding:18px;color:#fff;min-height:280px;position:relative;overflow:hidden}
+  .stage h4{font-family:Georgia,serif;color:#fff;margin-bottom:6px}
+  .throat{position:relative;height:210px;margin-top:10px}
+  .part{position:absolute;border-radius:8px;transition:all .6s ease;font-size:11px;font-weight:700;
+    display:grid;place-items:center;text-align:center;color:#04343d}
+  #nasal{left:14%;top:6px;width:120px;height:26px;background:var(--mint)}
+  #palate{left:34%;top:36px;width:60px;height:14px;background:var(--gold);color:#3a2a00;border-radius:20px}
+  #epiglottis{left:20%;top:120px;width:52px;height:12px;background:var(--coral);color:#fff;border-radius:20px;transform-origin:left center}
+  #glottis{left:16%;top:150px;width:70px;height:22px;background:#2A6470;color:#cdeee7;font-size:10px}
+  #bolus{left:60%;top:20px;width:36px;height:36px;border-radius:50%;background:var(--seafoam);color:#04343d}
+  .caption{position:absolute;bottom:12px;left:16px;right:16px;font-size:12.5px;color:var(--mintlt);min-height:34px}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btn.primary{background:var(--seafoam);color:#fff}
+  .btn.primary:hover{background:var(--teal)}
+  .btn.ghost{background:var(--paper);color:var(--teald);border:1px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .steps{list-style:none}
+  .steps li{padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;font-size:13.5px;
+    background:var(--paper);cursor:pointer;display:flex;gap:10px;align-items:center;transition:.15s}
+  .steps li:hover:not(.used){border-color:var(--seafoam);transform:translateX(3px)}
+  .steps li.used{opacity:.4;cursor:default}
+  .steps li .order{width:22px;height:22px;border-radius:50%;background:var(--mist);color:var(--mute);font-size:12px;
+    display:grid;place-items:center;font-weight:700;flex:none}
+  .steps li.used .order{background:var(--seafoam);color:#fff}
+  /* quiz */
+  .q{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none}
+  .qtext{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--ink)}
+  .qtext .qn{color:var(--seafoam);font-family:Georgia,serif}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;
+    padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14px;transition:.13s;color:var(--ink)}
+  .opt:hover:not(.locked){border-color:var(--seafoam);background:var(--mist)}
+  .opt.correct{border-color:var(--seafoam);background:#eafaf6;font-weight:600}
+  .opt.wrong{border-color:var(--coral);background:var(--corallt)}
+  .opt.locked{cursor:default}
+  .fb{font-size:13px;margin-top:6px;padding:9px 12px;border-radius:9px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eafaf6;color:#0c6b5f}
+  .fb.bad{background:var(--corallt);color:#7A3C2E}
+  .scorebar{position:sticky;bottom:0;margin-top:18px;background:var(--teald);color:#fff;border-radius:14px;
+    padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -6px 20px rgba(10,79,92,.2)}
+  .scorebar b{font-size:22px;font-family:Georgia,serif}
+  .foot{text-align:center;color:var(--mute);font-size:12.5px;margin-top:26px}
+  .reveal{margin-top:12px}
+  .msg{font-size:13.5px;font-weight:600;margin-top:10px;min-height:20px}
+  .msg.ok{color:var(--teal)}.msg.bad{color:var(--coraldk)}
+</style></head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge">🧪</div>
+    <div>
+      <div class="eyebrow">BIOL 432 · Digestive System · Lecture 2</div>
+      <h1>The Chemical Kitchen</h1>
+    </div>
+  </header>
+  <p class="sub">Drill the stomach and the accessory powerhouses: meet the gland-cell cast, race the stomach empty, tour the liver–gallbladder–pancreas team, then test yourself. Everything runs offline — no sign-in, nothing saved.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="cells"><span class="n">1</span>Gland Cell Cast</button>
+    <button class="tab" data-tab="empty"><span class="n">2</span>Empty the Stomach</button>
+    <button class="tab" data-tab="tour"><span class="n">3</span>Accessory Tour</button>
+    <button class="tab" data-tab="quiz"><span class="n">4</span>Self-Quiz</button>
+  </div>
+
+  <!-- ===================== GLAND CELL CAST ===================== -->
+  <section class="panel active" id="cells">
+    <div class="card">
+      <h2>Meet the gastric gland cast</h2>
+      <p class="lead">Click each cell to see what it makes and why it matters.</p>
+      <div class="journey">
+        <div class="rail" id="cellRail"></div>
+        <div class="detail" id="cellDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EMPTY THE STOMACH ===================== -->
+  <section class="panel" id="empty">
+    <div class="card">
+      <h2>Race the stomach empty</h2>
+      <p class="lead">Click the three meals in order — <b>fastest-emptying first</b>. Get it right and see why the pace is controlled.</p>
+      <div class="seq">
+        <div>
+          <ul class="steps" id="mealPool"></ul>
+          <div class="msg" id="emptyMsg"></div>
+          <div class="btnrow">
+            <button class="btn ghost" id="emptyReset">Reset</button>
+          </div>
+        </div>
+        <div class="slots">
+          <div class="hd">Emptying order — fastest → slowest</div>
+          <div class="slot" id="eslot0"><span class="idx">1</span><span>fastest</span></div>
+          <div class="slot" id="eslot1"><span class="idx">2</span><span>middle</span></div>
+          <div class="slot" id="eslot2"><span class="idx">3</span><span>slowest</span></div>
+          <div class="clin reveal" id="emptyReveal" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ACCESSORY TOUR ===================== -->
+  <section class="panel" id="tour">
+    <div class="card">
+      <h2>Tour the accessory powerhouses</h2>
+      <p class="lead">Three organs never touch food but make digestion possible. Click each one.</p>
+      <div class="journey">
+        <div class="rail" id="tourRail"></div>
+        <div class="detail" id="tourDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="panel" id="quiz">
+    <div class="card">
+      <h2>Self-quiz — Lecture 2</h2>
+      <p class="lead">Six questions across the stomach, liver, gallbladder, and pancreas. Immediate feedback; your score updates below.</p>
+      <div id="quizBox"></div>
+      <div class="scorebar"><span>Score</span><b><span id="score">0</span> / 6</b></div>
+    </div>
+  </section>
+
+  <p class="foot">BIOL 432 Physiology · Dr. Wael M. Osman · Khalifa University — Digestive System, Lecture 2</p>
+</div>
+<script>
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
+    document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    document.getElementById(t.getAttribute("data-tab")).classList.add("active");
+  });
+});
+
+/* ---------- 1. gland cell cast ---------- */
+var CELLS=[
+  {k:"mucous",icon:"🛡️",name:"Mucous neck cells",tag:"Protection",
+   prod:"Acidic mucus",
+   bullets:["Sit in the neck of the gastric gland.","Secrete a thin acidic mucus that lubricates and protects the gland lining.","Part of the barrier that keeps acid off the wall."],
+   clin:"<b>Barrier logic:</b> together with the surface alkaline mucus, this keeps HCl and pepsin from digesting the stomach itself."},
+  {k:"parietal",icon:"🧂",name:"Parietal cells",tag:"Acid + B\u2081\u2082 factor",
+   prod:"HCl + intrinsic factor",
+   bullets:["Secrete hydrochloric acid \u2014 activates pepsin and kills swallowed microbes.","Secrete intrinsic factor \u2014 required for vitamin B\u2081\u2082 absorption in the ileum.","Driven hard by gastrin during the gastric phase."],
+   clin:"<b>Clinical:</b> lose these cells (autoimmune gastritis) and you lose intrinsic factor \u2192 pernicious (B\u2081\u2082-deficiency) anemia."},
+  {k:"chief",icon:"\u2702\ufe0f",name:"Chief cells",tag:"Protein digestion",
+   prod:"Pepsinogen + gastric lipase",
+   bullets:["Release pepsinogen, an inactive zymogen.","HCl converts pepsinogen \u2192 pepsin, which begins protein digestion.","Also secrete a small amount of gastric lipase."],
+   clin:"<b>Why inactive?</b> storing the enzyme as a zymogen stops it digesting the chief cell that made it \u2014 the same safety trick the pancreas uses."},
+  {k:"gcell",icon:"\ud83d\udce1",name:"Enteroendocrine (G) cells",tag:"Hormonal control",
+   prod:"Gastrin",
+   bullets:["Sense distension and peptides in the stomach.","Release gastrin into the blood \u2192 stimulates parietal cells to make HCl.","Gastrin also promotes growth of the gastric mucosa."],
+   clin:"<b>Clinical:</b> a gastrin-secreting tumour (Zollinger\u2013Ellison) floods the stomach with acid \u2192 severe, stubborn ulcers."}
+];
+(function(){
+  var rail=document.getElementById("cellRail");
+  CELLS.forEach(function(c,i){
+    var d=document.createElement("div");
+    d.className="station"+(i===0?" on":"");
+    d.innerHTML='<div class="dot">'+c.icon+'</div><div class="lbl">'+c.name+'</div>';
+    d.addEventListener("click",function(){
+      document.querySelectorAll("#cellRail .station").forEach(function(s){s.classList.remove("on");});
+      d.classList.add("on"); renderCell(c);
+    });
+    rail.appendChild(d);
+  });
+  function renderCell(c){
+    document.getElementById("cellDetail").innerHTML=
+      '<span class="tag">'+c.tag+'</span>'+
+      '<h3>'+c.icon+' '+c.name+'</h3>'+
+      '<div style="font-size:13.5px;color:var(--seafoam);font-weight:700;margin:2px 0 4px">Secretes: '+c.prod+'</div>'+
+      '<ul>'+c.bullets.map(function(b){return "<li>"+b+"</li>";}).join("")+'</ul>'+
+      '<div class="clin">'+c.clin+'</div>';
+  }
+  renderCell(CELLS[0]);
+})();
+
+/* ---------- 2. empty the stomach ---------- */
+var MEALS=[
+  {k:"carb",label:"Carbohydrate meal",mini:"toast & jam",rank:0},
+  {k:"protein",label:"Protein meal",mini:"eggs & chicken",rank:1},
+  {k:"fat",label:"Fatty meal",mini:"cream & bacon",rank:2}
+];
+var emptyPicks=[];
+(function(){
+  var pool=document.getElementById("mealPool");
+  function draw(){
+    pool.innerHTML="";
+    // shuffle-ish stable display order
+    [MEALS[2],MEALS[0],MEALS[1]].forEach(function(m){
+      var li=document.createElement("li");
+      var used=emptyPicks.indexOf(m.k)>=0;
+      li.className=used?"used":"";
+      li.innerHTML='<span class="order">'+(used?(emptyPicks.indexOf(m.k)+1):"?")+'</span><span><b>'+m.label+'</b> <span style="color:var(--mute);font-weight:500">\u2014 '+m.mini+'</span></span>';
+      if(!used) li.addEventListener("click",function(){pick(m);});
+      pool.appendChild(li);
+    });
+  }
+  function pick(m){
+    if(emptyPicks.length>=3) return;
+    emptyPicks.push(m.k);
+    var slot=document.getElementById("eslot"+(emptyPicks.length-1));
+    slot.classList.add("filled");
+    slot.innerHTML='<span class="idx">'+emptyPicks.length+'</span><span>'+m.label+'</span>';
+    draw();
+    if(emptyPicks.length===3) grade();
+  }
+  function grade(){
+    var correct=["carb","protein","fat"];
+    var ok=emptyPicks.every(function(k,i){return k===correct[i];});
+    for(var i=0;i<3;i++){
+      var slot=document.getElementById("eslot"+i);
+      slot.classList.add(emptyPicks[i]===correct[i]?"ok":"bad");
+    }
+    var msg=document.getElementById("emptyMsg");
+    msg.className="msg "+(ok?"ok":"bad");
+    msg.textContent=ok?"Correct \u2014 carbohydrate clears fastest, fat slowest.":"Not quite \u2014 the right order is carbohydrate \u2192 protein \u2192 fat.";
+    var rev=document.getElementById("emptyReveal");
+    rev.style.display="block";
+    rev.innerHTML="<b>Why the pace matters:</b> fat entering the duodenum triggers <b>CCK</b>, which slams the brakes on gastric emptying so the small intestine has time to emulsify and digest it. Carbohydrate has no such brake, so it leaves first. The pylorus meters out only 2\u20133 mL per wave \u2014 flooding the gut causes cramping and dumping.";
+  }
+  document.getElementById("emptyReset").addEventListener("click",function(){
+    emptyPicks=[];
+    for(var i=0;i<3;i++){
+      var s=document.getElementById("eslot"+i);
+      s.className="slot";
+      s.innerHTML='<span class="idx">'+(i+1)+'</span><span>'+["fastest","middle","slowest"][i]+'</span>';
+    }
+    document.getElementById("emptyMsg").textContent="";
+    document.getElementById("emptyReveal").style.display="none";
+    draw();
+  });
+  draw();
+})();
+
+/* ---------- 3. accessory tour ---------- */
+var ORGANS=[
+  {k:"liver",icon:"\ud83e\udea8",name:"Liver",tag:"Metabolic hub",
+   bullets:["Largest internal organ (~1.4\u20131.8 kg).","Dual blood supply: hepatic artery (oxygen) + portal vein (nutrients from the gut).","Makes ~900 mL bile/day; stores glycogen; makes plasma proteins; detoxifies (ammonia \u2192 urea)."],
+   clin:"<b>First-pass gatekeeper:</b> portal blood is processed here before reaching the body \u2014 so the liver screens every absorbed nutrient, drug, and toxin first."},
+  {k:"gb",icon:"\ud83d\udfe2",name:"Gallbladder",tag:"Bile reservoir",
+   bullets:["Stores and concentrates bile up to 10-fold between meals.","When fat enters the duodenum, CCK makes it contract and the sphincter of Oddi relax.","Bile then flows to the duodenum to emulsify fat."],
+   clin:"<b>Gallstones:</b> a stone in the duct \u2192 right-upper-quadrant pain worse after fatty meals, and possible obstructive jaundice."},
+  {k:"panc",icon:"\ud83e\udda0",name:"Pancreas",tag:"Two glands in one",
+   bullets:["Exocrine (~99%): acini make enzymes; duct cells add bicarbonate (secretin) \u2192 pH-8 juice neutralises chyme.","Endocrine (~1%): islets make insulin (beta) and glucagon (alpha).","Proteases secreted inactive; enteropeptidase activates trypsinogen \u2192 trypsin in the duodenum."],
+   clin:"<b>Acute pancreatitis:</b> enzymes activate early, inside the gland, and digest the pancreas itself \u2014 severe pain radiating to the back."}
+];
+(function(){
+  var rail=document.getElementById("tourRail");
+  ORGANS.forEach(function(o,i){
+    var d=document.createElement("div");
+    d.className="station"+(i===0?" on":"");
+    d.innerHTML='<div class="dot">'+o.icon+'</div><div class="lbl">'+o.name+'</div>';
+    d.addEventListener("click",function(){
+      document.querySelectorAll("#tourRail .station").forEach(function(s){s.classList.remove("on");});
+      d.classList.add("on"); renderOrgan(o);
+    });
+    rail.appendChild(d);
+  });
+  function renderOrgan(o){
+    document.getElementById("tourDetail").innerHTML=
+      '<span class="tag">'+o.tag+'</span><h3>'+o.icon+' '+o.name+'</h3>'+
+      '<ul>'+o.bullets.map(function(b){return "<li>"+b+"</li>";}).join("")+'</ul>'+
+      '<div class="clin">'+o.clin+'</div>';
+  }
+  renderOrgan(ORGANS[0]);
+})();
+
+/* ---------- 4. quiz ---------- */
+var QUIZ=[
+  {q:"Which cells secrete both HCl and intrinsic factor?",
+   opts:["Chief cells","Parietal cells","G cells","Mucous neck cells"],a:1,
+   fb:"Parietal cells make HCl (activates pepsin) and intrinsic factor (needed for B\u2081\u2082 absorption)."},
+  {q:"During which phase is most gastric secretion driven, and by which hormone?",
+   opts:["Cephalic phase \u2014 secretin","Gastric phase \u2014 gastrin","Intestinal phase \u2014 CCK","Cephalic phase \u2014 gastrin"],a:1,
+   fb:"The gastric phase supplies roughly two-thirds of secretion, driven mainly by gastrin from G cells."},
+  {q:"Why does a fatty meal leave the stomach slowest?",
+   opts:["Fat is denser than carbohydrate","Fat triggers CCK, which inhibits gastric emptying","The pylorus closes for fat only","Fat is absorbed in the stomach"],a:1,
+   fb:"Fat in the duodenum releases CCK, which slows emptying so the gut can emulsify and digest it."},
+  {q:"What does the hepatic portal vein deliver to the liver?",
+   opts:["Oxygen-rich arterial blood","Nutrient-rich blood drained from the GI tract","Bile from the gallbladder","Lymph from the intestine"],a:1,
+   fb:"The portal vein carries nutrient-rich blood from the gut for first-pass processing; the hepatic artery brings oxygen."},
+  {q:"Do bile salts chemically digest fat?",
+   opts:["Yes \u2014 they break ester bonds","No \u2014 they emulsify fat; lipase digests it","Yes \u2014 together with bilirubin","No \u2014 they only colour the bile"],a:1,
+   fb:"Bile salts emulsify (physically break up) fat to raise surface area. Chemical digestion is lipase\u2019s job."},
+  {q:"How does the pancreas avoid digesting itself?",
+   opts:["It has no proteases","Proteases are secreted inactive and activated only in the duodenum","Bicarbonate destroys the enzymes","Mucus coats the acini"],a:1,
+   fb:"Proteases are released as zymogens; enteropeptidase in the duodenum activates trypsinogen \u2192 trypsin there, not in the gland."}
+];
+(function(){
+  var box=document.getElementById("quizBox"), score=0, answered={};
+  QUIZ.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var h=document.createElement("div"); h.className="qtext";
+    h.innerHTML='<span class="qn">Q'+(qi+1)+'.</span> '+item.q; div.appendChild(h);
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered[qi]) return; answered[qi]=true;
+        var all=div.querySelectorAll(".opt");
+        all.forEach(function(x){x.classList.add("locked");});
+        if(oi===item.a){ b.classList.add("correct"); score++; document.getElementById("score").textContent=score; }
+        else { b.classList.add("wrong"); all[item.a].classList.add("correct"); }
+        var fb=div.querySelector(".fb");
+        fb.className="fb show "+(oi===item.a?"good":"bad");
+        fb.textContent=(oi===item.a?"\u2713 ":"\u2717 ")+item.fb;
+      });
+      div.appendChild(b);
+    });
+    var fb=document.createElement("div"); fb.className="fb"; div.appendChild(fb);
+    box.appendChild(div);
+  });
+})();
+</script>
+</body>
+</html>
